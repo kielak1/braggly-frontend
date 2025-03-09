@@ -1,9 +1,14 @@
 import "../styles/globals.css"; // Import Tailwind CSS
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+
+export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <LanguageSwitcher />
+        {children}
+      </body>
     </html>
   );
 }
