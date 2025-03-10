@@ -16,12 +16,15 @@ export default function Navbar() {
   const handleLogin = async () => {
     try {
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+      const originUrl = process.env.ORIGIN_URL;
+
       const response = await fetch(`${backendUrl}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          Origin: "http://localhost:4000",
+          //     Origin: "http://localhost:4000",
+          Origin: "${originUrl}",
         },
         body: JSON.stringify({ username: "admin", password: "admin" }),
         mode: "cors",
