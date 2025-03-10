@@ -7,7 +7,8 @@ export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [translations, setTranslations] = useState({ login: "Zaloguj", logout: "Wyloguj" });
+  const [errorMessage, setErrorMessage] = useState(""); // Nowy stan na błędy
+  const [translations, setTranslations] = useState({ login: "Zaloguj", logout: "Wyloguj", error: "Nieprawidłowy login lub hasło" });
 
   useEffect(() => {
     try {
@@ -41,6 +42,8 @@ export default function Navbar() {
   }, []);
 
   const handleLogin = async () => {
+    setErrorMessage(""); // Resetujemy błąd przed próbą logowania
+
     try {
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
       const originUrl = process.env.ORIGIN_URL || "";
@@ -61,7 +64,12 @@ export default function Navbar() {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        if (response.status === 401) {
+          setErrorMessage(translations.loginerror); // Ustawienie błędu dla niepoprawnych danych
+        } else {
+          setErrorMessage(`Błąd serwera: ${response.status}`);
+        }
+        return;
       }
 
       const data = await response.json();
@@ -71,8 +79,10 @@ export default function Navbar() {
 
       localStorage.setItem("token", data.token);
       setIsLoggedIn(true);
+      setErrorMessage(""); // Wyczyść błąd po poprawnym logowaniu
     } catch (error) {
       console.error("Błąd logowania:", error);
+      setErrorMessage("Wystąpił błąd podczas logowania.");
     }
   };
 
@@ -98,27 +108,32 @@ export default function Navbar() {
             {translations.logout}
           </button>
         ) : (
-          <div className="flex items-center space-x-2">
-            <input
-              type="text"
-              placeholder="Login"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="p-2 text-black rounded"
-            />
-            <input
-              type="password"
-              placeholder="Hasło"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="p-2 text-black rounded"
-            />
-            <button
-              onClick={handleLogin}
-              className="bg-blue-500 px-4 py-2 rounded"
-            >
-              {translations.login}
-            </button>
+          <div className="flex flex-col items-center space-y-2">
+            {errorMessage && (
+              <p className="text-red-500 text-sm">{errorMessage}</p>
+            )}
+            <div className="flex items-center space-x-2">
+              <input
+                type="text"
+                placeholder="Login"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="p-2 text-black rounded"
+              />
+              <input
+                type="password"
+                placeholder="Hasło"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="p-2 text-black rounded"
+              />
+              <button
+                onClick={handleLogin}
+                className="bg-blue-500 px-4 py-2 rounded"
+              >
+                {translations.login}
+              </button>
+            </div>
           </div>
         )}
       </div>
