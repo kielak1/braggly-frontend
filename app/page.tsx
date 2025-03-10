@@ -13,5 +13,5 @@ export default async function Home() {
       <h1>{translations.greeting || "Loading..."}</h1>
       <p>{translations.welcome}</p>
     </div>
-  );s
+  );
 }
