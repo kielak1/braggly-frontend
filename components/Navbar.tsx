@@ -7,35 +7,45 @@ export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("token");
-      setIsLoggedIn(!!token);
+    try {
+      if (typeof window !== "undefined") {
+        const token = localStorage.getItem("token");
+        setIsLoggedIn(!!token);
+      }
+    } catch (error) {
+      console.error("Błąd dostępu do localStorage:", error);
     }
   }, []);
 
   const handleLogin = async () => {
     try {
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-      const originUrl = process.env.ORIGIN_URL;
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
+      const originUrl = process.env.ORIGIN_URL || "";
+
+      if (!backendUrl) {
+        throw new Error("Brak zmiennej środowiskowej NEXT_PUBLIC_BACKEND_URL");
+      }
 
       const response = await fetch(`${backendUrl}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          Origin: `${originUrl}`,
+          Origin: originUrl,
         },
         body: JSON.stringify({ username: "admin", password: "admin" }),
         mode: "cors",
       });
-
-      console.log("Response:", response);
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
       const data = await response.json();
+      if (!data.token) {
+        throw new Error("Brak tokena w odpowiedzi serwera");
+      }
+
       localStorage.setItem("token", data.token);
       setIsLoggedIn(true);
     } catch (error) {
@@ -44,9 +54,13 @@ export default function Navbar() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    setIsLoggedIn(false);
-    router.push("/");
+    try {
+      localStorage.removeItem("token");
+      setIsLoggedIn(false);
+      router.push("/");
+    } catch (error) {
+      console.error("Błąd podczas wylogowywania:", error);
+    }
   };
 
   return (

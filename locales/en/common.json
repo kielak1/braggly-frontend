@@ -1,4 +1,6 @@
 {
   "greeting": "Hello",
-  "welcome": "Welcome to our website"
+  "welcome": "Welcome to our website",
+  "login": "Login",
+  "logout": "Logout"
 }
