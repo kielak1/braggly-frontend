@@ -71,7 +71,7 @@ export default function Navbar() {
 
       if (!response.ok) {
         if (response.status === 401) {
-          setErrorMessage(translations.loginerror);
+          setErrorMessage(translations.error);
         } else {
           setErrorMessage(`Błąd serwera: ${response.status}`);
         }

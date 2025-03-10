@@ -3,5 +3,5 @@
   "welcome": "Welcome to our website",
   "login": "Login",
   "logout": "Logout",
-  "loginerror": "Login error"
+  "error": "Login error"
 }
