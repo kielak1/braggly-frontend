@@ -51,7 +51,7 @@ export default function Navbar() {
 
   return (
     <nav className="bg-gray-800 text-white p-4 flex justify-between">
-      <h1 className="text-lg font-bold">React-Spring App</h1>
+      <h1 className="text-3xl font-bold text-blue-600">React-Spring App</h1>
       <div>
         {isLoggedIn ? (
           <button
