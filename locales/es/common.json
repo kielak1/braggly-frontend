@@ -1,4 +1,6 @@
 {
   "greeting": "Hola",
-  "welcome": "Bienvenido a nuestro sitio web"
+  "welcome": "Bienvenido a nuestro sitio web",
+  "login": "Iniciar sesión",
+  "logout": "Cerrar sesión"
 }

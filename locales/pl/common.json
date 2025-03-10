@@ -1,4 +1,6 @@
 {
   "greeting": "Cześć",
-  "welcome": "Witamy na naszej stronie"
+  "welcome": "Witamy na naszej stronie",
+  "login": "Zaloguj",
+  "logout": "Wyloguj"
 }
