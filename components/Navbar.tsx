@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 export default function Navbar() {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [translations, setTranslations] = useState({ login: "Zaloguj", logout: "Wyloguj" });
 
   useEffect(() => {
@@ -18,7 +20,6 @@ export default function Navbar() {
     }
   }, []);
 
-  // Pobranie tłumaczeń na podstawie `locale` z ciasteczek
   useEffect(() => {
     const locale = document.cookie
       .split("; ")
@@ -55,7 +56,7 @@ export default function Navbar() {
           Accept: "application/json",
           Origin: originUrl,
         },
-        body: JSON.stringify({ username: "admin", password: "admin" }),
+        body: JSON.stringify({ username, password }),
         mode: "cors",
       });
 
@@ -87,7 +88,7 @@ export default function Navbar() {
 
   return (
     <nav className="bg-gray-800 text-white p-4 flex justify-between">
-      <h1 className="text-3xl font-bold text-blue-600">React-Spring App</h1>
+      <h1 className="text-3xl font-bold text-blue-600">Braggly</h1>
       <div>
         {isLoggedIn ? (
           <button
@@ -97,12 +98,28 @@ export default function Navbar() {
             {translations.logout}
           </button>
         ) : (
-          <button
-            onClick={handleLogin}
-            className="bg-blue-500 px-4 py-2 rounded"
-          >
-            {translations.login}
-          </button>
+          <div className="flex items-center space-x-2">
+            <input
+              type="text"
+              placeholder="Login"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="p-2 text-black rounded"
+            />
+            <input
+              type="password"
+              placeholder="Hasło"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="p-2 text-black rounded"
+            />
+            <button
+              onClick={handleLogin}
+              className="bg-blue-500 px-4 py-2 rounded"
+            >
+              {translations.login}
+            </button>
+          </div>
         )}
       </div>
     </nav>
