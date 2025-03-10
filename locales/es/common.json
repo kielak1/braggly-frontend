@@ -3,5 +3,5 @@
   "welcome": "Bienvenido a nuestro sitio web",
   "login": "Iniciar sesión",
   "logout": "Cerrar sesión",
-  "loginerror": "Error de inicio de sesión"
+  "error": "Error de inicio de sesión"
 }
