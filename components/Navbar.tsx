@@ -23,8 +23,7 @@ export default function Navbar() {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          //     Origin: "http://localhost:4000",
-          Origin: "${originUrl}",
+          Origin: `${originUrl}`,
         },
         body: JSON.stringify({ username: "admin", password: "admin" }),
         mode: "cors",
