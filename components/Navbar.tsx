@@ -15,19 +15,17 @@ export default function Navbar() {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch(
-        "http://backend.reactspr.kielak.com:9191/api/auth/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Origin: "http://localhost:4000",
-          },
-          body: JSON.stringify({ username: "admin", password: "admin" }),
-          mode: "cors",
-        }
-      );
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+      const response = await fetch(`${backendUrl}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Origin: "http://localhost:4000",
+        },
+        body: JSON.stringify({ username: "admin", password: "admin" }),
+        mode: "cors",
+      });
 
       console.log("Response:", response);
 
