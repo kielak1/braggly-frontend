@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 export default function Navbar() {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [translations, setTranslations] = useState({ login: "Zaloguj", logout: "Wyloguj" });
 
   useEffect(() => {
     try {
@@ -15,6 +16,27 @@ export default function Navbar() {
     } catch (error) {
       console.error("Błąd dostępu do localStorage:", error);
     }
+  }, []);
+
+  // Pobranie tłumaczeń na podstawie `locale` z ciasteczek
+  useEffect(() => {
+    const locale = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("locale="))
+      ?.split("=")[1] || "en"; // Domyślnie angielski
+
+    async function fetchTranslations() {
+      try {
+        const response = await fetch(`/api/i18n?locale=${locale}`);
+        if (!response.ok) throw new Error("Błąd pobierania tłumaczeń");
+        const data = await response.json();
+        setTranslations(data);
+      } catch (error) {
+        console.error("Błąd pobierania tłumaczeń:", error);
+      }
+    }
+
+    fetchTranslations();
   }, []);
 
   const handleLogin = async () => {
@@ -72,14 +94,14 @@ export default function Navbar() {
             onClick={handleLogout}
             className="bg-red-500 px-4 py-2 rounded"
           >
-            Wyloguj
+            {translations.logout}
           </button>
         ) : (
           <button
             onClick={handleLogin}
             className="bg-blue-500 px-4 py-2 rounded"
           >
-            Zaloguj
+            {translations.login}
           </button>
         )}
       </div>
