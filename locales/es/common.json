@@ -3,5 +3,8 @@
   "welcome": "Bienvenido a nuestro sitio web",
   "login": "Iniciar sesión",
   "logout": "Cerrar sesión",
-  "error": "Error de inicio de sesión"
+  "error": "Error de inicio de sesión",
+  "loggedAs": "Conectado como",
+  "googleLogin": "Iniciar sesión con Google",
+  "googleLogout": "Cerrar sesión de Google"
 }

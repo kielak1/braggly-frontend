@@ -3,5 +3,8 @@
   "welcome": "Witamy na naszej stronie",
   "login": "Zaloguj",
   "logout": "Wyloguj",
-  "error": "Błąd logowania"
+  "error": "Błąd logowania",
+  "loggedAs": "Zalogowany jako",
+  "googleLogin": "Zaloguj przez Google",
+  "googleLogout": "Wyloguj Google"
 }

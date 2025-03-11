@@ -3,5 +3,8 @@
   "welcome": "Welcome to our website",
   "login": "Login",
   "logout": "Logout",
-  "error": "Login error"
+  "error": "Login error",
+  "loggedAs": "Logged in as",  
+  "googleLogin": "Login with Google",
+  "googleLogout": "Logout from Google"
 }
