@@ -1,10 +1,13 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import LanguageSwitcher from "@/components/LanguageSwitcher"; // Dodajemy LanguageSwitcher
+import { signIn, signOut, useSession } from "next-auth/react";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function Navbar() {
   const router = useRouter();
+  const { data: session } = useSession();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -12,6 +15,8 @@ export default function Navbar() {
   const [translations, setTranslations] = useState({
     login: "Zaloguj",
     logout: "Wyloguj",
+    googleLogin: "Zaloguj przez Google",
+    googleLogout: "Wyloguj Google",
     error: "Nieprawidłowy login lub hasło",
   });
 
@@ -104,10 +109,20 @@ export default function Navbar() {
 
   return (
     <nav className="bg-gray-800 text-white p-4 flex justify-between items-center">
-      <LanguageSwitcher /> {/* Przeniesienie LanguageSwitcher tutaj */}
+      <LanguageSwitcher />
       <h1 className="text-3xl font-bold text-blue-600">Braggly</h1>
       <div className="flex items-center space-x-4">
-        {isLoggedIn ? (
+        {session ? (
+          <>
+            <p className="text-green-400">Zalogowany jako {session.user?.name}</p>
+            <button
+              onClick={() => signOut()}
+              className="bg-red-500 px-4 py-2 rounded"
+            >
+              {translations.googleLogout}
+            </button>
+          </>
+        ) : isLoggedIn ? (
           <button
             onClick={handleLogout}
             className="bg-red-500 px-4 py-2 rounded"
@@ -138,6 +153,12 @@ export default function Navbar() {
               className="bg-blue-500 px-4 py-2 rounded"
             >
               {translations.login}
+            </button>
+            <button
+              onClick={() => signIn("google")}
+              className="bg-green-500 px-4 py-2 rounded"
+            >
+              {translations.googleLogin}
             </button>
           </div>
         )}
