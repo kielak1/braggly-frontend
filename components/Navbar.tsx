@@ -18,6 +18,7 @@ export default function Navbar() {
     googleLogin: "Zaloguj przez Google",
     googleLogout: "Wyloguj Google",
     error: "Nieprawidłowy login lub hasło",
+    loggedAs: "Zalogowany jako",
   });
 
   useEffect(() => {
@@ -114,7 +115,9 @@ export default function Navbar() {
       <div className="flex items-center space-x-4">
         {session ? (
           <>
-            <p className="text-green-400">Zalogowany jako {session.user?.name}</p>
+            <p className="text-green-400">
+              {translations.loggedAs} {session.user?.name}
+            </p>
             <button
               onClick={() => signOut()}
               className="bg-red-500 px-4 py-2 rounded"
