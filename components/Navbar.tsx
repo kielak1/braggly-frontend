@@ -1,5 +1,5 @@
 "use client";
-
+import { getCookie } from "@/utils/cookies";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signIn, signOut, useSession } from "next-auth/react";
@@ -24,6 +24,8 @@ export default function Navbar() {
   useEffect(() => {
     try {
       if (typeof window !== "undefined") {
+
+        
         const token = localStorage.getItem("token");
         setIsLoggedIn(!!token);
       }
@@ -33,11 +35,7 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    const locale =
-      document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("locale="))
-        ?.split("=")[1] || "en";
+    const locale = getCookie("locale") || "en";
 
     async function fetchTranslations() {
       try {
