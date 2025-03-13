@@ -8,14 +8,16 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const locale = searchParams.get("locale") || "en";
 
-    // Określamy ścieżkę do `common.json` w katalogu języka
-    const filePath = path.join(process.cwd(), "locales", locale, "common.json");
+    // Upewnij się, że odczytujesz pliki z `public/locales/`
+    const filePath = path.join(process.cwd(), "public", "locales", locale, "common.json");
+
+    console.log(`🔍 Próba odczytu pliku: ${filePath}`);
 
     // Sprawdzenie, czy plik istnieje
     try {
-      await fs.access(filePath); // Jeśli plik nie istnieje, zwróci błąd
+      await fs.access(filePath);
     } catch (error) {
-      console.error(`Plik tłumaczeń nie istnieje: ${filePath}`);
+      console.error(`❌ Plik tłumaczeń nie istnieje: ${filePath}`);
       return NextResponse.json({ error: `Nie znaleziono pliku dla języka: ${locale}` }, { status: 404 });
     }
 
@@ -26,7 +28,7 @@ export async function GET(req: Request) {
     // Zwróć tłumaczenia jako JSON
     return NextResponse.json(translations);
   } catch (error) {
-    console.error("Błąd ładowania tłumaczeń:", error);
+    console.error("❌ Błąd ładowania tłumaczeń:", error);
     return NextResponse.json({ error: "Nie udało się załadować tłumaczeń" }, { status: 500 });
   }
 }
