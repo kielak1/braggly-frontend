@@ -12,17 +12,21 @@ export default function LanguageSwitcher() {
   const [locale, setLocale] = useState("en");
 
   useEffect(() => {
+    // Pobierz język zapisany w ciasteczkach
     const storedLang = document.cookie
       .split("; ")
       .find((row) => row.startsWith("locale="))
       ?.split("=")[1];
-    if (storedLang) setLocale(storedLang);
+
+    if (storedLang) {
+      setLocale(storedLang);
+    }
   }, []);
 
   const changeLanguage = (lang: string) => {
     document.cookie = `locale=${lang}; path=/; max-age=31536000`; // 1 rok
     setLocale(lang);
-    window.location.reload(); // Odświeżamy stronę
+    window.location.reload(); // Odświeżamy stronę, żeby załadować nowe tłumaczenia
   };
 
   return (
