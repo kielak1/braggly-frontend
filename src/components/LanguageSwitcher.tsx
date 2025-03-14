@@ -9,25 +9,38 @@ const LANGUAGES = [
 ];
 
 export default function LanguageSwitcher() {
+  // const [locale, setLocale] = useState<string | null>(null);
   const [locale, setLocale] = useState("en");
 
   useEffect(() => {
-    // Pobierz język zapisany w ciasteczkach
-    const storedLang = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("locale="))
-      ?.split("=")[1];
+    // Pobierz język zapisany w ciasteczkach lub localStorage
+    const storedLang =
+      document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("locale="))
+        ?.split("=")[1] || localStorage.getItem("locale");
 
-    if (storedLang) {
-      setLocale(storedLang);
-    }
+    setLocale(storedLang || "en");
   }, []);
 
   const changeLanguage = (lang: string) => {
-    document.cookie = `locale=${lang}; path=/; max-age=31536000`; // 1 rok
-    setLocale(lang);
-    window.location.reload(); // Odświeżamy stronę, żeby załadować nowe tłumaczenia
+    try {
+      const isSecure = window.location.protocol === "https:";
+      document.cookie = `locale=${lang}; path=/; max-age=31536000; ${
+        isSecure ? "Secure; SameSite=None" : "SameSite=Lax"
+      }`;
+
+      localStorage.setItem("locale", lang);
+      setLocale(lang);
+      window.location.reload();
+    } catch (error) {
+      console.error("Błąd zapisu języka:", error);
+    }
   };
+
+  if (!locale) {
+    return null; // Nie renderuj nic, dopóki nie ma języka
+  }
 
   return (
     <div className="relative">
