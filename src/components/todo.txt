@@ -1,0 +1,8 @@
+- komunikaty o bledach na ios
+   - sprawdzic czy to nie z powodu braku https.  
+      - skopiowac aktualny main na bok
+      - domergowac payment do main i przetestowac na iphone
+ 
+- zrozumiec logike co na kliencie a co na serwerze
+funkcje do ciateczek zapis i  odczyt
+

@@ -1,0 +1,50 @@
+server {
+    server_name bragglydev.kielak.com;
+
+    location = /favicon.ico {
+        access_log off;
+        log_not_found off;
+    }
+
+    location /static/ {
+        alias /opt/braggly-frontend/public/;
+    }
+
+    # Obsługa plików Next.js (_next)
+    location /_next/ {
+        proxy_pass http://aprobo.kielak.com:4000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Obsługa głównego ruchu
+    location / {
+        include proxy_params;
+        proxy_pass http://aprobo.kielak.com:4000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+    }
+
+    error_log /var/log/nginx/bragglydev_error.log;
+    access_log /var/log/nginx/bragglydev_access.log;
+
+    listen 443 ssl;
+    ssl_certificate /etc/letsencrypt/live/bragglydev.kielak.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/bragglydev.kielak.com/privkey.pem;
+}
+
+server {
+    if ($host = bragglydev.kielak.com) {
+        return 301 https://$host$request_uri;
+    }
+
+    listen 80;
+    server_name bragglydev.kielak.com;
+    return 404;
+}

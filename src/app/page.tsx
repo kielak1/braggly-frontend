@@ -3,7 +3,7 @@ import { getTranslations } from "@/lib/i18n";
 
 export default async function Home() {
   const cookieStore = await cookies();
-  const locale = cookieStore.get("locale")?.value || "es"; // Domyślnie angielski
+  const locale = cookieStore.get("locale")?.value || "en"; // Domyślnie angielski
   const translations = await getTranslations(locale);
   return (
     <div>
