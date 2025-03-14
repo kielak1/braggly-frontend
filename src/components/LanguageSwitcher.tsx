@@ -9,38 +9,41 @@ const LANGUAGES = [
 ];
 
 export default function LanguageSwitcher() {
-  // const [locale, setLocale] = useState<string | null>(null);
   const [locale, setLocale] = useState("en");
 
   useEffect(() => {
-    // Pobierz język zapisany w ciasteczkach lub localStorage
-    const storedLang =
-      document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("locale="))
-        ?.split("=")[1] || localStorage.getItem("locale");
+    try {
+      const storedLang =
+        document.cookie
+          .split("; ")
+          .find((row) => row.startsWith("locale="))
+          ?.split("=")[1] || (typeof localStorage !== "undefined" ? localStorage.getItem("locale") : null);
 
-    setLocale(storedLang || "en");
+      setLocale(storedLang || "en");
+    } catch (error) {
+      console.error("Błąd odczytu języka:", error);
+      setLocale("en");
+    }
   }, []);
 
   const changeLanguage = (lang: string) => {
     try {
       const isSecure = window.location.protocol === "https:";
-      document.cookie = `locale=${lang}; path=/; max-age=31536000; ${
-        isSecure ? "Secure; SameSite=None" : "SameSite=Lax"
-      }`;
+      document.cookie = `locale=${lang}; path=/; max-age=31536000; ${isSecure ? "Secure; SameSite=Lax" : "SameSite=Lax"}`;
 
-      localStorage.setItem("locale", lang);
+      if (typeof localStorage !== "undefined") {
+        localStorage.setItem("locale", lang);
+      }
+
       setLocale(lang);
-      window.location.reload();
+
+      setTimeout(() => {
+        window.location.href = window.location.href;
+      }, 50);
     } catch (error) {
       console.error("Błąd zapisu języka:", error);
     }
   };
-
-  if (!locale) {
-    return null; // Nie renderuj nic, dopóki nie ma języka
-  }
 
   return (
     <div className="relative">
