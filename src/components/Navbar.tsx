@@ -22,17 +22,23 @@ export default function Navbar() {
   });
 
   useEffect(() => {
-    try {
-      if (typeof window !== "undefined") {
-
-        
-        const token = localStorage.getItem("token");
-        setIsLoggedIn(!!token);
+    const checkToken = () => {
+      try {
+        if (typeof window !== "undefined") {
+          const token = localStorage.getItem("token");
+          setIsLoggedIn(!!token);
+        }
+      } catch (error) {
+        console.error("Błąd dostępu do localStorage:", error);
       }
-    } catch (error) {
-      console.error("Błąd dostępu do localStorage:", error);
-    }
+    };
+  
+    checkToken();
+    window.addEventListener("storage", checkToken);
+  
+    return () => window.removeEventListener("storage", checkToken);
   }, []);
+  
 
   useEffect(() => {
     const locale = getCookie("locale") || "en";
