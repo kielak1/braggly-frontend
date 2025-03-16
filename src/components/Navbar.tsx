@@ -20,19 +20,17 @@ export default function Navbar() {
     error: "Nieprawidłowy login lub hasło",
     loggedAs: "Zalogowany jako",
   });
+  const [localStorageToken, setLocalStorageToken] = useState<string | null>(
+    null
+  ); // Stan dla tokenu
 
   useEffect(() => {
     const checkToken = () => {
       try {
         if (typeof window !== "undefined") {
           const token = localStorage.getItem("token");
-          if (token) {
-            const payload = JSON.parse(
-              Buffer.from(token.split(".")[1], "base64").toString("utf-8")
-            );
-            console.log("Payload tokenu z localStorage:", payload);
-          }
           setIsLoggedIn(!!token);
+          setLocalStorageToken(token); // Ustawiamy token z localStorage na start
         }
       } catch (error) {
         console.error("Błąd dostępu do localStorage:", error);
@@ -63,7 +61,16 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    console.log("Sesja:", session); // Dodajemy logowanie sesji dla debugowania
+    console.log("Sesja:", session); // Debugowanie sesji
+    if (session?.backendToken) {
+      setLocalStorageToken(session.backendToken); // Ustawiamy token z sesji
+      localStorage.setItem("token", session.backendToken); // Zapisujemy do localStorage
+      setIsLoggedIn(true); // Ustawiamy stan logowania
+    } else if (!localStorage.getItem("token")) {
+      setLocalStorageToken(null); // Czyścimy stan, jeśli nie ma tokenu
+      setIsLoggedIn(false); // Czyścimy stan logowania
+      localStorage.removeItem("token"); // Czyścimy localStorage
+    }
   }, [session]);
 
   const handleLogin = async () => {
@@ -102,8 +109,10 @@ export default function Navbar() {
         throw new Error("Brak tokena w odpowiedzi serwera");
       }
 
-      localStorage.setItem("token", data.token);
-      setIsLoggedIn(true);
+      const token = data.token;
+      localStorage.setItem("token", token); // Zapisujemy token do localStorage
+      setLocalStorageToken(token); // Ustawiamy stan
+      setIsLoggedIn(true); // Ustawiamy stan logowania
       setErrorMessage("");
     } catch (error) {
       console.error("Błąd logowania:", error);
@@ -114,7 +123,8 @@ export default function Navbar() {
   const handleLogout = () => {
     try {
       localStorage.removeItem("token");
-      setIsLoggedIn(false);
+      setLocalStorageToken(null); // Czyścimy token w stanie
+      setIsLoggedIn(false); // Czyścimy stan logowania
       router.push("/");
     } catch (error) {
       console.error("Błąd podczas wylogowywania:", error);
@@ -127,7 +137,9 @@ export default function Navbar() {
       <h1 className="text-3xl font-bold text-blue-600">Braggly</h1>
 
       <div className="flex items-center space-x-4">
-        {isLoggedIn && <div>JWT Token:</div>}
+        {isLoggedIn && (
+          <div>JWT Token: {localStorageToken || "Brak tokenu"}</div>
+        )}
       </div>
 
       <div className="flex items-center space-x-4">
@@ -135,8 +147,6 @@ export default function Navbar() {
           <div className="flex items-center space-x-4">
             <div className="text-green-400">
               {translations.loggedAs} {session?.user?.name}
-              <div>Cześć, {session?.user?.name}</div>
-              <div>Token JWT: {session?.backendToken || "Brak tokenu"}</div>
             </div>
             <button
               onClick={() => signOut()}
