@@ -7,7 +7,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   return (
     <SessionProvider>
       <Navbar />
-      {children}
+{children}
     </SessionProvider>
   );
 }
