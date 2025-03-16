@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signIn, signOut, useSession } from "next-auth/react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { fetchWhoAmI, WhoAmIResponse } from "@/utils/api"; // Import funkcji i interfejsu
 
 export default function Navbar() {
   const router = useRouter();
@@ -22,7 +23,8 @@ export default function Navbar() {
   });
   const [localStorageToken, setLocalStorageToken] = useState<string | null>(
     null
-  ); // Stan dla tokenu
+  );
+  const [userData, setUserData] = useState<WhoAmIResponse | null>(null); // Nowy stan dla danych użytkownika
 
   useEffect(() => {
     const checkToken = () => {
@@ -30,7 +32,13 @@ export default function Navbar() {
         if (typeof window !== "undefined") {
           const token = localStorage.getItem("token");
           setIsLoggedIn(!!token);
-          setLocalStorageToken(token); // Ustawiamy token z localStorage na start
+          setLocalStorageToken(token);
+
+          // Pobierz dane użytkownika z localStorage, jeśli istnieją
+          const storedUserData = localStorage.getItem("userData");
+          if (storedUserData) {
+            setUserData(JSON.parse(storedUserData));
+          }
         }
       } catch (error) {
         console.error("Błąd dostępu do localStorage:", error);
@@ -61,13 +69,31 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    console.log("Sesja:", session); // Debugowanie sesji
+    console.log("Sesja:", session);
     if (session?.backendToken) {
-      setLocalStorageToken(session.backendToken); // Ustawiamy token z sesji
-      localStorage.setItem("token", session.backendToken); // Zapisujemy do localStorage
-      setIsLoggedIn(true); // Ustawiamy stan logowania
+      setLocalStorageToken(session.backendToken);
+      localStorage.setItem("token", session.backendToken);
+      setIsLoggedIn(true);
+
+      // Wywołaj fetchWhoAmI po zalogowaniu przez Google
+      fetchWhoAmI().then((data) => {
+        if (data) {
+          setUserData(data);
+        }
+      });
     }
   }, [session]);
+
+  useEffect(() => {
+    // Wywołaj fetchWhoAmI po zmianie localStorageToken (np. po logowaniu ręcznym)
+    if (localStorageToken) {
+      fetchWhoAmI().then((data) => {
+        if (data) {
+          setUserData(data);
+        }
+      });
+    }
+  }, [localStorageToken]);
 
   const handleLogin = async () => {
     setErrorMessage("");
@@ -106,10 +132,17 @@ export default function Navbar() {
       }
 
       const token = data.token;
-      localStorage.setItem("token", token); // Zapisujemy token do localStorage
-      setLocalStorageToken(token); // Ustawiamy stan
-      setIsLoggedIn(true); // Ustawiamy stan logowania
+      localStorage.setItem("token", token);
+      setLocalStorageToken(token);
+      setIsLoggedIn(true);
       setErrorMessage("");
+
+      // Wywołaj fetchWhoAmI po zalogowaniu ręcznym
+      fetchWhoAmI().then((userData) => {
+        if (userData) {
+          setUserData(userData);
+        }
+      });
     } catch (error) {
       console.error("Błąd logowania:", error);
       setErrorMessage("Wystąpił błąd podczas logowania.");
@@ -119,8 +152,10 @@ export default function Navbar() {
   const handleLogout = () => {
     try {
       localStorage.removeItem("token");
-      setLocalStorageToken(null); // Czyścimy token w stanie
-      setIsLoggedIn(false); // Czyścimy stan logowania
+      localStorage.removeItem("userData"); // Czyścimy dane użytkownika
+      setLocalStorageToken(null);
+      setUserData(null); // Czyścimy stan userData
+      setIsLoggedIn(false);
       router.push("/");
     } catch (error) {
       console.error("Błąd podczas wylogowywania:", error);
@@ -129,12 +164,13 @@ export default function Navbar() {
 
   const handleGoogleLogout = async () => {
     try {
-      // Czyszczenie stanu i localStorage przed wylogowaniem z Google
       localStorage.removeItem("token");
+      localStorage.removeItem("userData"); // Czyścimy dane użytkownika
       setLocalStorageToken(null);
+      setUserData(null); // Czyścimy stan userData
       setIsLoggedIn(false);
-      await signOut(); // Wylogowanie z next-auth
-      router.push("/"); // Przekierowanie na stronę główną
+      await signOut();
+      router.push("/");
     } catch (error) {
       console.error("Błąd podczas wylogowywania z Google:", error);
     }
@@ -147,18 +183,22 @@ export default function Navbar() {
 
       <div className="flex items-center space-x-4">
         {isLoggedIn && (
-          <div>JWT Token: {localStorageToken || "Brak tokenu"}</div>
+          <div>
+            {/* JWT Token: {localStorageToken || "Brak tokenu"} */}
+            {userData && (
+              <div className="text-green-400">
+                {translations.loggedAs} {userData.username} ({userData.role})
+              </div>
+            )}
+          </div>
         )}
       </div>
 
       <div className="flex items-center space-x-4">
         {session ? (
           <div className="flex items-center space-x-4">
-            <div className="text-green-400">
-              {translations.loggedAs} {session?.user?.name}
-            </div>
             <button
-              onClick={handleGoogleLogout} // Używamy nowego handlera
+              onClick={handleGoogleLogout}
               className="bg-red-500 px-4 py-2 rounded"
             >
               {translations.googleLogout}
