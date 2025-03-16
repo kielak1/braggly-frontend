@@ -7,7 +7,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function Navbar() {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -27,8 +27,10 @@ export default function Navbar() {
         if (typeof window !== "undefined") {
           const token = localStorage.getItem("token");
           if (token) {
-            const payload = JSON.parse(Buffer.from(token.split(".")[1], 'base64').toString('utf-8'));
-            console.log(payload);
+            const payload = JSON.parse(
+              Buffer.from(token.split(".")[1], "base64").toString("utf-8")
+            );
+            console.log("Payload tokenu z localStorage:", payload);
           }
           setIsLoggedIn(!!token);
         }
@@ -59,6 +61,10 @@ export default function Navbar() {
 
     fetchTranslations();
   }, []);
+
+  useEffect(() => {
+    console.log("Sesja:", session); // Dodajemy logowanie sesji dla debugowania
+  }, [session]);
 
   const handleLogin = async () => {
     setErrorMessage("");
@@ -119,19 +125,26 @@ export default function Navbar() {
     <nav className="bg-gray-800 text-white p-4 flex justify-between items-center">
       <LanguageSwitcher />
       <h1 className="text-3xl font-bold text-blue-600">Braggly</h1>
+
+      <div className="flex items-center space-x-4">
+        {isLoggedIn && <div>JWT Token:</div>}
+      </div>
+
       <div className="flex items-center space-x-4">
         {session ? (
-          <>
-            <p className="text-green-400">
-              {translations.loggedAs} {session.user?.name}
-            </p>
+          <div className="flex items-center space-x-4">
+            <div className="text-green-400">
+              {translations.loggedAs} {session?.user?.name}
+              <div>Cześć, {session?.user?.name}</div>
+              <div>Token JWT: {session?.backendToken || "Brak tokenu"}</div>
+            </div>
             <button
               onClick={() => signOut()}
               className="bg-red-500 px-4 py-2 rounded"
             >
               {translations.googleLogout}
             </button>
-          </>
+          </div>
         ) : isLoggedIn ? (
           <button
             onClick={handleLogout}
