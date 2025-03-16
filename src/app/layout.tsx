@@ -1,6 +1,7 @@
-import '@/styles/globals.css';
+import "@/styles/globals.css";
 import { Metadata } from "next";
 import ClientLayout from "./ClientLayout";
+
 export const metadata: Metadata = {
   title: "Braggly App",
   description: "Aplikacja Braggly",
