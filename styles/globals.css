@@ -586,6 +586,18 @@ video {
   display: none;
 }
 
+.h-screen {
+  height: 100vh;
+}
+
+.w-64 {
+  width: 16rem;
+}
+
+.flex-1 {
+  flex: 1 1 0%;
+}
+
 .border-collapse {
   border-collapse: collapse;
 }
@@ -596,6 +608,10 @@ video {
 
 .resize {
   resize: both;
+}
+
+.flex-col {
+  flex-direction: column;
 }
 
 .items-center {
@@ -681,6 +697,11 @@ video {
 .text-sm {
   font-size: 0.875rem;
   line-height: 1.25rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
 }
 
 .font-bold {

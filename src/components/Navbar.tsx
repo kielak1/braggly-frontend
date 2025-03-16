@@ -90,8 +90,15 @@ export default function Navbar() {
       fetchWhoAmI().then((data) => {
         if (data) {
           setUserData(data);
+          if (data.role === "ADMIN") {
+            router.push("/admin");
+          } else {
+            router.push("/user");
+          }
         }
       });
+    } else {
+      router.push("/");
     }
   }, [localStorageToken]);
 
