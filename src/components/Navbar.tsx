@@ -1,13 +1,14 @@
 "use client";
 import { getCookie } from "@/utils/cookies";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation"; // Dodajemy usePathname
 import { signIn, signOut, useSession } from "next-auth/react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { fetchWhoAmI, WhoAmIResponse } from "@/utils/api"; // Import funkcji i interfejsu
+import { fetchWhoAmI, WhoAmIResponse } from "@/utils/api";
 
 export default function Navbar() {
   const router = useRouter();
+  const pathname = usePathname(); // Pobieramy bieżącą ścieżkę
   const { data: session, status } = useSession();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
@@ -24,7 +25,7 @@ export default function Navbar() {
   const [localStorageToken, setLocalStorageToken] = useState<string | null>(
     null
   );
-  const [userData, setUserData] = useState<WhoAmIResponse | null>(null); // Nowy stan dla danych użytkownika
+  const [userData, setUserData] = useState<WhoAmIResponse | null>(null);
 
   useEffect(() => {
     const checkToken = () => {
@@ -34,7 +35,6 @@ export default function Navbar() {
           setIsLoggedIn(!!token);
           setLocalStorageToken(token);
 
-          // Pobierz dane użytkownika z localStorage, jeśli istnieją
           const storedUserData = localStorage.getItem("userData");
           if (storedUserData) {
             setUserData(JSON.parse(storedUserData));
@@ -75,7 +75,6 @@ export default function Navbar() {
       localStorage.setItem("token", session.backendToken);
       setIsLoggedIn(true);
 
-      // Wywołaj fetchWhoAmI po zalogowaniu przez Google
       fetchWhoAmI().then((data) => {
         if (data) {
           setUserData(data);
@@ -85,22 +84,27 @@ export default function Navbar() {
   }, [session]);
 
   useEffect(() => {
-    // Wywołaj fetchWhoAmI po zmianie localStorageToken (np. po logowaniu ręcznym)
+    // Wywołaj fetchWhoAmI po zmianie localStorageToken i przekieruj na odpowiednią ścieżkę
     if (localStorageToken) {
       fetchWhoAmI().then((data) => {
         if (data) {
           setUserData(data);
           if (data.role === "ADMIN") {
-            router.push("/admin");
+            if (!pathname.startsWith("/admin")) {
+              router.push("/admin");
+            }
           } else {
-            router.push("/user");
+            if (!pathname.startsWith("/user")) {
+              router.push("/user");
+            }
           }
         }
       });
     } else {
       router.push("/");
+      setUserData(null);
     }
-  }, [localStorageToken]);
+  }, [localStorageToken, router, pathname]); 
 
   const handleLogin = async () => {
     setErrorMessage("");
@@ -159,9 +163,9 @@ export default function Navbar() {
   const handleLogout = () => {
     try {
       localStorage.removeItem("token");
-      localStorage.removeItem("userData"); // Czyścimy dane użytkownika
+      localStorage.removeItem("userData");
       setLocalStorageToken(null);
-      setUserData(null); // Czyścimy stan userData
+      setUserData(null);
       setIsLoggedIn(false);
       router.push("/");
     } catch (error) {
@@ -172,9 +176,9 @@ export default function Navbar() {
   const handleGoogleLogout = async () => {
     try {
       localStorage.removeItem("token");
-      localStorage.removeItem("userData"); // Czyścimy dane użytkownika
+      localStorage.removeItem("userData");
       setLocalStorageToken(null);
-      setUserData(null); // Czyścimy stan userData
+      setUserData(null);
       setIsLoggedIn(false);
       await signOut();
       router.push("/");
@@ -191,7 +195,6 @@ export default function Navbar() {
       <div className="flex items-center space-x-4">
         {isLoggedIn && (
           <div>
-            {/* JWT Token: {localStorageToken || "Brak tokenu"} */}
             {userData && (
               <div className="text-green-400">
                 {translations.loggedAs} {userData.username} ({userData.role})
@@ -204,6 +207,9 @@ export default function Navbar() {
       <div className="flex items-center space-x-4">
         {session ? (
           <div className="flex items-center space-x-4">
+            <div className="text-green-400">
+              {translations.loggedAs} {session?.user?.name}
+            </div>
             <button
               onClick={handleGoogleLogout}
               className="bg-red-500 px-4 py-2 rounded"
