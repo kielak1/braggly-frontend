@@ -66,10 +66,6 @@ export default function Navbar() {
       setLocalStorageToken(session.backendToken); // Ustawiamy token z sesji
       localStorage.setItem("token", session.backendToken); // Zapisujemy do localStorage
       setIsLoggedIn(true); // Ustawiamy stan logowania
-    } else if (!localStorage.getItem("token")) {
-      setLocalStorageToken(null); // Czyścimy stan, jeśli nie ma tokenu
-      setIsLoggedIn(false); // Czyścimy stan logowania
-      localStorage.removeItem("token"); // Czyścimy localStorage
     }
   }, [session]);
 
@@ -131,6 +127,19 @@ export default function Navbar() {
     }
   };
 
+  const handleGoogleLogout = async () => {
+    try {
+      // Czyszczenie stanu i localStorage przed wylogowaniem z Google
+      localStorage.removeItem("token");
+      setLocalStorageToken(null);
+      setIsLoggedIn(false);
+      await signOut(); // Wylogowanie z next-auth
+      router.push("/"); // Przekierowanie na stronę główną
+    } catch (error) {
+      console.error("Błąd podczas wylogowywania z Google:", error);
+    }
+  };
+
   return (
     <nav className="bg-gray-800 text-white p-4 flex justify-between items-center">
       <LanguageSwitcher />
@@ -149,7 +158,7 @@ export default function Navbar() {
               {translations.loggedAs} {session?.user?.name}
             </div>
             <button
-              onClick={() => signOut()}
+              onClick={handleGoogleLogout} // Używamy nowego handlera
               className="bg-red-500 px-4 py-2 rounded"
             >
               {translations.googleLogout}
