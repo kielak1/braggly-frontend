@@ -1,10 +1,16 @@
 {
   "greeting": "Hola",
-  "welcome": "Bienvenido a nuestro sitio web",
+  "welcome": "bienvenido a Braggly",
   "login": "Iniciar sesión",
   "logout": "Cerrar sesión",
   "error": "Error de inicio de sesión",
   "loggedAs": "Conectado como",
   "googleLogin": "Iniciar sesión con Google",
-  "googleLogout": "Cerrar sesión de Google"
+  "googleLogout": "Cerrar sesión de Google",
+  "panel": "Panel de Usuario",
+  "dashboard": "Tablero",
+  "account": "Cuenta",
+  "uploads": "Subida de archivos",
+  "you_have": "tienes",
+  "tokens_on_your_account": "tokens en tu cuenta"
 }
