@@ -635,6 +635,10 @@ video {
   min-height: calc(100vh - 64px);
 }
 
+.w-32 {
+  width: 8rem;
+}
+
 .w-64 {
   width: 16rem;
 }
@@ -770,6 +774,10 @@ video {
 .bg-clip-text {
   -webkit-background-clip: text;
           background-clip: text;
+}
+
+.p-1 {
+  padding: 0.25rem;
 }
 
 .p-2 {

@@ -234,14 +234,14 @@ export default function Navbar() {
               placeholder="Login"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="p-2 text-black rounded"
+              className="p-1 w-32 text-black rounded"
             />
             <input
               type="password"
               placeholder="Hasło"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="p-2 text-black rounded"
+              className="p-1 w-32 text-black rounded"
             />
             <button
               onClick={handleLogin}
