@@ -1,10 +1,16 @@
 {
   "greeting": "Hello",
-  "welcome": "Welcome to our website",
+  "welcome": "welcome to the Braggly system",
   "login": "Login",
   "logout": "Logout",
   "error": "Login error",
   "loggedAs": "Logged in as",  
   "googleLogin": "Login with Google",
-  "googleLogout": "Logout from Google"
+  "googleLogout": "Logout from Google",
+  "panel": "User Panel",
+  "dashboard": "Dashboard",
+  "account": "Account",
+  "uploads": "File Uploads",
+  "you_have": "you have",
+  "tokens_on_your_account": "tokens on your account"
 }

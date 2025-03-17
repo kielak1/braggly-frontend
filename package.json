@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "npm run watch:css & next dev --turbopack",
+    "dev": "npm run watch:css & next dev",
     "build": "next build && npm run build:css",
     "start": "next start",
     "lint": "next lint",
-    "watch:css": "npx tailwindcss -o styles/globals.css --watch",
-    "build:css": "npx tailwindcss -o styles/globals.css"
+    "watch:css": "npx tailwindcss -i src/styles/tailwind.css -o src/styles/globals.css --watch",
+    "build:css": "npx tailwindcss -i src/styles/tailwind.css -o src/styles/globals.css"
   },
   "dependencies": {
     "autoprefixer": "^10.4.20",
