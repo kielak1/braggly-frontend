@@ -17,18 +17,25 @@ import {
 } from "@/utils/api";
 import "@/styles/globals.css";
 
-type TranslationsSetter = Dispatch<SetStateAction<Record<string, string> | null>>;
+type TranslationsSetter = Dispatch<
+  SetStateAction<Record<string, string> | null>
+>;
 type UserRole = "USER" | "ADMIN"; // Dodajemy typ dla roli
 
 const Dashboard = () => {
-  const [translations, setTranslations] = useState<Record<string, string> | null>(null);
+  const [translations, setTranslations] = useState<Record<
+    string,
+    string
+  > | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [creditPackages, setCreditPackages] = useState<CreditPackage[]>([]);
   const [newUser, setNewUser] = useState({ username: "", password: "" });
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [selectedRole, setSelectedRole] = useState<UserRole>("USER"); // Używamy UserRole zamiast string
   const [newPassword, setNewPassword] = useState("");
-  const [selectedPackageId, setSelectedPackageId] = useState<number | null>(null);
+  const [selectedPackageId, setSelectedPackageId] = useState<number | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -110,13 +117,23 @@ const Dashboard = () => {
 
   const handleAssignCredits = async () => {
     if (!selectedUserId || !selectedPackageId) return;
+
     setIsLoading(true);
     try {
-      await assignCreditsToUser(selectedUserId, selectedPackageId);
-      const zaktualizowaniUzytkownicy = await fetchUsers();
-      if (zaktualizowaniUzytkownicy) setUsers(zaktualizowaniUzytkownicy);
+      const success = await assignCreditsToUser(
+        selectedUserId,
+        selectedPackageId
+      );
+      if (success) {
+        const zaktualizowaniUzytkownicy = await fetchUsers();
+        if (zaktualizowaniUzytkownicy) setUsers(zaktualizowaniUzytkownicy);
+        setError(null); // Wyczyść poprzedni błąd przy sukcesie
+      } else {
+        setError("Nie udało się przypisać kredytów");
+      }
     } catch (err) {
       setError("Błąd podczas przypisywania kredytów");
+      console.error(err);
     } finally {
       setIsLoading(false);
     }
@@ -130,7 +147,9 @@ const Dashboard = () => {
       {error && (
         <div className="bg-red-100 text-red-700 p-2 mb-4 rounded">
           {error}
-          <button onClick={() => setError(null)} className="ml-2">X</button>
+          <button onClick={() => setError(null)} className="ml-2">
+            X
+          </button>
         </div>
       )}
 
@@ -144,7 +163,8 @@ const Dashboard = () => {
             className="flex justify-between items-center p-4 bg-white rounded shadow"
           >
             <span>
-              {user.username} ({user.role}) - {translations.balance || "Saldo"}: {user.balance}
+              {user.username} ({user.role}) - {translations.balance || "Saldo"}:{" "}
+              {user.balance}
             </span>
             <button
               onClick={() => handleDeleteUser(user.username)}
@@ -157,7 +177,9 @@ const Dashboard = () => {
       </ul>
 
       <div className="mt-6 p-4 bg-white rounded shadow">
-        <h2 className="text-xl font-bold mb-2">{translations.add_user || "Dodaj użytkownika"}</h2>
+        <h2 className="text-xl font-bold mb-2">
+          {translations.add_user || "Dodaj użytkownika"}
+        </h2>
         <input
           type="text"
           placeholder={translations.username || "Nazwa użytkownika"}
@@ -181,12 +203,16 @@ const Dashboard = () => {
       </div>
 
       <div className="mt-6 p-4 bg-white rounded shadow">
-        <h2 className="text-xl font-bold mb-2">{translations.set_role || "Ustaw rolę"}</h2>
+        <h2 className="text-xl font-bold mb-2">
+          {translations.set_role || "Ustaw rolę"}
+        </h2>
         <select
           onChange={(e) => setSelectedUserId(Number(e.target.value))}
           className="border p-2 mr-2"
         >
-          <option value="">{translations.select_user || "Wybierz użytkownika"}</option>
+          <option value="">
+            {translations.select_user || "Wybierz użytkownika"}
+          </option>
           {users.map((user) => (
             <option key={user.id} value={user.id}>
               {user.username}
@@ -210,12 +236,16 @@ const Dashboard = () => {
       </div>
 
       <div className="mt-6 p-4 bg-white rounded shadow">
-        <h2 className="text-xl font-bold mb-2">{translations.set_password || "Ustaw hasło"}</h2>
+        <h2 className="text-xl font-bold mb-2">
+          {translations.set_password || "Ustaw hasło"}
+        </h2>
         <select
           onChange={(e) => setSelectedUserId(Number(e.target.value))}
           className="border p-2 mr-2"
         >
-          <option value="">{translations.select_user || "Wybierz użytkownika"}</option>
+          <option value="">
+            {translations.select_user || "Wybierz użytkownika"}
+          </option>
           {users.map((user) => (
             <option key={user.id} value={user.id}>
               {user.username}
@@ -238,12 +268,16 @@ const Dashboard = () => {
       </div>
 
       <div className="mt-6 p-4 bg-white rounded shadow">
-        <h2 className="text-xl font-bold mb-2">{translations.assign_credits || "Przypisz kredyty"}</h2>
+        <h2 className="text-xl font-bold mb-2">
+          {translations.assign_credits || "Przypisz kredyty"}
+        </h2>
         <select
           onChange={(e) => setSelectedUserId(Number(e.target.value))}
           className="border p-2 mr-2"
         >
-          <option value="">{translations.select_user || "Wybierz użytkownika"}</option>
+          <option value="">
+            {translations.select_user || "Wybierz użytkownika"}
+          </option>
           {users.map((user) => (
             <option key={user.id} value={user.id}>
               {user.username}
@@ -254,7 +288,9 @@ const Dashboard = () => {
           onChange={(e) => setSelectedPackageId(Number(e.target.value))}
           className="border p-2 mr-2"
         >
-          <option value="">{translations.select_package || "Wybierz pakiet"}</option>
+          <option value="">
+            {translations.select_package || "Wybierz pakiet"}
+          </option>
           {creditPackages.map((pkg) => (
             <option key={pkg.id} value={pkg.id}>
               {pkg.credits} kredytów
