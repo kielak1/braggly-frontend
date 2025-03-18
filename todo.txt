@@ -3,4 +3,4 @@
 
 funkcje do ciateczek zapis i  odczyt
 
-zarzadzanie pakietami
+

@@ -1,4 +1,4 @@
-// src/utils/api.ts
+// src/app/utils/api.ts
 
 export interface WhoAmIResponse {
   role: string;
@@ -21,42 +21,22 @@ export interface CreditPackage {
   priceInCents: number;
 }
 
+// Zaktualizowany interfejs dla historii zakupów
 export interface PurchaseHistory {
+  id: number;
   userId: number;
-  packageId: number;
+  creditsPurchased: number;
+  amountPaid: number;
   purchaseDate: string;
 }
 
+// Zaktualizowany interfejs dla historii użycia
 export interface UsageHistory {
-  userId: number;
-  usageDetails: string;
-  usageDate: string;
-}
-
-export interface WhoAmIResponse {
-  role: string;
-  username: string;
-  lastUpdated: string;
-  balance: number;
   id: number;
-}
-
-export interface CreditPackage {
-  id: number;
-  credits: number;
-  priceInCents: number;
-}
-
-export interface PurchaseHistory {
   userId: number;
-  packageId: number;
-  purchaseDate: string;
-}
-
-export interface UsageHistory {
-  userId: number;
-  usageDetails: string;
+  usageType: string;
   usageDate: string;
+  creditsUsed: number;
 }
 
 const getAuthHeaders = () => {
@@ -97,7 +77,6 @@ export const createUser = async (
       headers: getAuthHeaders(),
       body: JSON.stringify({ username, password }),
     });
-
     if (!response.ok) throw new Error(`Błąd serwera: ${response.status}`);
     return true;
   } catch (error) {
@@ -116,7 +95,6 @@ export const deleteUser = async (username: string): Promise<boolean> => {
         headers: getAuthHeaders(),
       }
     );
-
     if (!response.ok) throw new Error(`Błąd serwera: ${response.status}`);
     return true;
   } catch (error) {
@@ -138,7 +116,6 @@ export const setUserRole = async (
         headers: getAuthHeaders(),
       }
     );
-
     if (!response.ok) throw new Error(`Błąd serwera: ${response.status}`);
     return true;
   } catch (error) {
@@ -160,7 +137,6 @@ export const setUserPassword = async (
         headers: getAuthHeaders(),
       }
     );
-
     if (!response.ok) throw new Error(`Błąd serwera: ${response.status}`);
     return true;
   } catch (error) {
@@ -169,6 +145,7 @@ export const setUserPassword = async (
   }
 };
 
+// Pobieranie informacji o zalogowanym użytkowniku
 export const fetchWhoAmI = async (): Promise<WhoAmIResponse | null> => {
   try {
     const response = await fetch(`${backendUrl}/api/whoami`, {
@@ -184,6 +161,8 @@ export const fetchWhoAmI = async (): Promise<WhoAmIResponse | null> => {
     return null;
   }
 };
+
+// Dodawanie pakietu kredytowego
 export const addCreditPackage = async (
   credits: number,
   priceInCents: number
@@ -194,34 +173,30 @@ export const addCreditPackage = async (
       headers: getAuthHeaders(),
       body: JSON.stringify({ credits, priceInCents }),
     });
-
     if (!response.ok) {
       console.error(`Błąd serwera: ${response.status}`);
-      return null; // Zwróć null tylko w przypadku błędów serwera
+      return null;
     }
-
     const text = await response.text();
     if (!text.trim()) {
-      return { success: true }; // Zwróć obiekt z informacją o sukcesie
+      return { success: true };
     }
-
     return JSON.parse(text);
   } catch (error) {
     console.error("Błąd podczas dodawania pakietu kredytowego:", error);
     return null;
   }
 };
+
+// Usuwanie pakietu kredytowego
 export const deleteCreditPackage = async (
   packageId: number
 ): Promise<boolean> => {
   try {
-    const response = await fetch(
-      `${backendUrl}/credits/packages/${packageId}`,
-      {
-        method: "DELETE",
-        headers: getAuthHeaders(),
-      }
-    );
+    const response = await fetch(`${backendUrl}/credits/packages/${packageId}`, {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+    });
     if (!response.ok) throw new Error(`Błąd serwera: ${response.status}`);
     return true;
   } catch (error) {
@@ -230,9 +205,8 @@ export const deleteCreditPackage = async (
   }
 };
 
-export const fetchCreditPackages = async (): Promise<
-  CreditPackage[] | null
-> => {
+// Pobieranie listy pakietów kredytowych
+export const fetchCreditPackages = async (): Promise<CreditPackage[] | null> => {
   try {
     const response = await fetch(`${backendUrl}/credits/packages`, {
       method: "GET",
@@ -246,22 +220,22 @@ export const fetchCreditPackages = async (): Promise<
   }
 };
 
-// src/app/utils/api.ts
+// Przypisywanie kredytów użytkownikowi
 export const assignCreditsToUser = async (
   userId: number,
   packageId: number
 ): Promise<boolean> => {
   try {
     const headers = getAuthHeaders();
-    console.log("Nagłówki wysyłane do serwera:", headers); // Debugowanie nagłówków
-    console.log("URL zapytania:", `${backendUrl}/credits/assign`); // Debugowanie URL
-    console.log("Dane wysyłane:", { userId, packageId }); // Debugowanie danych
+    console.log("Nagłówki wysyłane do serwera:", headers);
+    console.log("URL zapytania:", `${backendUrl}/credits/assign`);
+    console.log("Dane wysyłane:", { userId, packageId });
 
     const response = await fetch(`${backendUrl}/credits/assign`, {
       method: "POST",
       headers: {
         ...headers,
-        "Content-Type": "application/x-www-form-urlencoded", // Jawne ustawienie typu zawartości
+        "Content-Type": "application/x-www-form-urlencoded",
       },
       body: new URLSearchParams({
         userId: userId.toString(),
@@ -270,10 +244,9 @@ export const assignCreditsToUser = async (
     });
 
     if (!response.ok) {
-      const errorText = await response.text(); // Pobierz szczegóły błędu
+      const errorText = await response.text();
       throw new Error(`Błąd serwera: ${response.status} - ${errorText}`);
     }
-
     return true;
   } catch (error) {
     console.error("Błąd podczas przypisywania kredytów użytkownikowi:", error);
@@ -281,7 +254,7 @@ export const assignCreditsToUser = async (
   }
 };
 
-
+// Pobieranie historii zakupów użytkownika
 export const fetchPurchaseHistory = async (
   userId: number
 ): Promise<PurchaseHistory[] | null> => {
@@ -301,6 +274,7 @@ export const fetchPurchaseHistory = async (
   }
 };
 
+// Pobieranie historii użycia kredytów użytkownika
 export const fetchUsageHistory = async (
   userId: number
 ): Promise<UsageHistory[] | null> => {

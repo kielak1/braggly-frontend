@@ -44,5 +44,12 @@
   "assign_credits": "Asignar créditos",
   "select_package": "Seleccionar paquete",
   "assign": "Asignar",
-  "confirm_delete_user": "¿Estás seguro de que quieres eliminar al usuario {username}?"
+  "confirm_delete_user": "¿Estás seguro de que quieres eliminar al usuario {username}?",
+  "purchase_history": "Historial de compras",
+  "usage_history": "Historial de uso",
+  "bought": "Comprado",
+  "used": "Usado",
+  "no_purchases": "Sin historial de compras",
+  "no_usage": "Sin historial de uso",
+  "zaco": "por"
 }

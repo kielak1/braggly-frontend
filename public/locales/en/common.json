@@ -44,5 +44,12 @@
   "assign_credits": "Assign Credits",
   "select_package": "Select Package",
   "assign": "Assign",
-  "confirm_delete_user": "Are you sure you want to delete user {username}?"
+  "confirm_delete_user": "Are you sure you want to delete user {username}?",
+  "purchase_history": "Purchase History",
+  "usage_history": "Usage History",
+  "bought": "Bought",
+  "used": "Used",
+  "no_purchases": "No purchase history",
+  "no_usage": "No usage history",
+  "zaco": "for"
 }
