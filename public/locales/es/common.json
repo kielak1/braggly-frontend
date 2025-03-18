@@ -29,5 +29,6 @@
   "price": "Precio",
   "delete": "Eliminar",
   "add_package": "Agregar nuevo paquete",
-  "add": "Agregar"
+  "add": "Agregar",
+  "invalid_package_values": "Valores de paquete inválidos"
 }
