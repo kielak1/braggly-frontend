@@ -246,26 +246,41 @@ export const fetchCreditPackages = async (): Promise<
   }
 };
 
+// src/app/utils/api.ts
 export const assignCreditsToUser = async (
   userId: number,
   packageId: number
 ): Promise<boolean> => {
   try {
+    const headers = getAuthHeaders();
+    console.log("Nagłówki wysyłane do serwera:", headers); // Debugowanie nagłówków
+    console.log("URL zapytania:", `${backendUrl}/credits/assign`); // Debugowanie URL
+    console.log("Dane wysyłane:", { userId, packageId }); // Debugowanie danych
+
     const response = await fetch(`${backendUrl}/credits/assign`, {
       method: "POST",
-      headers: getAuthHeaders(),
+      headers: {
+        ...headers,
+        "Content-Type": "application/x-www-form-urlencoded", // Jawne ustawienie typu zawartości
+      },
       body: new URLSearchParams({
         userId: userId.toString(),
         packageId: packageId.toString(),
-      }),
+      }).toString(),
     });
-    if (!response.ok) throw new Error(`Błąd serwera: ${response.status}`);
+
+    if (!response.ok) {
+      const errorText = await response.text(); // Pobierz szczegóły błędu
+      throw new Error(`Błąd serwera: ${response.status} - ${errorText}`);
+    }
+
     return true;
   } catch (error) {
     console.error("Błąd podczas przypisywania kredytów użytkownikowi:", error);
     return false;
   }
 };
+
 
 export const fetchPurchaseHistory = async (
   userId: number
