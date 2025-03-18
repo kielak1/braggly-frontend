@@ -3,5 +3,4 @@
 
 funkcje do ciateczek zapis i  odczyt
 
-tlumaczenia w stronach usera
 zarzadzanie pakietami
