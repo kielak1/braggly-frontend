@@ -19,5 +19,9 @@
   "token_packages": "Paquetes de tokens",
   "you_are_admin": "Eres un administrador",
   "user_list": "Usuarios del sistema",
-  "packages_header": "Gestión de paquetes de tokens"
+  "packages_header": "Gestión de paquetes de tokens",
+  "account_balance": "Saldo de la cuenta",
+  "top_up_account": "Recargar cuenta",
+  "upload_uxd_files": "Subir archivos UXD",
+  "selected_file": "Archivo seleccionado"
 }
