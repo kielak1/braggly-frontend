@@ -8,6 +8,39 @@ export interface WhoAmIResponse {
   id: number;
 }
 
+export interface User {
+  id: number;
+  username: string;
+  role: string;
+  balance: number;
+}
+
+export interface CreditPackage {
+  id: number;
+  credits: number;
+  priceInCents: number;
+}
+
+export interface PurchaseHistory {
+  userId: number;
+  packageId: number;
+  purchaseDate: string;
+}
+
+export interface UsageHistory {
+  userId: number;
+  usageDetails: string;
+  usageDate: string;
+}
+
+export interface WhoAmIResponse {
+  role: string;
+  username: string;
+  lastUpdated: string;
+  balance: number;
+  id: number;
+}
+
 export interface CreditPackage {
   id: number;
   credits: number;
@@ -37,6 +70,104 @@ const getAuthHeaders = () => {
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 if (!backendUrl) throw new Error("Brak zmiennej NEXT_PUBLIC_BACKEND_URL");
+
+// Pobranie listy użytkowników
+export const fetchUsers = async (): Promise<User[] | null> => {
+  try {
+    const response = await fetch(`${backendUrl}/api/admin/list-user`, {
+      method: "GET",
+      headers: getAuthHeaders(),
+    });
+    if (!response.ok) throw new Error(`Błąd serwera: ${response.status}`);
+    return await response.json();
+  } catch (error) {
+    console.error("Błąd podczas pobierania listy użytkowników:", error);
+    return null;
+  }
+};
+
+// Tworzenie użytkownika
+export const createUser = async (
+  username: string,
+  password: string
+): Promise<boolean> => {
+  try {
+    const response = await fetch(`${backendUrl}/api/admin/create-user`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ username, password }),
+    });
+
+    if (!response.ok) throw new Error(`Błąd serwera: ${response.status}`);
+    return true;
+  } catch (error) {
+    console.error("Błąd podczas tworzenia użytkownika:", error);
+    return false;
+  }
+};
+
+// Usuwanie użytkownika
+export const deleteUser = async (username: string): Promise<boolean> => {
+  try {
+    const response = await fetch(
+      `${backendUrl}/api/admin/delete-user?username=${username}`,
+      {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      }
+    );
+
+    if (!response.ok) throw new Error(`Błąd serwera: ${response.status}`);
+    return true;
+  } catch (error) {
+    console.error("Błąd podczas usuwania użytkownika:", error);
+    return false;
+  }
+};
+
+// Ustawianie roli użytkownika
+export const setUserRole = async (
+  userId: number,
+  role: "ADMIN" | "USER"
+): Promise<boolean> => {
+  try {
+    const response = await fetch(
+      `${backendUrl}/api/admin/set-role?userId=${userId}&role=${role}`,
+      {
+        method: "PUT",
+        headers: getAuthHeaders(),
+      }
+    );
+
+    if (!response.ok) throw new Error(`Błąd serwera: ${response.status}`);
+    return true;
+  } catch (error) {
+    console.error("Błąd podczas zmiany roli użytkownika:", error);
+    return false;
+  }
+};
+
+// Ustawianie nowego hasła użytkownika
+export const setUserPassword = async (
+  userId: number,
+  newPassword: string
+): Promise<boolean> => {
+  try {
+    const response = await fetch(
+      `${backendUrl}/api/admin/set-password?userId=${userId}&newPassword=${newPassword}`,
+      {
+        method: "PUT",
+        headers: getAuthHeaders(),
+      }
+    );
+
+    if (!response.ok) throw new Error(`Błąd serwera: ${response.status}`);
+    return true;
+  } catch (error) {
+    console.error("Błąd podczas ustawiania nowego hasła:", error);
+    return false;
+  }
+};
 
 export const fetchWhoAmI = async (): Promise<WhoAmIResponse | null> => {
   try {
