@@ -20,7 +20,7 @@ import "@/styles/globals.css";
 type TranslationsSetter = Dispatch<
   SetStateAction<Record<string, string> | null>
 >;
-type UserRole = "USER" | "ADMIN"; // Dodajemy typ dla roli
+type UserRole = "USER" | "ADMIN";
 
 const Dashboard = () => {
   const [translations, setTranslations] = useState<Record<
@@ -31,7 +31,7 @@ const Dashboard = () => {
   const [creditPackages, setCreditPackages] = useState<CreditPackage[]>([]);
   const [newUser, setNewUser] = useState({ username: "", password: "" });
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
-  const [selectedRole, setSelectedRole] = useState<UserRole>("USER"); // Używamy UserRole zamiast string
+  const [selectedRole, setSelectedRole] = useState<UserRole>("USER");
   const [newPassword, setNewPassword] = useState("");
   const [selectedPackageId, setSelectedPackageId] = useState<number | null>(
     null
@@ -76,6 +76,14 @@ const Dashboard = () => {
   };
 
   const handleDeleteUser = async (username: string) => {
+    // Dodajemy potwierdzenie usunięcia
+    const confirmMessage = translations?.confirm_delete_user
+      ? translations.confirm_delete_user.replace("{username}", username)
+      : `Czy na pewno chcesz usunąć użytkownika ${username}?`;
+    const confirmed = window.confirm(confirmMessage);
+
+    if (!confirmed) return; // Jeśli użytkownik kliknie "Anuluj", przerywamy
+
     setIsLoading(true);
     try {
       await deleteUser(username);
@@ -117,7 +125,6 @@ const Dashboard = () => {
 
   const handleAssignCredits = async () => {
     if (!selectedUserId || !selectedPackageId) return;
-
     setIsLoading(true);
     try {
       const success = await assignCreditsToUser(
@@ -127,7 +134,7 @@ const Dashboard = () => {
       if (success) {
         const zaktualizowaniUzytkownicy = await fetchUsers();
         if (zaktualizowaniUzytkownicy) setUsers(zaktualizowaniUzytkownicy);
-        setError(null); // Wyczyść poprzedni błąd przy sukcesie
+        setError(null);
       } else {
         setError("Nie udało się przypisać kredytów");
       }
@@ -220,7 +227,7 @@ const Dashboard = () => {
           ))}
         </select>
         <select
-          onChange={(e) => setSelectedRole(e.target.value as UserRole)} // Poprawiamy typ
+          onChange={(e) => setSelectedRole(e.target.value as UserRole)}
           value={selectedRole}
           className="border p-2 mr-2"
         >

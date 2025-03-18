@@ -43,5 +43,6 @@
   "update_password": "Update Password",
   "assign_credits": "Assign Credits",
   "select_package": "Select Package",
-  "assign": "Assign"
+  "assign": "Assign",
+  "confirm_delete_user": "Are you sure you want to delete user {username}?"
 }

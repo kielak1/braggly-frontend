@@ -43,5 +43,6 @@
   "update_password": "Actualizar contraseña",
   "assign_credits": "Asignar créditos",
   "select_package": "Seleccionar paquete",
-  "assign": "Asignar"
+  "assign": "Asignar",
+  "confirm_delete_user": "¿Estás seguro de que quieres eliminar al usuario {username}?"
 }
