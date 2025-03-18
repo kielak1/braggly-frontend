@@ -29,5 +29,6 @@
   "price": "Price",
   "delete": "Delete",
   "add_package": "Add new package",
-  "add": "Add"
+  "add": "Add",
+  "invalid_package_values": "Invalid package values"
 }

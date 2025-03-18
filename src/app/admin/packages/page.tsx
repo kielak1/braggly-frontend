@@ -63,6 +63,15 @@ const Dashboard = () => {
   };
 
   const handleAddPackage = async () => {
+    if (newCredits <= 0 || newPrice <= 0) {
+      if (translations && translations.invalid_package_values) {
+        alert(translations.invalid_package_values);
+      } else {
+        alert("Wartości kredytów i ceny muszą być większe od zera.");
+      }
+      return; // Przerwij dodawanie pakietu
+    }
+
     const newPackage = await addCreditPackage(newCredits, newPrice);
     if (newPackage) {
       setRefresh((prev) => !prev);

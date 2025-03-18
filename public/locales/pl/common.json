@@ -29,5 +29,6 @@
   "price": "Cena",
   "delete": "Usuń",
   "add_package": "Dodaj nowy pakiet",
-  "add": "Dodaj"
+  "add": "Dodaj",
+  "invalid_package_values": "Nieprawidłowe wartości pakietu"
 }
