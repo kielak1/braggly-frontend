@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { getCookie } from "@/utils/cookies";
 import { useFetchTranslations } from "@/utils/fetchTranslations";
 import "@/styles/globals.css";
@@ -13,10 +13,6 @@ const UploadUXD = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useFetchTranslations(setTranslations, getCookie);
-
-  useEffect(() => {
-    console.log("Translations z useEffect:", translations);
-  }, [translations]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -44,7 +40,7 @@ const UploadUXD = () => {
         accept=".uxd"
         onChange={handleFileChange}
         id="fileInput"
-        className="hidden" // Ukryj natywny przycisk
+        className="hidden"
       />
       {selectedFile && (
         <p className="mt-2 text-gray-600">
