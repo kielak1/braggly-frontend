@@ -53,11 +53,10 @@ export const fetchWhoAmI = async (): Promise<WhoAmIResponse | null> => {
     return null;
   }
 };
-
 export const addCreditPackage = async (
   credits: number,
   priceInCents: number
-): Promise<CreditPackage | null> => {
+): Promise<CreditPackage | { success: boolean } | null> => {
   try {
     const response = await fetch(`${backendUrl}/credits/packages`, {
       method: "POST",
@@ -65,10 +64,15 @@ export const addCreditPackage = async (
       body: JSON.stringify({ credits, priceInCents }),
     });
 
-    if (!response.ok) throw new Error(`Błąd serwera: ${response.status}`);
+    if (!response.ok) {
+      console.error(`Błąd serwera: ${response.status}`);
+      return null; // Zwróć null tylko w przypadku błędów serwera
+    }
 
     const text = await response.text();
-    if (!text.trim()) return null; // Akceptacja pustej odpowiedzi
+    if (!text.trim()) {
+      return { success: true }; // Zwróć obiekt z informacją o sukcesie
+    }
 
     return JSON.parse(text);
   } catch (error) {
@@ -76,7 +80,6 @@ export const addCreditPackage = async (
     return null;
   }
 };
-
 export const deleteCreditPackage = async (
   packageId: number
 ): Promise<boolean> => {
