@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getCookie } from "@/utils/cookies";
 import { useFetchTranslations } from "@/utils/fetchTranslations";
 import {
   fetchCreditPackages,
   deleteCreditPackage,
   addCreditPackage,
+  CreditPackage,
 } from "@/utils/api";
 import "@/styles/globals.css";
 
@@ -21,8 +22,18 @@ const Dashboard = () => {
   );
   const [newCredits, setNewCredits] = useState(0);
   const [newPrice, setNewPrice] = useState(0);
+  const [refresh, setRefresh] = useState(false);
 
   useFetchTranslations(setTranslations, getCookie);
+
+  const loadCreditPackages = useCallback(async () => {
+    const packages = await fetchCreditPackages();
+    setCreditPackages(packages);
+  }, []);
+
+  useEffect(() => {
+    loadCreditPackages();
+  }, [loadCreditPackages, refresh]); // Dodano loadCreditPackages do zależności
 
   useEffect(() => {
     const storedData = localStorage.getItem("userData");
@@ -45,24 +56,16 @@ const Dashboard = () => {
     }
   }, []);
 
-  useEffect(() => {
-    fetchCreditPackages().then(setCreditPackages);
-  }, []);
-
   const handleDelete = async (id: number) => {
     if (await deleteCreditPackage(id)) {
-      setCreditPackages((prev) =>
-        prev ? prev.filter((pkg) => pkg.id !== id) : null
-      );
+      setRefresh((prev) => !prev);
     }
   };
 
   const handleAddPackage = async () => {
     const newPackage = await addCreditPackage(newCredits, newPrice);
     if (newPackage) {
-      setCreditPackages((prev) =>
-        prev ? [...prev, newPackage] : [newPackage]
-      );
+      setRefresh((prev) => !prev);
       setNewCredits(0);
       setNewPrice(0);
     }
