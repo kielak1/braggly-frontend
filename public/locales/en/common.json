@@ -19,5 +19,9 @@
   "token_packages": "Token packages",
   "you_are_admin": "You are an admin",
   "user_list": "System Users",
-  "packages_header": "Token Packages management"
+  "packages_header": "Token Packages management",
+  "account_balance": "Account balance",
+  "top_up_account": "Top up account",
+  "upload_uxd_files": "Upload UXD Files",
+  "selected_file": "Selected File"
 }

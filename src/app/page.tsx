@@ -24,8 +24,10 @@ export default async function Home() {
         <h1 className="text-5xl font-extrabold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
           Braggly !!!
         </h1>
-        <p className="text-2xl mt-4">{translations.greeting || "Loading..."}</p>
-        <p className="text-lg mt-2">{translations.welcome}</p>
+        <p className="text-2xl mt-4">{translations.greeting || "Hello"}</p>
+        <p className="text-lg mt-2">
+          {translations.welcome || "Welcome to the Braggly system"}
+        </p>
       </div>
     </div>
   );

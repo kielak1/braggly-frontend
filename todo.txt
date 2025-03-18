@@ -1,8 +1,7 @@
-- komunikaty o bledach na ios
-   - sprawdzic czy to nie z powodu braku https.  
-      - skopiowac aktualny main na bok
-      - domergowac payment do main i przetestowac na iphone
- 
-- zrozumiec logike co na kliencie a co na serwerze
+- komunikaty hydration na ipad
+
+
 funkcje do ciateczek zapis i  odczyt
 
+tlumaczenia w stronach usera
+zarzadzanie pakietami
