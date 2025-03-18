@@ -23,5 +23,6 @@
   "account_balance": "Saldo de la cuenta",
   "top_up_account": "Recargar cuenta",
   "upload_uxd_files": "Subir archivos UXD",
-  "selected_file": "Archivo seleccionado"
+  "selected_file": "Archivo seleccionado",
+  "select_file_button": "Seleccionar archivo"
 }

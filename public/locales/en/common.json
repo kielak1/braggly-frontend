@@ -23,5 +23,6 @@
   "account_balance": "Account balance",
   "top_up_account": "Top up account",
   "upload_uxd_files": "Upload UXD Files",
-  "selected_file": "Selected File"
+  "selected_file": "Selected File",
+  "select_file_button": "Select file"
 }
