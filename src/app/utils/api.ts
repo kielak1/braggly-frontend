@@ -64,8 +64,13 @@ export const addCreditPackage = async (
       headers: getAuthHeaders(),
       body: JSON.stringify({ credits, priceInCents }),
     });
+
     if (!response.ok) throw new Error(`Błąd serwera: ${response.status}`);
-    return await response.json();
+
+    const text = await response.text();
+    if (!text.trim()) return null; // Akceptacja pustej odpowiedzi
+
+    return JSON.parse(text);
   } catch (error) {
     console.error("Błąd podczas dodawania pakietu kredytowego:", error);
     return null;
