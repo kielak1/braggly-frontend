@@ -30,5 +30,18 @@
   "delete": "Usuń",
   "add_package": "Dodaj nowy pakiet",
   "add": "Dodaj",
-  "invalid_package_values": "Nieprawidłowe wartości pakietu"
+  "invalid_package_values": "Nieprawidłowe wartości pakietu",
+  "balance": "Saldo",
+  "add_user": "Dodaj użytkownika",
+  "username": "Nazwa użytkownika",
+  "password": "Hasło",
+  "set_role": "Ustaw rolę",
+  "select_user": "Wybierz użytkownika",
+  "update_role": "Aktualizuj rolę",
+  "set_password": "Ustaw hasło",
+  "new_password": "Nowe hasło",
+  "update_password": "Aktualizuj hasło",
+  "select_package": "Wybierz pakiet",
+  "assign": "Przypisz",
+  "assign_credits": "Przypisz kredyty"
 }

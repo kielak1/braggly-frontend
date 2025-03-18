@@ -30,5 +30,18 @@
   "delete": "Delete",
   "add_package": "Add new package",
   "add": "Add",
-  "invalid_package_values": "Invalid package values"
+  "invalid_package_values": "Invalid package values",
+  "balance": "Balance",
+  "add_user": "Add User",
+  "username": "Username",
+  "password": "Password",
+  "set_role": "Set Role",
+  "select_user": "Select User",
+  "update_role": "Update Role",
+  "set_password": "Set Password",
+  "new_password": "New Password",
+  "update_password": "Update Password",
+  "assign_credits": "Assign Credits",
+  "select_package": "Select Package",
+  "assign": "Assign"
 }
