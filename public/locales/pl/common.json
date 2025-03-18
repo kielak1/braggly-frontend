@@ -44,5 +44,12 @@
   "select_package": "Wybierz pakiet",
   "assign": "Przypisz",
   "assign_credits": "Przypisz kredyty",
-  "confirm_delete_user": "Czy na pewno chcesz usunąć użytkownika {username}?"
+  "confirm_delete_user": "Czy na pewno chcesz usunąć użytkownika {username}?",
+  "purchase_history": "Historia zakupów",
+  "usage_history": "Historia użycia",
+  "bought": "Kupiono",
+  "used": "Użyto",
+  "no_purchases": "Brak historii zakupów",
+  "no_usage": "Brak historii użycia",
+  "zaco": "za"
 }
