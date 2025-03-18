@@ -1,15 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getCookie } from "@/utils/cookies";
 import { useFetchTranslations } from "@/utils/fetchTranslations";
 import "@/styles/globals.css";
 
 const UploadUXD = () => {
-  const [translations, setTranslations] = useState<Record<string, string> | null>(null);
+  const [translations, setTranslations] = useState<Record<
+    string,
+    string
+  > | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useFetchTranslations(setTranslations, getCookie);
+
+  useEffect(() => {
+    console.log("Translations z useEffect:", translations);
+  }, [translations]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -26,11 +33,18 @@ const UploadUXD = () => {
       <h1 className="text-3xl font-bold text-gray-800 mb-4">
         {translations.upload_uxd_files || "Upload UXD Files"}
       </h1>
+      <label
+        htmlFor="fileInput"
+        className="mt-4 p-2 border rounded-lg w-full text-gray-700 cursor-pointer"
+      >
+        {translations.select_file_button || "Wybierz plik"}
+      </label>
       <input
         type="file"
         accept=".uxd"
         onChange={handleFileChange}
-        className="mt-4 p-2 border rounded-lg w-full text-gray-700"
+        id="fileInput"
+        className="hidden" // Ukryj natywny przycisk
       />
       {selectedFile && (
         <p className="mt-2 text-gray-600">
