@@ -24,5 +24,10 @@
   "top_up_account": "Doładuj konto",
   "upload_uxd_files": "Prześlij pliki UXD",
   "selected_file": "Wybrany plik",
-  "select_file_button": "Wybierz plik"
+  "select_file_button": "Wybierz plik",
+  "credits": "Kredyty",
+  "price": "Cena",
+  "delete": "Usuń",
+  "add_package": "Dodaj nowy pakiet",
+  "add": "Dodaj"
 }

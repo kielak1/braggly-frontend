@@ -24,5 +24,10 @@
   "top_up_account": "Top up account",
   "upload_uxd_files": "Upload UXD Files",
   "selected_file": "Selected File",
-  "select_file_button": "Select file"
+  "select_file_button": "Select file",
+  "credits": "Credits",
+  "price": "Price",
+  "delete": "Delete",
+  "add_package": "Add new package",
+  "add": "Add"
 }
