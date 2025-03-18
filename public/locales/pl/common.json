@@ -12,5 +12,12 @@
   "account": "Konto",
   "uploads": "Przesyłanie plików",
   "you_have": "masz",
-  "tokens_on_your_account": "tokeny(ów) na swoim koncie"
+  "tokens_on_your_account": "tokeny(ów) na swoim koncie",
+  "admin_panel": "Panel administratora",
+  "main_panel_window": "Główne okno panelu",
+  "users": "Użytkownicy",
+  "token_packages": "Pakiety tokenów",
+  "you_are_admin": "Jesteś administratorem",
+  "user_list": "Użytkownicy systemu",
+  "packages_header": "Zarządzanie pakietami tokenów"
 }

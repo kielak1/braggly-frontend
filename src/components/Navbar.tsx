@@ -192,24 +192,11 @@ export default function Navbar() {
       <LanguageSwitcher />
       <h1 className="text-3xl font-bold text-blue-600">Braggly</h1>
 
-      <div className="flex items-center space-x-4">
-        {isLoggedIn && (
-          <div>
-            {userData && (
-              <div className="text-green-400">
-                {translations.loggedAs} {userData.username} ({userData.role})
-              </div>
-            )}
-          </div>
-        )}
-      </div>
 
       <div className="flex items-center space-x-4">
         {session ? (
           <div className="flex items-center space-x-4">
-            <div className="text-green-400">
-              {translations.loggedAs} {session?.user?.name}
-            </div>
+
             <button
               onClick={handleGoogleLogout}
               className="bg-red-500 px-4 py-2 rounded"

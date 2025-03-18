@@ -4,7 +4,7 @@
   "login": "Login",
   "logout": "Logout",
   "error": "Login error",
-  "loggedAs": "Logged in as",  
+  "loggedAs": "Logged in as",
   "googleLogin": "Login with Google",
   "googleLogout": "Logout from Google",
   "panel": "User Panel",
@@ -12,5 +12,12 @@
   "account": "Account",
   "uploads": "File Uploads",
   "you_have": "you have",
-  "tokens_on_your_account": "tokens on your account"
+  "tokens_on_your_account": "tokens on your account",
+  "admin_panel": "Admin Panel",
+  "main_panel_window": "Main panel window",
+  "users": "Users",
+  "token_packages": "Token packages",
+  "you_are_admin": "You are an admin",
+  "user_list": "System Users",
+  "packages_header": "Token Packages management"
 }

@@ -12,5 +12,12 @@
   "account": "Cuenta",
   "uploads": "Subida de archivos",
   "you_have": "tienes",
-  "tokens_on_your_account": "tokens en tu cuenta"
+  "tokens_on_your_account": "tokens en tu cuenta",
+  "admin_panel": "Panel de administración",
+  "main_panel_window": "Ventana principal del panel",
+  "users": "Usuarios",
+  "token_packages": "Paquetes de tokens",
+  "you_are_admin": "Eres un administrador",
+  "user_list": "Usuarios del sistema",
+  "packages_header": "Gestión de paquetes de tokens"
 }
