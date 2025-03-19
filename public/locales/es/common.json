@@ -51,5 +51,12 @@
   "used": "Usado",
   "no_purchases": "Sin historial de compras",
   "no_usage": "Sin historial de uso",
-  "zaco": "por"
+  "zaco": "por",
+  "analyze_button": "Analizar",
+  "analysis_error": "Error al analizar el archivo. Por favor, inténtelo de nuevo.",
+  "xrd_pattern": "Patrón XRD",
+  "intensity": "Intensidad (cuentas)",
+  "detected_peaks": "Picos detectados",
+  "auth_error": "No se encontró el token de autorización. Por favor, inicie sesión.",
+  "access_denied": "Acceso denegado. Permisos insuficientes."
 }
