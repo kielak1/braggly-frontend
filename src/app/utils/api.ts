@@ -59,7 +59,7 @@ export const uploadXrdFile = async (file: File): Promise<any> => {
     console.error("Błąd autoryzacji:", error);
     throw error;
   }
-  console.info("authHeader: ",authHeaders);
+  console.info("authHeader: ", authHeaders);
   const response = await fetch("/api/xrd/analyze", {
     method: "POST",
     headers: authHeaders, // Tylko Authorization, Content-Type ustawi się automatycznie
@@ -68,7 +68,9 @@ export const uploadXrdFile = async (file: File): Promise<any> => {
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Failed to upload and analyze XRD file: ${response.status} - ${errorText}`);
+    throw new Error(
+      `Failed to upload and analyze XRD file: ${response.status} - ${errorText}`
+    );
   }
 
   return response.json();
@@ -91,11 +93,17 @@ export const fetchUsers = async (): Promise<User[] | null> => {
   }
 };
 
-export const createUser = async (username: string, password: string): Promise<boolean> => {
+export const createUser = async (
+  username: string,
+  password: string
+): Promise<boolean> => {
   try {
     const response = await fetch(`${backendUrl}/api/admin/create-user`, {
       method: "POST",
-      headers: getAuthHeaders(),
+      headers: {
+        ...getAuthHeaders(), // Nagłówek Authorization
+        "Content-Type": "application/json", // Jawne ustawienie Content-Type
+      },
       body: JSON.stringify({ username, password }),
     });
     if (!response.ok) {
@@ -105,16 +113,19 @@ export const createUser = async (username: string, password: string): Promise<bo
     return true;
   } catch (error) {
     console.error("Błąd podczas tworzenia użytkownika:", error);
-    return false;
+    throw error; // Rzucamy błąd, aby Dashboard mógł go obsłużyć
   }
 };
 
 export const deleteUser = async (username: string): Promise<boolean> => {
   try {
-    const response = await fetch(`${backendUrl}/api/admin/delete-user?username=${username}`, {
-      method: "DELETE",
-      headers: getAuthHeaders(),
-    });
+    const response = await fetch(
+      `${backendUrl}/api/admin/delete-user?username=${username}`,
+      {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      }
+    );
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`Błąd serwera: ${response.status} - ${errorText}`);
@@ -126,12 +137,18 @@ export const deleteUser = async (username: string): Promise<boolean> => {
   }
 };
 
-export const setUserRole = async (userId: number, role: "ADMIN" | "USER"): Promise<boolean> => {
+export const setUserRole = async (
+  userId: number,
+  role: "ADMIN" | "USER"
+): Promise<boolean> => {
   try {
-    const response = await fetch(`${backendUrl}/api/admin/set-role?userId=${userId}&role=${role}`, {
-      method: "PUT",
-      headers: getAuthHeaders(),
-    });
+    const response = await fetch(
+      `${backendUrl}/api/admin/set-role?userId=${userId}&role=${role}`,
+      {
+        method: "PUT",
+        headers: getAuthHeaders(),
+      }
+    );
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`Błąd serwera: ${response.status} - ${errorText}`);
@@ -143,7 +160,10 @@ export const setUserRole = async (userId: number, role: "ADMIN" | "USER"): Promi
   }
 };
 
-export const setUserPassword = async (userId: number, newPassword: string): Promise<boolean> => {
+export const setUserPassword = async (
+  userId: number,
+  newPassword: string
+): Promise<boolean> => {
   try {
     const response = await fetch(
       `${backendUrl}/api/admin/set-password?userId=${userId}&newPassword=${newPassword}`,
@@ -189,7 +209,13 @@ export const addCreditPackage = async (
   try {
     const response = await fetch(`${backendUrl}/credits/packages`, {
       method: "POST",
-      headers: getAuthHeaders(),
+      headers: {
+        ...getAuthHeaders(), // Nagłówek Authorization
+        "Content-Type": "application/json", // Jawne ustawienie Content-Type
+      },
+
+      // headers: getAuthHeaders(),
+
       body: JSON.stringify({ credits, priceInCents }),
     });
     if (!response.ok) {
@@ -204,12 +230,17 @@ export const addCreditPackage = async (
   }
 };
 
-export const deleteCreditPackage = async (packageId: number): Promise<boolean> => {
+export const deleteCreditPackage = async (
+  packageId: number
+): Promise<boolean> => {
   try {
-    const response = await fetch(`${backendUrl}/credits/packages/${packageId}`, {
-      method: "DELETE",
-      headers: getAuthHeaders(),
-    });
+    const response = await fetch(
+      `${backendUrl}/credits/packages/${packageId}`,
+      {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      }
+    );
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`Błąd serwera: ${response.status} - ${errorText}`);
@@ -221,7 +252,9 @@ export const deleteCreditPackage = async (packageId: number): Promise<boolean> =
   }
 };
 
-export const fetchCreditPackages = async (): Promise<CreditPackage[] | null> => {
+export const fetchCreditPackages = async (): Promise<
+  CreditPackage[] | null
+> => {
   try {
     const response = await fetch(`${backendUrl}/credits/packages`, {
       method: "GET",
@@ -238,7 +271,10 @@ export const fetchCreditPackages = async (): Promise<CreditPackage[] | null> => 
   }
 };
 
-export const assignCreditsToUser = async (userId: number, packageId: number): Promise<boolean> => {
+export const assignCreditsToUser = async (
+  userId: number,
+  packageId: number
+): Promise<boolean> => {
   try {
     const headers = getAuthHeaders();
     const response = await fetch(`${backendUrl}/credits/assign`, {
@@ -264,12 +300,17 @@ export const assignCreditsToUser = async (userId: number, packageId: number): Pr
   }
 };
 
-export const fetchPurchaseHistory = async (userId: number): Promise<PurchaseHistory[] | null> => {
+export const fetchPurchaseHistory = async (
+  userId: number
+): Promise<PurchaseHistory[] | null> => {
   try {
-    const response = await fetch(`${backendUrl}/credits/purchase-history?userId=${userId}`, {
-      method: "GET",
-      headers: getAuthHeaders(),
-    });
+    const response = await fetch(
+      `${backendUrl}/credits/purchase-history?userId=${userId}`,
+      {
+        method: "GET",
+        headers: getAuthHeaders(),
+      }
+    );
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`Błąd serwera: ${response.status} - ${errorText}`);
@@ -281,12 +322,17 @@ export const fetchPurchaseHistory = async (userId: number): Promise<PurchaseHist
   }
 };
 
-export const fetchUsageHistory = async (userId: number): Promise<UsageHistory[] | null> => {
+export const fetchUsageHistory = async (
+  userId: number
+): Promise<UsageHistory[] | null> => {
   try {
-    const response = await fetch(`${backendUrl}/credits/usage-history?userId=${userId}`, {
-      method: "GET",
-      headers: getAuthHeaders(),
-    });
+    const response = await fetch(
+      `${backendUrl}/credits/usage-history?userId=${userId}`,
+      {
+        method: "GET",
+        headers: getAuthHeaders(),
+      }
+    );
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`Błąd serwera: ${response.status} - ${errorText}`);

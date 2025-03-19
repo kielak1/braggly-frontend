@@ -2,9 +2,10 @@ Upload plików
   rozszerzenie +UXD
   obsluga zlych plikow
 
+blokowqanie usuwania samego siebie
 
-  
-
+dlaczego nie mam skrytpu bulid w packages.json 
+   - automatycnze tlumaczeniua
 
 
 
