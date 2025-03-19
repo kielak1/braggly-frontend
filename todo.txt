@@ -1,7 +1,11 @@
 Upload plików
+  rozszerzenie +UXD
+  obsluga zlych plikow
 
-Token jest wysylane ale zwrotnie error 403 . Prawdopodobnie trzeba poprawic security na backend. Niech grok dostosuje zasady dostepu do innych endpoontow (najlepiej do whoami)
-Moze przez Postman na koncie admina
+
+  
+
+
 
 
 

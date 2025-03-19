@@ -58,5 +58,6 @@
   "intensity": "Intensywność (zliczenia)",
   "detected_peaks": "Wykryte piki",
   "auth_error": "Nie znaleziono tokena autoryzacji. Zaloguj się.",
-  "access_denied": "Brak dostępu. Niewystarczające uprawnienia."
+  "access_denied": "Brak dostępu. Niewystarczające uprawnienia.",
+  "loading": "Ładowanie ..."
 }

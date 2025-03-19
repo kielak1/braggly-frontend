@@ -28,11 +28,10 @@ ChartJS.register(
   Legend
 );
 
-// Zaktualizowany interfejs Peak z poprawnym nazewnictwem
 interface Peak {
   angle: number;
   intensity: number;
-  dspacing: number; // Zmieniono z dSpacing na dspacing
+  dspacing: number;
 }
 
 const UploadUXD = () => {
@@ -89,7 +88,7 @@ const UploadUXD = () => {
         (peak: any) =>
           typeof peak.angle === "number" &&
           typeof peak.intensity === "number" &&
-          typeof peak.dspacing === "number" // Zmieniono z dSpacing na dspacing
+          typeof peak.dspacing === "number"
       );
       setPeaks(validatedPeaks);
       if (validatedPeaks.length !== result.peaks.length) {
@@ -112,7 +111,10 @@ const UploadUXD = () => {
   if (!translations) {
     return (
       <div className="max-w-4xl mx-auto p-6 text-center">
-        <p className="text-gray-700">Ładowanie...</p>
+        <p className="text-gray-700">
+          {/* {translations?.loading || "Ładowanie..."} */}
+          Ładowanie..
+        </p>
       </div>
     );
   }
@@ -131,7 +133,7 @@ const UploadUXD = () => {
         </label>
         <input
           type="file"
-          accept=".raw"
+          accept=".uxd"
           onChange={handleFileChange}
           id="fileInput"
           className="hidden"
@@ -210,10 +212,7 @@ const UploadUXD = () => {
                   >
                     <td className="border p-2">{peak.angle.toFixed(2)}</td>
                     <td className="border p-2">{peak.intensity}</td>
-                    <td className="border p-2">
-                      {peak.dspacing.toFixed(2)}
-                    </td>{" "}
-                    {/* Zmieniono z dSpacing na dspacing */}
+                    <td className="border p-2">{peak.dspacing.toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>
