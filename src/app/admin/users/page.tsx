@@ -59,17 +59,32 @@ const Dashboard = () => {
 
     pobierzDane();
   }, []);
-
   const handleCreateUser = async () => {
-    if (!newUser.username || !newUser.password) return;
+    if (!newUser.username || !newUser.password) {
+      setError("Proszę wypełnić nazwę użytkownika i hasło.");
+      return;
+    }
     setIsLoading(true);
     try {
-      await createUser(newUser.username, newUser.password);
+      const success = await createUser(newUser.username, newUser.password);
+      if (!success) {
+        throw new Error("Nie udało się utworzyć użytkownika.");
+      }
       const zaktualizowaniUzytkownicy = await fetchUsers();
       if (zaktualizowaniUzytkownicy) setUsers(zaktualizowaniUzytkownicy);
       setNewUser({ username: "", password: "" });
-    } catch (err) {
-      setError("Błąd podczas tworzenia użytkownika");
+    } catch (err: any) {
+      if (err.message.includes("403")) {
+        setError(
+          "Brak uprawnień do tworzenia użytkownika. Skontaktuj się z administratorem."
+        );
+      } else if (err.message.includes("415")) {
+        setError(
+          "Błąd serwera: Nieprawidłowy format danych. Skontaktuj się z administratorem."
+        );
+      } else {
+        setError("Błąd podczas tworzenia użytkownika: " + err.message);
+      }
     } finally {
       setIsLoading(false);
     }
