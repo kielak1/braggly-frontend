@@ -51,5 +51,12 @@
   "used": "Used",
   "no_purchases": "No purchase history",
   "no_usage": "No usage history",
-  "zaco": "for"
+  "zaco": "for",
+  "analyze_button": "Analyze",
+  "analysis_error": "Failed to analyze the file. Please try again.",
+  "xrd_pattern": "XRD Pattern",
+  "intensity": "Intensity (counts)",
+  "detected_peaks": "Detected Peaks",
+  "auth_error": "No authorization token found. Please log in.",
+  "access_denied": "Access denied. Insufficient permissions."
 }

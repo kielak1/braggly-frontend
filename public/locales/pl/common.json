@@ -51,5 +51,12 @@
   "used": "Użyto",
   "no_purchases": "Brak historii zakupów",
   "no_usage": "Brak historii użycia",
-  "zaco": "za"
+  "zaco": "za",
+  "analyze_button": "Analizuj",
+  "analysis_error": "Nie udało się przeanalizować pliku. Spróbuj ponownie.",
+  "xrd_pattern": "Wzorzec XRD",
+  "intensity": "Intensywność (zliczenia)",
+  "detected_peaks": "Wykryte piki",
+  "auth_error": "Nie znaleziono tokena autoryzacji. Zaloguj się.",
+  "access_denied": "Brak dostępu. Niewystarczające uprawnienia."
 }
