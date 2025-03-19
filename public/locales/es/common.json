@@ -58,5 +58,6 @@
   "intensity": "Intensidad (cuentas)",
   "detected_peaks": "Picos detectados",
   "auth_error": "No se encontró el token de autorización. Por favor, inicie sesión.",
-  "access_denied": "Acceso denegado. Permisos insuficientes."
+  "access_denied": "Acceso denegado. Permisos insuficientes.",
+  "loading": "Cargando ..."
 }
