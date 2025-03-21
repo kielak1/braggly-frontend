@@ -7,17 +7,14 @@ import "@/styles/globals.css";
 import Checkout from "@/components/Checkout";
 
 const AccountPage = () => {
-  const [translations, setTranslations] = useState<Record<
-    string,
-    string
-  > | null>(null);
+  const [translations, setTranslations] = useState<Record<string, string> | null>(null);
   const [userData, setUserData] = useState<Record<string, string> | null>(null);
 
   // Pobieranie tłumaczeń
   useFetchTranslations(setTranslations, getCookie);
 
-  // Pobieranie danych użytkownika z localStorage przy montowaniu komponentu
-  useEffect(() => {
+  // Funkcja do aktualizacji userData z localStorage
+  const updateUserData = () => {
     try {
       const storedData = localStorage.getItem("userData");
       if (storedData) {
@@ -33,12 +30,17 @@ const AccountPage = () => {
           );
         }
       } else {
-        setUserData({ username: "Brak nazwy", balance: "0" }); // Domyślne wartości
+        setUserData({ username: "Brak nazwy", balance: "0" });
       }
     } catch (error) {
       console.error("Błąd parsowania danych z localStorage:", error);
-      setUserData({ username: "Brak nazwy", balance: "0" }); // Fallback w przypadku błędu
+      setUserData({ username: "Brak nazwy", balance: "0" });
     }
+  };
+
+  // Pobieranie danych użytkownika z localStorage przy montowaniu komponentu
+  useEffect(() => {
+    updateUserData();
   }, []);
 
   // Jeśli tłumaczenia lub dane z localStorage nie są załadowane, pokaż stan ładowania
@@ -66,7 +68,7 @@ const AccountPage = () => {
 
       {/* Osadzenie formularza płatności */}
       <div className="mt-6">
-        <Checkout />
+        <Checkout updateUserData={updateUserData} /> {/* Przekazujemy funkcję aktualizującą */}
       </div>
     </div>
   );
