@@ -5,7 +5,7 @@ import {
   Elements,
   useStripe,
   useElements,
-  CardElement,
+  PaymentElement,
 } from "@stripe/react-stripe-js";
 import { useFetchTranslations } from "@/utils/fetchTranslations";
 import { fetchCreditPackages, CreditPackage } from "@/utils/api";
@@ -26,9 +26,9 @@ const CheckoutForm = () => {
     loadCreditPackages();
   }, [loadCreditPackages, refresh]);
 
-  const stripe = useStripe();
-  const elements = useElements();
   const [message, setMessage] = useState("");
+  const [selectedPackage, setSelectedPackage] = useState<CreditPackage | null>(null);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   // Pobieramy dane użytkownika z localStorage
   const storedUserData = localStorage.getItem("userData");
@@ -44,16 +44,8 @@ const CheckoutForm = () => {
     }
   }
 
-  // Funkcja handleSubmit z parametrem pakietu
-  const handleSubmit = async (event: React.FormEvent, pkg: CreditPackage) => {
-    event.preventDefault();
-
-    // Sprawdzamy, czy stripe i elements są dostępne
-    if (!stripe || !elements) {
-      setMessage("Stripe nie jest jeszcze załadowany.");
-      return;
-    }
-
+  // Funkcja do tworzenia PaymentIntent dla wybranego pakietu
+  const createPaymentIntent = async (pkg: CreditPackage) => {
     const response = await fetch("/api/payments/create-payment-intent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -65,19 +57,13 @@ const CheckoutForm = () => {
       }),
     });
 
-    const { clientSecret } = await response.json();
-
-    const { paymentIntent, error } = await stripe.confirmCardPayment(clientSecret, {
-      payment_method: {
-        card: elements.getElement(CardElement)!,
-      },
-    });
-
+    const { clientSecret, error } = await response.json();
     if (error) {
-      setMessage(`Error: ${error.message}`);
-    } else {
-      setMessage(`Success! Payment ID: ${paymentIntent?.id}`);
+      setMessage(`Błąd: ${error}`);
+      return null;
     }
+    setClientSecret(clientSecret);
+    setSelectedPackage(pkg);
   };
 
   if (!translations || !creditPackages) {
@@ -85,10 +71,7 @@ const CheckoutForm = () => {
   }
 
   return (
-    <form>
-      <CardElement />
-      <p>{message}</p>
-
+    <div>
       <ul className="space-y-4">
         {creditPackages.length > 0 ? (
           creditPackages.map((pkg) => (
@@ -102,9 +85,8 @@ const CheckoutForm = () => {
               </span>
 
               <button
-                type="submit"
-                disabled={!stripe}
-                onClick={(e) => handleSubmit(e, pkg)}
+                type="button"
+                onClick={() => createPaymentIntent(pkg)}
                 className="px-4 py-1 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition"
               >
                 {translations.top_up_account}
@@ -115,14 +97,87 @@ const CheckoutForm = () => {
           <li className="text-gray-500">{translations.no_packages}</li>
         )}
       </ul>
+
+      {clientSecret && selectedPackage && (
+        <Elements stripe={stripePromise} options={{ clientSecret }}>
+          <CheckoutFormInner
+            clientSecret={clientSecret}
+            selectedPackage={selectedPackage}
+            translations={translations}
+            message={message} // Przekazujemy message
+            setMessage={setMessage}
+          />
+        </Elements>
+      )}
+    </div>
+  );
+};
+
+// Nowy komponent wewnętrzny do obsługi formularza z PaymentElement
+const CheckoutFormInner = ({
+  clientSecret,
+  selectedPackage,
+  translations,
+  message,
+  setMessage,
+}: {
+  clientSecret: string;
+  selectedPackage: CreditPackage;
+  translations: Record<string, string>;
+  message: string;
+  setMessage: (message: string) => void;
+}) => {
+  const stripe = useStripe();
+  const elements = useElements();
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!stripe || !elements || !clientSecret) {
+      setMessage("Stripe lub clientSecret nie jest jeszcze załadowany.");
+      return;
+    }
+
+    // Krok 1: Przesłanie formularza PaymentElement w celu zebrania i zweryfikowania danych
+    const { error: submitError } = await elements.submit();
+    if (submitError) {
+      setMessage(`Błąd: ${submitError.message}`);
+      return;
+    }
+
+    // Krok 2: Potwierdzenie płatności po pomyślnym przesłaniu
+    const { error, paymentIntent } = await stripe.confirmPayment({
+      elements,
+      clientSecret,
+      confirmParams: {
+        return_url: `${window.location.origin}/payment-success`,
+      },
+      redirect: "if_required",
+    });
+
+    if (error) {
+      setMessage(`Błąd: ${error.message}`);
+    } else if (paymentIntent && paymentIntent.status === "succeeded") {
+      setMessage(`Sukces! ID płatności: ${paymentIntent.id}`);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="mt-4">
+      <PaymentElement />
+      <button
+        type="submit"
+        disabled={!stripe}
+        className="mt-4 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+      >
+        {translations.confirm_payment}
+      </button>
+      <p className="mt-2">{message}</p>
     </form>
   );
 };
 
+
 export default function PaymentPage() {
-  return (
-    <Elements stripe={stripePromise}>
-      <CheckoutForm />
-    </Elements>
-  );
+  return <CheckoutForm />;
 }

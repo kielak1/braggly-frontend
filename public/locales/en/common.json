@@ -59,5 +59,6 @@
   "detected_peaks": "Detected Peaks",
   "auth_error": "No authorization token found. Please log in.",
   "access_denied": "Access denied. Insufficient permissions.",
-  "loading": "Loading..."
+  "loading": "Loading...",
+  "confirm_payment": "Confirm Payment"
 }
