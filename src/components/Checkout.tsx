@@ -8,10 +8,7 @@ import {
   CardElement,
 } from "@stripe/react-stripe-js";
 import { useFetchTranslations } from "@/utils/fetchTranslations";
-import {
-  fetchCreditPackages,
-  CreditPackage,
-} from "@/utils/api";
+import { fetchCreditPackages, CreditPackage } from "@/utils/api";
 import { getCookie } from "@/utils/cookies";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
@@ -102,7 +99,7 @@ const CheckoutForm = () => {
           creditPackages.map((pkg) => (
             <li
               key={pkg.id}
-              className="flex justify-between items-center py-2 px-4 bg-white rounded shadow text-sm"
+              className="flex justify-between items-center py-1 px-4 bg-white rounded shadow text-sm"
             >
               <span>
                 {translations.credits}: {pkg.credits}, {translations.price}:{" "}
@@ -112,7 +109,7 @@ const CheckoutForm = () => {
               <button
                 type="submit"
                 disabled={!stripe}
-                className="mt-4 px-4 py-3 bg-blue-500 text-white rounded-lg text-lg font-semibold hover:bg-blue-600 transition"
+                className="px-4 py-1 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition"
               >
                 {translations.top_up_account}
               </button>
