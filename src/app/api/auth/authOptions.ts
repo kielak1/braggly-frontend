@@ -40,11 +40,7 @@ export const authOptions: NextAuthOptions = {
           }
         );
         const responseData = await res.json(); // Zakładając, że backend zwraca JSON
-        console.log("Odpowiedź z backendu:", {
-          status: res.status,
-          ok: res.ok,
-          data: responseData,
-        });
+
 
         if (res.ok && responseData.token) {
           account.backendToken = responseData.token; // Przekaz token do account

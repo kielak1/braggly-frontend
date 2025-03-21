@@ -25,7 +25,7 @@
   "upload_uxd_files": "Upload UXD Files",
   "selected_file": "Selected File",
   "select_file_button": "Select file",
-  "credits": "Credits",
+  "credits": "Tokens",
   "price": "Price",
   "delete": "Delete",
   "add_package": "Add new package",
@@ -41,7 +41,7 @@
   "set_password": "Set Password",
   "new_password": "New Password",
   "update_password": "Update Password",
-  "assign_credits": "Assign Credits",
+  "assign_credits": "Assign Tokens",
   "select_package": "Select Package",
   "assign": "Assign",
   "confirm_delete_user": "Are you sure you want to delete user {username}?",
@@ -60,5 +60,6 @@
   "auth_error": "No authorization token found. Please log in.",
   "access_denied": "Access denied. Insufficient permissions.",
   "loading": "Loading...",
-  "confirm_payment": "Confirm Payment"
+  "confirm_payment": "Confirm Payment",
+  "what_are_tokens_for": "Tokens allow you to use certain features of the Braggly system. They are consumed at a rate of one token per day. Some activities in the future may consume more tokens."
 }

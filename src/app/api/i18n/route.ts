@@ -11,8 +11,6 @@ export async function GET(req: Request) {
     // Upewnij się, że odczytujesz pliki z `public/locales/`
     const filePath = path.join(process.cwd(), "public", "locales", locale, "common.json");
 
-    console.log(`🔍 Próba odczytu pliku: ${filePath}`);
-
     // Sprawdzenie, czy plik istnieje
     try {
       await fs.access(filePath);
