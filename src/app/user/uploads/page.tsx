@@ -64,8 +64,6 @@ const UploadUXD = () => {
 
     try {
       const result = await uploadXrdFile(selectedFile);
-      console.log("Backend response:", result);
-      console.log("Peaks structure:", result.peaks);
 
       if (!result.angles || !result.intensities || !result.peaks) {
         throw new Error("Invalid response format from backend");

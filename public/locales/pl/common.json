@@ -25,7 +25,7 @@
   "upload_uxd_files": "Prześlij pliki UXD",
   "selected_file": "Wybrany plik",
   "select_file_button": "Wybierz plik",
-  "credits": "Kredyty",
+  "credits": "Tokeny",
   "price": "Cena",
   "delete": "Usuń",
   "add_package": "Dodaj nowy pakiet",
@@ -43,7 +43,7 @@
   "update_password": "Aktualizuj hasło",
   "select_package": "Wybierz pakiet",
   "assign": "Przypisz",
-  "assign_credits": "Przypisz kredyty",
+  "assign_credits": "Przypisz tokeny",
   "confirm_delete_user": "Czy na pewno chcesz usunąć użytkownika {username}?",
   "purchase_history": "Historia zakupów",
   "usage_history": "Historia użycia",
@@ -60,5 +60,6 @@
   "auth_error": "Nie znaleziono tokena autoryzacji. Zaloguj się.",
   "access_denied": "Brak dostępu. Niewystarczające uprawnienia.",
   "loading": "Ładowanie ...",
-  "confirm_payment": "Potwierdź płatność"
+  "confirm_payment": "Potwierdź płatność",
+  "what_are_tokens_for": "Tokeny umożliwiają korzystanie z niektórych funkcji systemu Braggly. Zużywają się w tempie jednego tokena na dzień. Niektóre aktywności w przyszłości mogą konsumować więcej tokenów."
 }

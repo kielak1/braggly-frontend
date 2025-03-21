@@ -76,6 +76,10 @@ const Dashboard = () => {
         {translations.tokens_on_your_account}.
       </p>
 
+      <p className="italic text-gray-600">
+        {translations.what_are_tokens_for}
+      </p>
+
       {/* Lista historii zakupów */}
       <div className="mb-6">
         <h2 className="text-xl font-bold text-gray-800 mb-2">
@@ -87,12 +91,15 @@ const Dashboard = () => {
         >
           {purchaseHistory && purchaseHistory.length > 0 ? (
             <ul className="space-y-2">
-              {purchaseHistory.map((item) => (
+              {purchaseHistory
+              .slice()
+              .sort((a, b) => new Date(b.purchaseDate).getTime() - new Date(a.purchaseDate).getTime())
+              .map((item) => (
                 <li key={item.id} className="text-gray-700">
-                  {translations.bought || "Kupiono"} {item.creditsPurchased}{" "}
-                  {translations.credits || "kredytów"} {translations.zaco}{" "}
-                  {(item.amountPaid / 100).toFixed(2)} zł -{" "}
-                  {new Date(item.purchaseDate).toLocaleString()}
+                {translations.bought || "Kupiono"} {item.creditsPurchased}{" "}
+                {translations.credits || "kredytów"} {translations.zaco}{" "}
+                {(item.amountPaid / 100).toFixed(2)} zł -{" "}
+                {new Date(item.purchaseDate).toLocaleString()}
                 </li>
               ))}
             </ul>
@@ -115,11 +122,14 @@ const Dashboard = () => {
         >
           {usageHistory && usageHistory.length > 0 ? (
             <ul className="space-y-2">
-              {usageHistory.map((item) => (
+              {usageHistory
+              .slice()
+              .sort((a, b) => new Date(b.usageDate).getTime() - new Date(a.usageDate).getTime())
+              .map((item) => (
                 <li key={item.id} className="text-gray-700">
-                  {translations.used || "Użyto"} {item.creditsUsed}{" "}
-                  {translations.credits || "kredytów"} (
-                  {item.usageType}) - {new Date(item.usageDate).toLocaleString()}
+                {translations.used || "Użyto"} {item.creditsUsed}{" "}
+                {translations.credits || "tokenów"} (
+                {item.usageType}) - {new Date(item.usageDate).toLocaleString()}
                 </li>
               ))}
             </ul>
