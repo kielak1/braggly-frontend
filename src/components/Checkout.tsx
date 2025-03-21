@@ -31,12 +31,19 @@ const CheckoutForm = () => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
+    // Pobranie username z localStorage
+    const userData = localStorage.getItem("userData");
+    const parsedUserData = userData ? JSON.parse(userData) : {};
+    const username = parsedUserData.username || "unknown_user"; // Fallback, gdyby było puste
+    const user_id = parsedUserData.id || "unknown_idr"; // Fallback, gdyby było puste
+
     const response = await fetch("/api/payments/create-payment-intent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        amount: 1000, // 10 PLN w groszach
-        username: username, // 🔥 Przekazujemy username do backendu!
+        amount: 1000,
+        username: username, // <-- Dodajemy username
+        user_id: user_id,
       }),
     });
 
