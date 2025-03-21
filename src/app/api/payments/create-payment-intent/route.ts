@@ -3,13 +3,13 @@ import { stripe } from "../stripe";
 
 export async function POST(req: Request) {
   try {
-    const { amount, username, user_id } = await req.json(); // Pobranie amount i username z ciała żądania
+    const { amount, username, user_id, package_id } = await req.json();
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency: "pln",
       payment_method_types: ["card"],
-      metadata: { username, user_id }, // Dodanie username do metadanych
+      metadata: { username, user_id, package_id }, // Dodajemy package_id
     });
 
     return NextResponse.json({ clientSecret: paymentIntent.client_secret });
