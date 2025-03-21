@@ -7,7 +7,10 @@ import "@/styles/globals.css";
 import Checkout from "@/components/Checkout";
 
 const AccountPage = () => {
-  const [translations, setTranslations] = useState<Record<string, string> | null>(null);
+  const [translations, setTranslations] = useState<Record<
+    string,
+    string
+  > | null>(null);
   const [userData, setUserData] = useState<Record<string, string> | null>(null);
 
   // Pobieranie tłumaczeń
@@ -20,7 +23,14 @@ const AccountPage = () => {
       if (storedData) {
         const parsedData = JSON.parse(storedData);
         if (typeof parsedData === "object" && parsedData !== null) {
-          setUserData(Object.fromEntries(Object.entries(parsedData).map(([key, value]) => [key, String(value)])));
+          setUserData(
+            Object.fromEntries(
+              Object.entries(parsedData).map(([key, value]) => [
+                key,
+                String(value),
+              ])
+            )
+          );
         }
       } else {
         setUserData({ username: "Brak nazwy", balance: "0" }); // Domyślne wartości
@@ -33,7 +43,9 @@ const AccountPage = () => {
 
   // Jeśli tłumaczenia lub dane z localStorage nie są załadowane, pokaż stan ładowania
   if (!translations || !userData) {
-    return <div className="text-center text-gray-600 text-lg mt-6">Ładowanie...</div>;
+    return (
+      <div className="text-center text-gray-600 text-lg mt-6">Ładowanie...</div>
+    );
   }
 
   return (
@@ -51,10 +63,6 @@ const AccountPage = () => {
         </span>{" "}
         {translations.tokens_on_your_account || "tokenów na swoim koncie"}.
       </p>
-      
-      <button className="mt-4 px-6 py-3 bg-blue-500 text-white rounded-lg text-lg font-semibold hover:bg-blue-600 transition">
-        {translations.top_up_account || "Doładuj konto"}
-      </button>
 
       {/* Osadzenie formularza płatności */}
       <div className="mt-6">
