@@ -16,3 +16,4 @@ dlaczego nie mam skrytpu bulid w packages.json
 funkcje do ciateczek zapis i  odczyt
 
 
+plik webhook po stronie frontend chyba jest niepotrzeby i do usuniecia
