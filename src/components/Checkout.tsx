@@ -13,7 +13,7 @@ import { getCookie } from "@/utils/cookies";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
 
-const CheckoutForm = () => {
+const CheckoutForm = ({ updateUserData }: { updateUserData: () => void }) => {
   const [translations, setTranslations] = useState<Record<string, string> | null>(null);
   useFetchTranslations(setTranslations, getCookie);
   const [creditPackages, setCreditPackages] = useState<CreditPackage[] | null>(null);
@@ -66,6 +66,12 @@ const CheckoutForm = () => {
     setSelectedPackage(pkg);
   };
 
+  // Funkcja resetująca formularz
+  const resetForm = () => {
+    setClientSecret(null);
+    setSelectedPackage(null);
+  };
+
   if (!translations || !creditPackages) {
     return <div>Ładowanie...</div>;
   }
@@ -83,7 +89,6 @@ const CheckoutForm = () => {
                 {translations.credits}: {pkg.credits}, {translations.price}:{" "}
                 {pkg.priceInCents / 100} zł
               </span>
-
               <button
                 type="button"
                 onClick={() => createPaymentIntent(pkg)}
@@ -104,28 +109,34 @@ const CheckoutForm = () => {
             clientSecret={clientSecret}
             selectedPackage={selectedPackage}
             translations={translations}
-            message={message} // Przekazujemy message
+            message={message}
             setMessage={setMessage}
+            onSuccess={() => {
+              resetForm();
+              updateUserData(); // Wywołujemy aktualizację userData po sukcesie
+            }}
           />
         </Elements>
       )}
+      {message && <p className="mt-4">{message}</p>}
     </div>
   );
 };
 
-// Nowy komponent wewnętrzny do obsługi formularza z PaymentElement
 const CheckoutFormInner = ({
   clientSecret,
   selectedPackage,
   translations,
   message,
   setMessage,
+  onSuccess,
 }: {
   clientSecret: string;
   selectedPackage: CreditPackage;
   translations: Record<string, string>;
   message: string;
   setMessage: (message: string) => void;
+  onSuccess: () => void;
 }) => {
   const stripe = useStripe();
   const elements = useElements();
@@ -138,14 +149,12 @@ const CheckoutFormInner = ({
       return;
     }
 
-    // Krok 1: Przesłanie formularza PaymentElement w celu zebrania i zweryfikowania danych
     const { error: submitError } = await elements.submit();
     if (submitError) {
       setMessage(`Błąd: ${submitError.message}`);
       return;
     }
 
-    // Krok 2: Potwierdzenie płatności po pomyślnym przesłaniu
     const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       clientSecret,
@@ -157,8 +166,20 @@ const CheckoutFormInner = ({
 
     if (error) {
       setMessage(`Błąd: ${error.message}`);
+      onSuccess();
     } else if (paymentIntent && paymentIntent.status === "succeeded") {
       setMessage(`Sukces! ID płatności: ${paymentIntent.id}`);
+
+      // Ręczna aktualizacja salda w localStorage
+      const storedUserData = localStorage.getItem("userData");
+      if (storedUserData) {
+        const parsedData = JSON.parse(storedUserData);
+        const currentCredits = parsedData.balance || 0;
+        parsedData.balance = currentCredits + selectedPackage.credits;
+        localStorage.setItem("userData", JSON.stringify(parsedData));
+      }
+
+      onSuccess(); // Wywołujemy reset i aktualizację userData
     }
   };
 
@@ -172,12 +193,8 @@ const CheckoutFormInner = ({
       >
         {translations.confirm_payment}
       </button>
-      <p className="mt-2">{message}</p>
     </form>
   );
 };
 
-
-export default function PaymentPage() {
-  return <CheckoutForm />;
-}
+export default CheckoutForm;
