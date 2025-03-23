@@ -17,3 +17,6 @@ funkcje do ciateczek zapis i  odczyt
 
 
 plik webhook po stronie frontend chyba jest niepotrzeby i do usuniecia
+
+
+obsluzyc pole email przy platnosci - wyslac email z potwierdzeniem ?

@@ -154,17 +154,20 @@ const CheckoutForm = ({ updateUserData }: { updateUserData: () => void }) => {
       )}
 
       {message && (
-        <p
-          className={`mt-4 p-3 rounded-lg text-center font-medium shadow-md ${
-            message.includes("Sukces")
-              ? "bg-green-100 text-green-800 border border-green-300"
-              : message.includes("Błąd")
-                ? "bg-red-100 text-red-800 border border-red-300"
-                : "bg-gray-100 text-gray-800 border border-gray-300"
+        <div
+          className={`mt-4 p-4 rounded-lg flex items-center justify-center space-x-2 shadow-lg max-w-md mx-auto ${
+            !message.includes("Błąd")
+              ? "bg-green-50 text-green-800 border border-green-200"
+              :  "bg-red-50 text-red-800 border border-red-200"
           }`}
         >
-          {message}
-        </p>
+          {!message.toLowerCase().includes("Błąd") ? (
+            <CheckCircleIcon className="h-6 w-6 text-green-600" />
+          ) : (
+            <ExclamationCircleIcon className="h-6 w-6 text-red-600" />
+          )}
+          <p className="font-medium">{message}</p>
+        </div>
       )}
     </div>
   );
