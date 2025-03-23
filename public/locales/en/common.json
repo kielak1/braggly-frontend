@@ -61,5 +61,7 @@
   "access_denied": "Access denied. Insufficient permissions.",
   "loading": "Loading...",
   "confirm_payment": "Confirm Payment",
-  "what_are_tokens_for": "Tokens allow you to use certain features of the Braggly system. They are consumed at a rate of one token per day. Some activities in the future may consume more tokens."
+  "what_are_tokens_for": "Tokens allow you to use certain features of the Braggly system. They are consumed at a rate of one token per day. Some activities in the future may consume more tokens.",
+  "no_packages": "lack of packages",
+  "selected_package": "selected package"
 }
