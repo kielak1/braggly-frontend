@@ -11,6 +11,7 @@
     "build:css": "npx tailwindcss -i src/styles/tailwind.css -o src/styles/globals.css"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@stripe/react-stripe-js": "^3.5.1",
     "@stripe/stripe-js": "^6.1.0",
     "autoprefixer": "^10.4.20",

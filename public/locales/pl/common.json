@@ -63,5 +63,7 @@
   "confirm_payment": "Potwierdź płatność",
   "what_are_tokens_for": "Tokeny umożliwiają korzystanie z niektórych funkcji systemu Braggly. Zużywają się w tempie jednego tokena na dzień. Niektóre aktywności w przyszłości mogą konsumować więcej tokenów.",
   "no_packages": "brak pakietów",
-  "selected_package": "wybrany pakiet"
+  "selected_package": "wybrany pakiet",
+  "back": "cofnij",
+  "payment_success": "Płatność zakończona sukcesem! ID transakcji:"
 }
