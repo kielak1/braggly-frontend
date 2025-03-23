@@ -14,9 +14,14 @@ import { getCookie } from "@/utils/cookies";
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
 
 const CheckoutForm = ({ updateUserData }: { updateUserData: () => void }) => {
-  const [translations, setTranslations] = useState<Record<string, string> | null>(null);
+  const [translations, setTranslations] = useState<Record<
+    string,
+    string
+  > | null>(null);
   useFetchTranslations(setTranslations, getCookie);
-  const [creditPackages, setCreditPackages] = useState<CreditPackage[] | null>(null);
+  const [creditPackages, setCreditPackages] = useState<CreditPackage[] | null>(
+    null
+  );
   const loadCreditPackages = useCallback(async () => {
     const packages = await fetchCreditPackages();
     setCreditPackages(packages);
@@ -27,7 +32,9 @@ const CheckoutForm = ({ updateUserData }: { updateUserData: () => void }) => {
   }, [loadCreditPackages, refresh]);
 
   const [message, setMessage] = useState("");
-  const [selectedPackage, setSelectedPackage] = useState<CreditPackage | null>(null);
+  const [selectedPackage, setSelectedPackage] = useState<CreditPackage | null>(
+    null
+  );
   const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   // Pobieramy dane użytkownika z localStorage
@@ -78,46 +85,69 @@ const CheckoutForm = ({ updateUserData }: { updateUserData: () => void }) => {
 
   return (
     <div>
-      <ul className="space-y-4">
-        {creditPackages.length > 0 ? (
-          creditPackages.map((pkg) => (
-            <li
-              key={pkg.id}
-              className="flex justify-between items-center py-1 px-4 bg-white rounded shadow text-sm"
-            >
-              <span>
-                {translations.credits}: {pkg.credits}, {translations.price}:{" "}
-                {pkg.priceInCents / 100} zł
-              </span>
-              <button
-                type="button"
-                onClick={() => createPaymentIntent(pkg)}
-                className="px-4 py-1 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition"
+      {!(clientSecret && selectedPackage) && (
+        <ul className="space-y-4">
+          {creditPackages.length > 0 ? (
+            creditPackages.map((pkg) => (
+              <li
+                key={pkg.id}
+                className="flex justify-between items-center py-1 px-4 bg-white rounded shadow text-sm"
               >
-                {translations.top_up_account}
-              </button>
-            </li>
-          ))
-        ) : (
-          <li className="text-gray-500">{translations.no_packages}</li>
-        )}
-      </ul>
+                <span>
+                  {translations.credits}: {pkg.credits}, {translations.price}:{" "}
+                  {pkg.priceInCents / 100} zł
+                </span>
+                <button
+                  type="button"
+                  onClick={() => createPaymentIntent(pkg)}
+                  className="px-4 py-1 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition"
+                >
+                  {translations.top_up_account}
+                </button>
+              </li>
+            ))
+          ) : (
+            <li className="text-gray-500">{translations.no_packages}</li>
+          )}
+        </ul>
+      )}
 
       {clientSecret && selectedPackage && (
-        <Elements stripe={stripePromise} options={{ clientSecret }}>
-          <CheckoutFormInner
-            clientSecret={clientSecret}
-            selectedPackage={selectedPackage}
-            translations={translations}
-            message={message}
-            setMessage={setMessage}
-            onSuccess={() => {
-              resetForm();
-              updateUserData(); // Wywołujemy aktualizację userData po sukcesie
-            }}
-          />
-        </Elements>
+        <>
+          <div className="mt-6 p-4 rounded-xl border border-blue-200 bg-blue-50 shadow-inner">
+            <h2 className="text-blue-800 font-semibold text-sm mb-2">
+              {translations.selected_package}:
+            </h2>
+            <div className="flex justify-between items-center text-sm text-blue-900">
+              <span>
+                {translations.credits}:{" "}
+                <span className="font-bold">{selectedPackage.credits}</span>
+              </span>
+              <span>
+                {translations.price}:{" "}
+                <span className="font-bold">
+                  {selectedPackage.priceInCents / 100} zł
+                </span>
+              </span>
+            </div>
+          </div>
+
+          <Elements stripe={stripePromise} options={{ clientSecret }}>
+            <CheckoutFormInner
+              clientSecret={clientSecret}
+              selectedPackage={selectedPackage}
+              translations={translations}
+              message={message}
+              setMessage={setMessage}
+              onSuccess={() => {
+                resetForm();
+                updateUserData(); // Wywołujemy aktualizację userData po sukcesie
+              }}
+            />
+          </Elements>
+        </>
       )}
+
       {message && <p className="mt-4">{message}</p>}
     </div>
   );
