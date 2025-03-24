@@ -99,7 +99,8 @@ const Dashboard = () => {
                 {translations.bought || "Kupiono"} {item.creditsPurchased}{" "}
                 {translations.credits || "kredytów"} {translations.zaco}{" "}
                 {(item.amountPaid / 100).toFixed(2)} zł -{" "}
-                {new Date(item.purchaseDate).toLocaleString()}
+                {new Date(item.purchaseDate).toLocaleString()} {" "}
+                {item.paymentId}
                 </li>
               ))}
             </ul>

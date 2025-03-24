@@ -27,6 +27,7 @@ export interface PurchaseHistory {
   creditsPurchased: number;
   amountPaid: number;
   purchaseDate: string;
+  paymentId: string;
 }
 
 export interface UsageHistory {
