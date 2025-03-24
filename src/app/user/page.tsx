@@ -95,13 +95,16 @@ const Dashboard = () => {
               .slice()
               .sort((a, b) => new Date(b.purchaseDate).getTime() - new Date(a.purchaseDate).getTime())
               .map((item) => (
-                <li key={item.id} className="text-gray-700">
-                {translations.bought || "Kupiono"} {item.creditsPurchased}{" "}
+              <li key={item.id} className="text-gray-700 flex justify-between items-center">
+                <span>
+                {translations.bought || "Kupiono"}{" "}
+                <span className="font-semibold">{item.creditsPurchased}</span>{" "}
                 {translations.credits || "kredytów"} {translations.zaco}{" "}
-                {(item.amountPaid / 100).toFixed(2)} zł -{" "}
-                {new Date(item.purchaseDate).toLocaleString()} {" "}
-                {item.paymentId}
-                </li>
+                <span className="font-semibold">{(item.amountPaid / 100).toFixed(2)} zł</span> -{" "}
+                {new Date(item.purchaseDate).toLocaleString()}
+                </span>
+                <span className="text-sm text-gray-500">{item.paymentId}</span>
+              </li>
               ))}
             </ul>
           ) : (
