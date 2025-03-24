@@ -75,5 +75,9 @@
   "rights": "El usuario tiene derecho a acceder, rectificar, eliminar y limitar el tratamiento de sus datos.",
   "security": "Las contraseñas se almacenan en forma cifrada mediante mecanismos seguros..",
   "cookies": "La aplicación no utiliza mecanismos de seguimiento.",
-  "contact": "Para cuestiones relacionadas con los datos personales, contáctenos en: tadeusz@kielak.com"
+  "contact": "Para cuestiones relacionadas con los datos personales, contáctenos en: tadeusz@kielak.com",
+  "app_name": "Braggly",
+  "rights_reserved": "Todos los derechos reservados.",
+  "homepage": "Inicio",
+  "privacy_link": "Política de privacidad"
 }

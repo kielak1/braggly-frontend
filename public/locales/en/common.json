@@ -75,5 +75,9 @@
   "rights": "Users have the right to access, correct, delete, and restrict the processing of their data.",
   "security": "Passwords are stored in encrypted form using secure mechanisms..",
   "cookies": "The application does not use tracking mechanisms.",
-  "contact": "For data-related matters, contact us at: tadeusz@kielak.com"
+  "contact": "For data-related matters, contact us at: tadeusz@kielak.com",
+  "app_name": "Braggly",
+  "rights_reserved": "All rights reserved.",
+  "homepage": "Home",
+  "privacy_link": "Privacy Policy"
 }

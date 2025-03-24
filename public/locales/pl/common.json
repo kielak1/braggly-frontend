@@ -75,5 +75,9 @@
   "rights": "Użytkownik ma prawo do dostępu do swoich danych, ich poprawienia, usunięcia oraz ograniczenia przetwarzania.",
   "security": "Hasła są przechowywane w formie zaszyfrowanej z użyciem bezpiecznych mechanizmów.",
   "cookies": "Aplikacja nie korzysta z mechanizmów śledzących.",
-  "contact": "W sprawach związanych z danymi osobowymi skontaktuj się pod adresem: tadeusz@kielak.com"
+  "contact": "W sprawach związanych z danymi osobowymi skontaktuj się pod adresem: tadeusz@kielak.com",
+  "app_name": "Braggly",
+  "rights_reserved": "Wszelkie prawa zastrzeżone.",
+  "homepage": "Strona główna",
+  "privacy_link": "Polityka prywatności"
 }
