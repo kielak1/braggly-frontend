@@ -65,5 +65,15 @@
   "no_packages": "brak pakietów",
   "selected_package": "wybrany pakiet",
   "back": "cofnij",
-  "payment_success": "Płatność zakończona sukcesem! ID transakcji:"
+  "payment_success": "Płatność zakończona sukcesem! ID transakcji:",
+  "title": "Polityka prywatności",
+  "admin": "Administratorem danych osobowych jest właściciel aplikacji. Dane kontaktowe znajdują się poniżej.",
+  "scope": "Aplikacja zbiera i przechowuje jedynie dane niezbędne do logowania: login i hasło (w formie zaszyfrowanej).",
+  "purpose": "Dane osobowe są wykorzystywane wyłącznie w celu umożliwienia użytkownikowi logowania do aplikacji.",
+  "legal": "Podstawą prawną przetwarzania danych jest uzasadniony interes administratora – zapewnienie działania aplikacji i bezpieczeństwa.",
+  "sharing": "Dane nie są udostępniane osobom trzecim, z wyjątkiem sytuacji wymaganych przez prawo.",
+  "rights": "Użytkownik ma prawo do dostępu do swoich danych, ich poprawienia, usunięcia oraz ograniczenia przetwarzania.",
+  "security": "Hasła są przechowywane w formie zaszyfrowanej z użyciem bezpiecznych mechanizmów.",
+  "cookies": "Aplikacja nie korzysta z mechanizmów śledzących.",
+  "contact": "W sprawach związanych z danymi osobowymi skontaktuj się pod adresem: tadeusz@kielak.com"
 }

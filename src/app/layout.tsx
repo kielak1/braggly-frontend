@@ -1,7 +1,7 @@
 import "@/styles/globals.css";
 import { Metadata } from "next";
 import ClientLayout from "./ClientLayout";
-
+import Foot from "@/components/Foot";
 export const metadata: Metadata = {
   title: "Braggly App",
   description: "Aplikacja Braggly",
@@ -13,6 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <ClientLayout>{children}</ClientLayout>
+        <Foot />
       </body>
     </html>
   );

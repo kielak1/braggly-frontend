@@ -65,5 +65,15 @@
   "no_packages": "lack of packages",
   "selected_package": "selected package",
   "back": "go back",
-  "payment_success": "Payment completed successfully! Transaction ID:"
+  "payment_success": "Payment completed successfully! Transaction ID:",
+  "title": "Privacy Policy",
+  "admin": "The data controller is the owner of the application. Contact details are provided below.",
+  "scope": "The application collects and stores only the data necessary for login: username and password (encrypted).",
+  "purpose": "Personal data is used solely to enable the user to log into the application.",
+  "legal": "The legal basis for data processing is the legitimate interest of the controller – ensuring functionality and security.",
+  "sharing": "Data is not shared with third parties, except as required by law.",
+  "rights": "Users have the right to access, correct, delete, and restrict the processing of their data.",
+  "security": "Passwords are stored in encrypted form using secure mechanisms..",
+  "cookies": "The application does not use tracking mechanisms.",
+  "contact": "For data-related matters, contact us at: tadeusz@kielak.com"
 }

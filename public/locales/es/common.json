@@ -65,5 +65,15 @@
   "no_packages": "falta de paquetes",
   "selected_package": "paquete seleccionado",
   "back": "deshacer",
-  "payment_success": "¡Pago completado con éxito! ID de transacción:"
+  "payment_success": "¡Pago completado con éxito! ID de transacción:",
+  "title": "Política de privacidad",
+  "admin": "El responsable del tratamiento de los datos personales es el propietario de la aplicación. Los datos de contacto se encuentran a continuación.",
+  "scope": "La aplicación recopila y almacena únicamente los datos necesarios para el inicio de sesión: nombre de usuario y contraseña (cifrada).",
+  "purpose": "Los datos personales se utilizan únicamente para permitir al usuario iniciar sesión en la aplicación.",
+  "legal": "La base legal para el tratamiento de datos es el interés legítimo del responsable: garantizar la funcionalidad y seguridad.",
+  "sharing": "Los datos no se comparten con terceros, salvo que lo exija la ley.",
+  "rights": "El usuario tiene derecho a acceder, rectificar, eliminar y limitar el tratamiento de sus datos.",
+  "security": "Las contraseñas se almacenan en forma cifrada mediante mecanismos seguros..",
+  "cookies": "La aplicación no utiliza mecanismos de seguimiento.",
+  "contact": "Para cuestiones relacionadas con los datos personales, contáctenos en: tadeusz@kielak.com"
 }

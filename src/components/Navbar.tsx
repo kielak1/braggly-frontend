@@ -85,26 +85,28 @@ export default function Navbar() {
 
   useEffect(() => {
     // Wywołaj fetchWhoAmI po zmianie localStorageToken i przekieruj na odpowiednią ścieżkę
-    if (localStorageToken) {
-      fetchWhoAmI().then((data) => {
-        if (data) {
-          setUserData(data);
-          if (data.role === "ADMIN") {
-            if (!pathname.startsWith("/admin")) {
-              router.push("/admin");
-            }
-          } else {
-            if (!pathname.startsWith("/user")) {
-              router.push("/user");
+    if (!pathname.startsWith("/privacy-policy")) {
+      if (localStorageToken) {
+        fetchWhoAmI().then((data) => {
+          if (data) {
+            setUserData(data);
+            if (data.role === "ADMIN") {
+              if (!pathname.startsWith("/admin")) {
+                router.push("/admin");
+              }
+            } else {
+              if (!pathname.startsWith("/user")) {
+                router.push("/user");
+              }
             }
           }
-        }
-      });
-    } else {
-      router.push("/");
-      setUserData(null);
+        });
+      } else {
+        router.push("/");
+        setUserData(null);
+      }
     }
-  }, [localStorageToken, router, pathname]); 
+  }, [localStorageToken, router, pathname]);
 
   const handleLogin = async () => {
     setErrorMessage("");
@@ -192,11 +194,9 @@ export default function Navbar() {
       <LanguageSwitcher />
       <h1 className="text-3xl font-bold text-blue-600">Braggly</h1>
 
-
       <div className="flex items-center space-x-4">
         {session ? (
           <div className="flex items-center space-x-4">
-
             <button
               onClick={handleGoogleLogout}
               className="bg-red-500 px-4 py-2 rounded"
