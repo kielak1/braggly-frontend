@@ -20,7 +20,7 @@ export default async function Home() {
       />
 
       {/* Tekst na tle */}
-      <div className="relative flex flex-col items-center justify-center bg-black/60 text-white text-center px-6 py-10 rounded-lg backdrop-blur-md max-w-2xl">
+      <div className="relative flex flex-col items-center justify-center bg-black/60 text-white text-center px-6 py-10 rounded-lg backdrop-blur-md max-w-3xl">
         <h1 className="text-5xl font-extrabold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
           Braggly !!!
         </h1>
