@@ -23,6 +23,9 @@ export default function Foot() {
         <Link href="/privacy-policy" className="text-blue-600 hover:underline">
           {translations.privacy_link || "Polityka prywatności"}
         </Link>
+        <Link href="/terms" className="text-blue-600 hover:underline">
+          {translations.terms_title }
+        </Link>
       </div>
     </footer>
   );

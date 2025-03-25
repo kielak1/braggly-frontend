@@ -79,5 +79,12 @@
   "app_name": "Braggly",
   "rights_reserved": "All rights reserved.",
   "homepage": "Home",
-  "privacy_link": "Privacy Policy"
+  "privacy_link": "Privacy Policy",
+  "terms_title": "Terms of Service – Braggly",
+  "general": "Braggly is a web application for analyzing data from UXD files. The application is provided by the owner of the kielak.com domain.",
+  "storage": "Upon user request, UXD files may be temporarily stored on the server for later or more in-depth analysis. Users may request deletion of their files at any time.",
+  "liability": "Every effort has been made to ensure the application functions correctly. However, the owner of Braggly is not liable for any consequences of using the application, including incorrect analysis results or data loss.",
+  "payments": "Braggly is currently free to use. In the future, some features may require payment. Users will be informed in advance of any such changes.",
+  "changes": "The Terms of Service may change over time. The most recent version will always be available at this URL.",
+  "terms_contact": "For questions related to Braggly or data, please contact: tadeusz@kielak.com"
 }

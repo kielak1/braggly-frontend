@@ -79,5 +79,12 @@
   "app_name": "Braggly",
   "rights_reserved": "Todos los derechos reservados.",
   "homepage": "Inicio",
-  "privacy_link": "Política de privacidad"
+  "privacy_link": "Política de privacidad",
+  "terms_title": "Términos de servicio – Braggly",
+  "general": "Braggly es una aplicación web para analizar datos de archivos UXD. La aplicación es proporcionada por el propietario del dominio kielak.com.",
+  "storage": "A petición del usuario, los archivos UXD pueden almacenarse temporalmente en el servidor para un análisis posterior o más detallado. Los usuarios pueden solicitar la eliminación de sus archivos en cualquier momento.",
+  "liability": "Se ha hecho todo lo posible para garantizar que la aplicación funcione correctamente. Sin embargo, el propietario de Braggly no se hace responsable de las consecuencias del uso de la aplicación, incluidos los resultados de análisis incorrectos o la pérdida de datos.",
+  "payments": "Actualmente, Braggly es de uso gratuito. En el futuro, algunas funciones pueden requerir pago. Los usuarios serán informados con antelación sobre dichos cambios.",
+  "changes": "Los términos de servicio pueden cambiar con el tiempo. La versión más reciente siempre estará disponible en esta URL.",
+  "terms_contact": "Para consultas relacionadas con Braggly o datos, póngase en contacto: tadeusz@kielak.com"
 }
