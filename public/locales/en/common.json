@@ -87,5 +87,7 @@
   "payments": "Braggly is currently free to use. In the future, some features may require payment. Users will be informed in advance of any such changes.",
   "changes": "The Terms of Service may change over time. The most recent version will always be available at this URL.",
   "terms_contact": "For questions related to Braggly or data, please contact: tadeusz@kielak.com",
-  "simple_uxd": "Quick UXD File Analysis"
+  "simple_uxd": "Quick UXD File Analysis",
+  "uploaded_files": "uploaded files",
+  "xrd_file_list": "list of uploaded files"
 }

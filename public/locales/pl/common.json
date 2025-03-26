@@ -87,5 +87,7 @@
   "payments": "Obecnie Braggly jest aplikacją darmową. W przyszłości niektóre funkcje mogą być dostępne jedynie po wykupieniu dostępu. Użytkownicy zostaną wcześniej poinformowani o takich zmianach.",
   "changes": "Warunki korzystania z aplikacji mogą ulec zmianie. Aktualna wersja dokumentu zawsze będzie dostępna pod tym adresem.",
   "terms_contact": "W sprawach związanych z aplikacją lub danymi prosimy o kontakt: tadeusz@kielak.com",
-  "simple_uxd": "Szybka analiza pliku UXD"
+  "simple_uxd": "Szybka analiza pliku UXD",
+  "uploaded_files": "wgrane pliki",
+  "xrd_file_list": "lista wgranych plików"
 }
