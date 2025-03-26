@@ -48,6 +48,26 @@ const XrdFileList = () => {
     fetchFiles();
   }, []);
 
+  const handleDelete = async (id: number) => {
+    const confirmed = window.confirm("Czy na pewno chcesz usunąć ten plik?");
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch(`${backendUrl}/api/xrd/files/${id}`, {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      });
+
+      if (!res.ok) throw new Error("Błąd podczas usuwania pliku");
+
+      // aktualizuj stan lokalnie
+      setFiles((prev) => prev.filter((file) => file.id !== id));
+    } catch (err) {
+      console.error(err);
+      alert("❌ Nie udało się usunąć pliku.");
+    }
+  };
+
   if (!translations) return <p className="text-center">Ładowanie...</p>;
 
   if (loading) return <p className="text-center">⏳ Pobieranie plików...</p>;
@@ -79,7 +99,13 @@ const XrdFileList = () => {
                 <button className="text-blue-600 hover:underline">
                   Edytuj
                 </button>
-                <button className="text-red-600 hover:underline">Usuń</button>
+
+                <button
+                  onClick={() => handleDelete(file.id)}
+                  className="text-red-600 hover:underline"
+                >
+                  Usuń
+                </button>
               </td>
             </tr>
           ))}
