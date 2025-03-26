@@ -88,6 +88,11 @@
   "changes": "Warunki korzystania z aplikacji mogą ulec zmianie. Aktualna wersja dokumentu zawsze będzie dostępna pod tym adresem.",
   "terms_contact": "W sprawach związanych z aplikacją lub danymi prosimy o kontakt: tadeusz@kielak.com",
   "simple_uxd": "Szybka analiza pliku UXD",
-  "uploaded_files": "wgrane pliki",
-  "xrd_file_list": "lista wgranych plików"
+  "uploaded_files": "Wgrane pliki",
+  "xrd_file_list": "Lista wgranych plików",
+  "list_actions": "Actions",
+  "list_original_filename": "Oryginalny plik",
+  "list_public_visible": "Publiczny?",
+  "list_uploaded_at": "Data przesłania",
+  "list_user_filename": "Nazwa"
 }

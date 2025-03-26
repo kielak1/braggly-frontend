@@ -88,6 +88,11 @@
   "changes": "Los términos de servicio pueden cambiar con el tiempo. La versión más reciente siempre estará disponible en esta URL.",
   "terms_contact": "Para consultas relacionadas con Braggly o datos, póngase en contacto: tadeusz@kielak.com",
   "simple_uxd": "Análisis rápido de archivo UXD",
-  "uploaded_files": "archivos subidos",
-  "xrd_file_list": "lista de archivos subidos"
+  "uploaded_files": "Archivos subidos",
+  "xrd_file_list": "Lista de archivos subidos",
+  "list_actions": "Acciones",
+  "list_original_filename": "Archivo original",
+  "list_public_visible": "¿Público?",
+  "list_uploaded_at": "Fecha de subida",
+  "list_user_filename": "Nombre"
 }
