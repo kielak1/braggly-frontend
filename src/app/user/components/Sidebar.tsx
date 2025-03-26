@@ -30,10 +30,16 @@ const Sidebar = () => {
           </Link>
         </li>
         <li>
+          <Link href="/user/simple-uxd" className="block p-2 rounded hover:bg-gray-700">
+            {translations.simple_uxd}
+          </Link>
+        </li>
+        <li>
           <Link href="/user/uploads" className="block p-2 rounded hover:bg-gray-700">
             {translations.uploads}
           </Link>
         </li>
+
       </ul>
     </aside>
   );

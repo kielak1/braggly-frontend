@@ -49,7 +49,7 @@ const getAuthHeaders = (): Record<string, string> => {
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 if (!backendUrl) throw new Error("Brak zmiennej NEXT_PUBLIC_BACKEND_URL");
 
-export const uploadXrdFile = async (file: File): Promise<any> => {
+export const quickAnalysisXrdFile = async (file: File): Promise<any> => {
   const formData = new FormData();
   formData.append("file", file);
 

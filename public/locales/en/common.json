@@ -86,5 +86,6 @@
   "liability": "Every effort has been made to ensure the application functions correctly. However, the owner of Braggly is not liable for any consequences of using the application, including incorrect analysis results or data loss.",
   "payments": "Braggly is currently free to use. In the future, some features may require payment. Users will be informed in advance of any such changes.",
   "changes": "The Terms of Service may change over time. The most recent version will always be available at this URL.",
-  "terms_contact": "For questions related to Braggly or data, please contact: tadeusz@kielak.com"
+  "terms_contact": "For questions related to Braggly or data, please contact: tadeusz@kielak.com",
+  "simple_uxd": "Quick UXD File Analysis"
 }

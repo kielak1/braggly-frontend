@@ -18,5 +18,5 @@ export const useFetchTranslations = (
     };
 
     fetchTranslations();
-  }, []); // Pusta tablica, bo efekt uruchamia się tylko raz po zamontowaniu
+  }, [getCookie, setTranslations]); // Pusta tablica, bo efekt uruchamia się tylko raz po zamontowaniu
 };
