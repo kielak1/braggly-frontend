@@ -2,7 +2,6 @@ import { cookies } from "next/headers";
 import { getTranslations } from "@/lib/i18n";
 import Image from "next/image";
 import Link from "next/link";
-import ClientSection from "@/src/app/ClientSection"; // Nowy komponent po stronie klienta
 
 // Komponent serwerowy
 export default async function Home() {
@@ -49,8 +48,45 @@ export default async function Home() {
         </Link>
       </div>
 
-      {/* Sekcja z polityką prywatności i warunkami użytkowania (komponent po stronie klienta) */}
-      <ClientSection translations={translations} />
+      {/* Sekcja z polityką prywatności i warunkami użytkowania (statyczna) */}
+      <div className="relative bg-black/60 text-white px-6 py-10 max-w-4xl mx-auto mt-10 mb-10 rounded-lg backdrop-blur-md">
+        <h2 className="text-3xl font-bold mb-6 text-center">
+          {translations.legal_info || "Legal Information"}
+        </h2>
+
+        {/* Polityka prywatności */}
+        <div className="mb-8">
+          <h3 className="text-2xl font-semibold mb-4">
+            {translations.title || "Privacy Policy"}
+          </h3>
+          <div className="text-gray-300 space-y-3">
+            <p>{translations.admin || "The data controller is the owner of the application. Contact details are provided below."}</p>
+            <p>{translations.scope || "The application collects and stores only the data necessary for login: username and password (encrypted)."}</p>
+            <p>{translations.purpose || "Personal data is used solely to enable the user to log into the application."}</p>
+            <p>{translations.legal || "The legal basis for data processing is the legitimate interest of the controller – ensuring functionality and security."}</p>
+            <p>{translations.sharing || "Data is not shared with third parties, except as required by law."}</p>
+            <p>{translations.rights || "Users have the right to access, correct, delete, and restrict the processing of their data."}</p>
+            <p>{translations.security || "Passwords are stored in encrypted form using secure mechanisms."}</p>
+            <p>{translations.cookies || "The application does not use tracking mechanisms."}</p>
+            <p>{translations.contact || "For data-related matters, contact us at: tadeusz@kielak.com"}</p>
+          </div>
+        </div>
+
+        {/* Warunki użytkowania */}
+        <div>
+          <h3 className="text-2xl font-semibold mb-4">
+            {translations.terms_title || "Terms of Service"}
+          </h3>
+          <div className="text-gray-300 space-y-3">
+            <p>{translations.general || "By using Braggly, you agree to the following terms and conditions."}</p>
+            <p>{translations.storage || "Users are responsible for the content they upload, including ensuring it does not violate any laws or third-party rights."}</p>
+            <p>{translations.liability || "Braggly reserves the right to remove any content that violates these terms."}</p>
+            <p>{translations.payments || "The application is provided 'as is' without warranties of any kind."}</p>
+            <p>{translations.changes || "Braggly is not liable for any damages resulting from the use of the application."}</p>
+            <p>{translations.terms_contact || "For any questions, contact us at: tadeusz@kielak.com"}</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
