@@ -87,7 +87,8 @@ export default function Navbar() {
     // Wywołaj fetchWhoAmI po zmianie localStorageToken i przekieruj na odpowiednią ścieżkę
     if (
       !pathname.startsWith("/privacy-policy") &&
-      !pathname.startsWith("/terms")
+      !pathname.startsWith("/terms")&&
+      !pathname.startsWith("/public")
     ) {
       if (localStorageToken) {
         fetchWhoAmI().then((data) => {

@@ -4,17 +4,9 @@ import { useEffect, useState } from "react";
 import { getCookie } from "@/utils/cookies";
 import { useFetchTranslations } from "@/utils/fetchTranslations";
 import { FlaskConical } from "lucide-react";
-import XrdAnalysisModal from "@/user/components/XrdAnalysisModal";
+import XrdAnalysisModal from "@/public/components/XrdAnalysisModal";
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-const getAuthHeaders = (): Record<string, string> => {
-  const token = localStorage.getItem("token");
-  if (!token) throw new Error("Brak tokena w localStorage");
-  return {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-  };
-};
 
 const XrdPublicFileList = () => {
   const [translations, setTranslations] = useState<Record<string, string> | null>(null);
@@ -31,7 +23,6 @@ const XrdPublicFileList = () => {
     try {
       const res = await fetch(`${backendUrl}/api/xrd/public-files`, {
         method: "GET",
-        headers: getAuthHeaders(),
       });
       if (!res.ok) throw new Error("Błąd pobierania publicznych plików");
       const data = await res.json();
@@ -45,8 +36,6 @@ const XrdPublicFileList = () => {
   };
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (!localStorage.getItem("token")) return;
     fetchPublicFiles();
   }, []);
 

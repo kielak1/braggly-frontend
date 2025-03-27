@@ -6,7 +6,9 @@
       "@/lib/*": ["./src/app/lib/*"],
       "@/utils/*": ["./src/app/utils/*"],
       "@/components/*": ["./src/components/*"],
-      "@/styles/*": ["./src/styles/*"]
+      "@/styles/*": ["./src/styles/*"],
+      "@/public/*": ["./src/app/public/*"],
+      "@/user/*": ["./src/app/user/*"]
     },
     "target": "ES2017",
     "lib": ["dom", "dom.iterable", "esnext"],
