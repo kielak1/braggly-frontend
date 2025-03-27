@@ -99,5 +99,10 @@
   "analysis": "XRD Data Analysis",
   "analyzing": "Analyzing..",
   "zamknij_okno": "Close",
-  "public_files": "Public Files"
+  "public_files": "Public Files",
+  "analysis_fetch_error": "Failed to fetch analysis",
+  "app_purpose_title": "Discover the Power of XRD Analysis",
+  "explore_public_files": "Explore Public XRD Files",
+  "legal_info": "Legal Information",
+  "app_purpose_description": "Braggly is a cutting-edge platform for X-ray Diffraction (XRD) analysis. Upload your XRD files, analyze them with advanced tools, and explore a library of publicly shared XRD data from the community."
 }
