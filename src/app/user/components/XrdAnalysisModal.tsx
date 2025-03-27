@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { getCookie } from "@/utils/cookies";
 import { useFetchTranslations } from "@/utils/fetchTranslations";
 import { Line } from "react-chartjs-2";
@@ -49,7 +55,10 @@ type Props = {
 };
 
 const XrdAnalysisModal = ({ fileId, open, onClose }: Props) => {
-  const [translations, setTranslations] = useState<Record<string, string> | null>(null);
+  const [translations, setTranslations] = useState<Record<
+    string,
+    string
+  > | null>(null);
   const [chartData, setChartData] = useState<any>(null);
   const [peaks, setPeaks] = useState<Peak[]>([]);
   const [loading, setLoading] = useState(false);
@@ -87,9 +96,11 @@ const XrdAnalysisModal = ({ fileId, open, onClose }: Props) => {
             {
               label: translations?.intensity || "Intensity",
               data: intensities,
-              borderColor: "blue",
+              borderColor: "#1E90FF", // Jasnoniebieski kolor linii
+              borderWidth: 2,
               fill: false,
               tension: 0.1,
+              pointRadius: 0, // Usunięcie punktów na linii dla lepszej czytelności
             },
           ],
         });
@@ -117,61 +128,105 @@ const XrdAnalysisModal = ({ fileId, open, onClose }: Props) => {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="max-w-[95vw] w-[1500px] !max-w-[1500px] p-8">
         <DialogHeader>
-          <DialogTitle>{translations?.analysis || "Analiza danych XRD"}</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-gray-800">
+            {translations?.analysis || "Analiza danych XRD"}
+          </DialogTitle>
         </DialogHeader>
 
-        {loading && <p>⏳ Ładowanie danych analizy...</p>}
+        {loading && (
+          <p className="text-gray-600">⏳ Ładowanie danych analizy...</p>
+        )}
         {error && <p className="text-red-500">{error}</p>}
 
         {chartData && (
-          <div className="mt-6">
-            <Line
-              data={chartData}
-              options={{
-                responsive: true,
-                plugins: {
-                  title: {
-                    display: true,
-                    text: translations?.xrd_pattern || "XRD Pattern",
-                    font: { size: 18 },
-                  },
-                  legend: { position: "top" },
-                  tooltip: { mode: "index", intersect: false },
-                },
-                scales: {
-                  x: {
-                    title: { display: true, text: "2θ (degrees)" },
-                    grid: { display: false },
-                  },
-                  y: {
+          <div className="mt-8 bg-white p-6 rounded-lg shadow-md">
+            <div className="h-[400px]">
+              <Line
+                data={chartData}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false, // Pozwala na ręczne ustawienie wysokości
+                  plugins: {
                     title: {
                       display: true,
-                      text: translations?.intensity || "Intensity (counts)",
+                      text: translations?.xrd_pattern || "XRD Pattern",
+                      font: { size: 20, weight: "bold" },
+                      color: "#333",
+                      padding: 20,
                     },
-                    beginAtZero: true,
+                    legend: {
+                      position: "top",
+                      labels: {
+                        font: { size: 14 },
+                        color: "#333",
+                      },
+                    },
+                    tooltip: {
+                      mode: "index",
+                      intersect: false,
+                      backgroundColor: "rgba(0, 0, 0, 0.8)",
+                      titleFont: { size: 14 },
+                      bodyFont: { size: 12 },
+                    },
                   },
-                },
-              }}
-            />
+                  scales: {
+                    x: {
+                      title: {
+                        display: true,
+                        text: "2θ (degrees)",
+                        font: { size: 16, weight: "bold" },
+                        color: "#333",
+                      },
+                      ticks: {
+                        font: { size: 12 },
+                        color: "#666",
+                        maxTicksLimit: 20, // Ograniczenie liczby etykiet dla lepszej czytelności
+                      },
+                      grid: { display: false },
+                    },
+                    y: {
+                      title: {
+                        display: true,
+                        text: translations?.intensity || "Intensity (counts)",
+                        font: { size: 16, weight: "bold" },
+                        color: "#333",
+                      },
+                      ticks: {
+                        font: { size: 12 },
+                        color: "#666",
+                      },
+                      beginAtZero: true,
+                      grid: {
+                        color: "rgba(0, 0, 0, 0.1)",
+                      },
+                    },
+                  },
+                }}
+              />
+            </div>
           </div>
         )}
 
         {peaks.length > 0 && (
-          <div className="mt-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-2">
+          <div className="mt-8 bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-bold text-gray-800 mb-4">
               {translations?.detected_peaks || "Detected Peaks"}
             </h2>
-            <div className="max-h-64 overflow-y-auto border rounded">
+            <div className="max-h-80 overflow-y-auto border rounded-lg">
               <table className="w-full border-collapse">
-                <thead className="bg-gray-200 sticky top-0">
+                <thead className="bg-gray-100 sticky top-0">
                   <tr>
-                    <th className="border p-2 text-left">2θ (degrees)</th>
-                    <th className="border p-2 text-left">
+                    <th className="border-b p-3 text-left text-gray-700 font-semibold text-sm">
+                      2θ (degrees)
+                    </th>
+                    <th className="border-b p-3 text-left text-gray-700 font-semibold text-sm">
                       {translations?.intensity || "Intensity (counts)"}
                     </th>
-                    <th className="border p-2 text-left">d-spacing (Å)</th>
+                    <th className="border-b p-3 text-left text-gray-700 font-semibold text-sm">
+                      d-spacing (Å)
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -180,9 +235,15 @@ const XrdAnalysisModal = ({ fileId, open, onClose }: Props) => {
                       key={index}
                       className="hover:bg-gray-50 transition-colors"
                     >
-                      <td className="border p-2">{peak.angle.toFixed(2)}</td>
-                      <td className="border p-2">{peak.intensity}</td>
-                      <td className="border p-2">{peak.dspacing.toFixed(2)}</td>
+                      <td className="border-b p-3 text-gray-600 text-sm">
+                        {peak.angle.toFixed(2)}
+                      </td>
+                      <td className="border-b p-3 text-gray-600 text-sm">
+                        {peak.intensity}
+                      </td>
+                      <td className="border-b p-3 text-gray-600 text-sm">
+                        {peak.dspacing.toFixed(2)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -191,9 +252,9 @@ const XrdAnalysisModal = ({ fileId, open, onClose }: Props) => {
           </div>
         )}
 
-        <DialogFooter>
+        <DialogFooter className="mt-8">
           <button
-            className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+            className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
             onClick={onClose}
           >
             {translations?.close || "Zamknij"}
