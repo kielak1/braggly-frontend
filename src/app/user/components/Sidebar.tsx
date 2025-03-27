@@ -44,6 +44,11 @@ const Sidebar = () => {
             {translations.xrd_file_list}
           </Link>
         </li>
+        <li>
+          <Link href="/user/xrd-public-file-list" className="block p-2 rounded hover:bg-gray-700">
+            {translations.xrd_public_file_list}
+          </Link>
+        </li>
       </ul>
     </aside>
   );

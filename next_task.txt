@@ -1,6 +1,0 @@
-mamy calkiem fajna przegladarke plikow teraz obok akcji usuniecie i edycja metadanych powwinna sie pojawic ikona po nacisnieciu ktorej pojawi sie okienko z analiza danych tozsame z tym 
-ktore w projekcie pojawia sie po wyswietleniu SimpleUXD. z tym ze teraz zaden plik nie bedzie ladowany ale wykorzystane zostana dane pobrane z B2. na backendzie trzeba bedzie dorobic endpoint.
-Taka standardowa analiza pojedynczego pliku bedzie w kilku miejscach . juz jest w SimpleUXD , teraz bedzie dla listy wlasnych plikow ale w kolejnym zadaniu bede chcial uzyc podobnego mechanizmu 
-dla plikow dostepnych publicznie. 
-
-Wklejam aktualne kody Projektujac

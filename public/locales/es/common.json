@@ -90,6 +90,7 @@
   "simple_uxd": "Análisis rápido de archivo UXD",
   "uploaded_files": "Archivos subidos",
   "xrd_file_list": "Lista de archivos subidos",
+  "xrd_public_file_list": "Lista de archivos públicos subidos",
   "list_actions": "Acciones",
   "list_original_filename": "Archivo original",
   "list_public_visible": "¿Público?",
@@ -97,5 +98,6 @@
   "list_user_filename": "Nombre",
   "analysis": "\"Análisis de datos XRD",
   "analyzing": "Analizando...",
-  "zamknij_okno": "Cerrar"
+  "zamknij_okno": "Cerrar",
+  "public_files": "Archivos públicos"
 }

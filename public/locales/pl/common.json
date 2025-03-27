@@ -90,6 +90,7 @@
   "simple_uxd": "Szybka analiza pliku UXD",
   "uploaded_files": "Wgrane pliki",
   "xrd_file_list": "Lista wgranych plików",
+  "xrd_public_file_list": "Lista publicznych plików",
   "list_actions": "Actions",
   "list_original_filename": "Oryginalny plik",
   "list_public_visible": "Publiczny?",
@@ -97,5 +98,6 @@
   "list_user_filename": "Nazwa",
   "analysis": "Analiza danych XRD",
   "analyzing": "Analizowanie...",
-  "zamknij_okno": "Zamknij"
+  "zamknij_okno": "Zamknij",
+  "public_files": "Pliki publiczne"
 }
