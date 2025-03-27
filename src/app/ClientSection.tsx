@@ -32,7 +32,7 @@ const Accordion = ({ title, children }: { title: string; children: React.ReactNo
 // Komponent po stronie klienta
 export default function ClientSection({ translations }: Props) {
   return (
-    <div className="relative bg-black/80 text-white px-6 py-10 max-w-4xl mx-auto mt-10 mb-10 rounded-lg backdrop-blur-md">
+    <div className="relative bg-black/60 text-white px-6 py-10 max-w-4xl min-w-[900px] mx-auto mt-10 mb-10 rounded-lg backdrop-blur-md">
       <h2 className="text-3xl font-bold mb-6 text-center">
         {translations.legal_info || "Legal Information"}
       </h2>
