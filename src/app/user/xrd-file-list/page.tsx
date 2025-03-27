@@ -65,7 +65,7 @@ const XrdFileList = () => {
           <tr className="bg-gray-200 text-left">
             <th className="p-2">{translations.list_user_filename || "Nazwa"}</th>
             <th className="p-2">{translations.list_original_filename || "Oryginalny plik"}</th>
-            <th className="p-2">{translations.list_public || "Publiczny?"}</th>
+            <th className="p-2">{translations.list_public_visible || "Publiczny?"}</th>
             <th className="p-2">{translations.list_uploaded_at || "Data przesłania"}</th>
             <th className="p-2">{translations.list_actions || "Akcje"}</th>
           </tr>

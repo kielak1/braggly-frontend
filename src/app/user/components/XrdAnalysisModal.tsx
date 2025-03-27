@@ -128,7 +128,7 @@ const XrdAnalysisModal = ({ fileId, open, onClose }: Props) => {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-[95vw] w-[1500px] !max-w-[1500px] p-8">
+      <DialogContent className="max-w-[95vw] w-[1500px] !max-w-[1500px] max-h-[90vh] overflow-y-auto p-6">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-gray-800">
             {translations?.analysis || "Analiza danych XRD"}
@@ -141,8 +141,8 @@ const XrdAnalysisModal = ({ fileId, open, onClose }: Props) => {
         {error && <p className="text-red-500">{error}</p>}
 
         {chartData && (
-          <div className="mt-8 bg-white p-6 rounded-lg shadow-md">
-            <div className="h-[400px]">
+          <div className="mt-6 bg-white p-4 rounded-lg shadow-md">
+            <div className="h-[300px]">
               <Line
                 data={chartData}
                 options={{
@@ -210,11 +210,11 @@ const XrdAnalysisModal = ({ fileId, open, onClose }: Props) => {
         )}
 
         {peaks.length > 0 && (
-          <div className="mt-8 bg-white p-6 rounded-lg shadow-md">
+          <div className="mt-6 bg-white p-4 rounded-lg shadow-md">
             <h2 className="text-xl font-bold text-gray-800 mb-4">
               {translations?.detected_peaks || "Detected Peaks"}
             </h2>
-            <div className="max-h-80 overflow-y-auto border rounded-lg">
+            <div className="max-h-60 overflow-y-auto border rounded-lg">
               <table className="w-full border-collapse">
                 <thead className="bg-gray-100 sticky top-0">
                   <tr>
@@ -252,12 +252,12 @@ const XrdAnalysisModal = ({ fileId, open, onClose }: Props) => {
           </div>
         )}
 
-        <DialogFooter className="mt-8">
+        <DialogFooter className="mt-6">
           <button
             className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
             onClick={onClose}
           >
-            {translations?.close || "Zamknij"}
+            {translations?.zamknij_okno || "Zamknij"}
           </button>
         </DialogFooter>
       </DialogContent>

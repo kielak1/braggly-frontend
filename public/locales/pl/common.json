@@ -94,5 +94,8 @@
   "list_original_filename": "Oryginalny plik",
   "list_public_visible": "Publiczny?",
   "list_uploaded_at": "Data przesłania",
-  "list_user_filename": "Nazwa"
+  "list_user_filename": "Nazwa",
+  "analysis": "Analiza danych XRD",
+  "analyzing": "Analizowanie...",
+  "zamknij_okno": "Zamknij"
 }

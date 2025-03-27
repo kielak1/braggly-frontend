@@ -94,5 +94,8 @@
   "list_original_filename": "Archivo original",
   "list_public_visible": "¿Público?",
   "list_uploaded_at": "Fecha de subida",
-  "list_user_filename": "Nombre"
+  "list_user_filename": "Nombre",
+  "analysis": "\"Análisis de datos XRD",
+  "analyzing": "Analizando...",
+  "zamknij_okno": "Cerrar"
 }
