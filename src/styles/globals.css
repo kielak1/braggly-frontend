@@ -1509,6 +1509,10 @@ video {
   animation-duration: 200ms;
 }
 
+.running {
+  animation-play-state: running;
+}
+
 .hover\:bg-blue-600:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(37 99 235 / var(--tw-bg-opacity, 1));
