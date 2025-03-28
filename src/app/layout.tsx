@@ -21,15 +21,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* LOGI do konsoli przeglądarki zaraz po <head> */}
-        <Script id="log-env" strategy="afterInteractive">
-          {`
-            console.log("isProduction:", ${JSON.stringify(isProduction)});
-            console.log("GA_ID:", "${GA_ID}");
-          `}
-        </Script>
-
-        {/* Google Analytics tylko w produkcji */}
         {isProduction && GA_ID && (
           <>
             <Script
@@ -38,7 +29,6 @@ export default function RootLayout({
             />
             <Script id="ga-init" strategy="afterInteractive">
               {`
-                console.log("GA init running on page load");
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
