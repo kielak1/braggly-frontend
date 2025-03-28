@@ -1,6 +1,6 @@
 import "@/styles/globals.css";
 import { Metadata } from "next";
-import Script from "next/script"; // dodaj to
+import Script from "next/script";
 import ClientLayout from "./ClientLayout";
 import Foot from "@/components/Foot";
 
@@ -21,6 +21,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* LOGI do konsoli przeglądarki zaraz po <head> */}
+        <Script id="log-env" strategy="afterInteractive">
+          {`
+            console.log("isProduction:", ${JSON.stringify(isProduction)});
+            console.log("GA_ID:", "${GA_ID}");
+          `}
+        </Script>
+
+        {/* Google Analytics tylko w produkcji */}
         {isProduction && GA_ID && (
           <>
             <Script
