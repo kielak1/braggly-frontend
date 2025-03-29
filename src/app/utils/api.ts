@@ -38,6 +38,12 @@ export interface UsageHistory {
   creditsUsed: number;
 }
 
+export type BoolParameter = {
+  id: number;
+  name: string;
+  value: boolean;
+};
+
 const getAuthHeaders = (): Record<string, string> => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("Brak tokena w localStorage");
@@ -47,7 +53,45 @@ const getAuthHeaders = (): Record<string, string> => {
 };
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+
 if (!backendUrl) throw new Error("Brak zmiennej NEXT_PUBLIC_BACKEND_URL");
+
+
+export const fetchBoolParameters = async (): Promise<BoolParameter[]> => {
+  const res = await fetch(`${backendUrl}/parameters/list`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) throw new Error("Błąd pobierania parametrów");
+  return res.json();
+};
+
+
+export const deleteBoolParameter = async (name: string): Promise<boolean> => {
+  const res = await fetch(
+    `${backendUrl}/parameters/delete?name=${encodeURIComponent(name)}`,
+    {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+    }
+  );
+  return res.ok;
+};
+
+export const updateBoolParameter = async (
+  name: string,
+  value: boolean
+): Promise<boolean> => {
+  const res = await fetch(
+    `${backendUrl}/parameters/update?name=${encodeURIComponent(name)}&value=${value}`,
+    {
+      method: "PUT",
+      headers: getAuthHeaders(),
+    }
+  );
+  return res.ok;
+};
 
 export const quickAnalysisXrdFile = async (file: File): Promise<any> => {
   const formData = new FormData();

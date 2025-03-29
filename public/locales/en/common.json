@@ -104,5 +104,8 @@
   "app_purpose_title": "Discover the Power of XRD Analysis",
   "explore_public_files": "Explore Public XRD Files",
   "legal_info": "Legal Information",
-  "app_purpose_description": "Braggly is a cutting-edge platform for X-ray Diffraction (XRD) analysis. Upload your XRD files, analyze them with advanced tools, and explore a library of publicly shared XRD data from the community."
+  "app_purpose_description": "Braggly is a cutting-edge platform for X-ray Diffraction (XRD) analysis. Upload your XRD files, analyze them with advanced tools, and explore a library of publicly shared XRD data from the community.",
+  "no_parameters": "No parameters",
+  "param_sidebar": "System parameters",
+  "parameters_header": "System parameters"
 }

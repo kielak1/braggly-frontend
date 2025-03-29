@@ -104,5 +104,8 @@
   "app_purpose_title": "Odkryj Moc Analizy XRD",
   "explore_public_files": "Przeglądaj Publiczne Pliki XRD",
   "legal_info": "Informacje Prawne",
-  "app_purpose_description": "Braggly to nowoczesna platforma do analizy danych dyfrakcji rentgenowskiej (XRD). Prześlij swoje pliki XRD, analizuj je za pomocą zaawansowanych narzędzi i przeglądaj bibliotekę publicznie udostępnionych danych XRD od społeczności."
+  "app_purpose_description": "Braggly to nowoczesna platforma do analizy danych dyfrakcji rentgenowskiej (XRD). Prześlij swoje pliki XRD, analizuj je za pomocą zaawansowanych narzędzi i przeglądaj bibliotekę publicznie udostępnionych danych XRD od społeczności.",
+  "no_parameters": "Brak parametrów",
+  "param_sidebar": "Parametry systemowe",
+  "parameters_header": "Parametry systemowe"
 }

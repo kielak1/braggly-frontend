@@ -46,6 +46,12 @@ const AdminSidebar = () => {
           >
             {translations.token_packages}
           </Link>
+          <Link
+            href="/admin/parameters"
+            className="block p-2 rounded hover:bg-gray-700"
+          >
+            {translations.param_sidebar || "parametry"}
+          </Link>
         </li>
       </ul>
     </aside>
