@@ -111,5 +111,8 @@
   "resticted_paths": "Defined paths",
   "restricted_paths_header": "List of paths with paid access",
   "what_are_tokens_for": "To access certain features of the system, you need to have a positive token balance. Tokens are consumed at a rate of 1 token per day. In other words, if you have 30 tokens, you will be able to use all system features for 30 days. To purchase tokens, use the form below.",
-  "donations": "Currently, all system features are available free of charge. However, if you would like to support the development of the application, you can purchase a number of tokens. After the free access period ends, these tokens will allow you to continue using the full functionality of the system. To purchase tokens, use the form below."
+  "donations": "Currently, all system features are available free of charge. However, if you would like to support the development of the application, you can purchase a number of tokens. After the free access period ends, these tokens will allow you to continue using the full functionality of the system. To purchase tokens, use the form below.",
+  "donations_dashboard": "Currently, all features of the system are available free of charge. However, if you'd like to support the development of the application, you can purchase a number of tokens. After the free access period ends, these tokens will allow you to continue using the system's full functionality.",
+  "what_are_tokens_for_dashboard": "To use certain features of the system, you need to have a positive token balance. Tokens are consumed at a rate of 1 token per day. In other words, if you have 30 tokens, you will be able to use all system features for 30 days.",
+  "buy_tokens": "Buy tokens"
 }

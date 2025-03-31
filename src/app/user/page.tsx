@@ -92,16 +92,32 @@ const Dashboard = () => {
         , {translations.welcome}
       </h1>
 
+      <p className="text-lg text-gray-700 mb-6">
+        {translations.you_have}{" "}
+        <span className="font-semibold text-green-600">
+          {userData.balance || "0"}
+        </span>{" "}
+        {translations.tokens_on_your_account}.
+      </p>
+
       {freeAccess ? (
-        <p className="italic text-gray-600">{translations.donations}</p>
+        <p className="italic text-gray-600">
+          {translations.donations_dashboard}
+        </p>
       ) : (
         <p className="italic text-gray-600">
-          {translations.what_are_tokens_for}
+          {translations.what_are_tokens_for_dashboard}
         </p>
       )}
+      <div className="flex justify-center mb-6">
+        <a
+          href="/user/account"
+          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow transition duration-200"
+        >
+          {translations.buy_tokens || "Kup tokeny"}
+        </a>
+      </div>
 
-      <p className="italic text-gray-600">{translations.what_are_tokens_for}</p>
-      <p className="italic text-gray-600">{translations.donations}</p>
       {/* Lista historii zakupów */}
       <div className="mb-6">
         <h2 className="text-xl font-bold text-gray-800 mb-2">

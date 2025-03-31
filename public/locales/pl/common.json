@@ -111,5 +111,8 @@
   "resticted_paths": "Zdefiniowane ścieżki",
   "restricted_paths_header": "Lista ścieżek, dla których dostęp jest płatny",
   "what_are_tokens_for": "Żeby móc korzystać z niektórych funkcji systemu trzeba mieć dodatnie saldo tokenów. Tokeny zużywają się w tempie 1 token na jeden dzień. Innymi słowy, jeżeli posiadasz 30 tokenów, to przez 30 dni będziesz mógł korzystać ze wszystkich funkcji systemu. Aby zakupić tokeny, użyj poniższego formularza.",
-  "donations": "Aktualnie wszystkie funkcje systemu są zwolnione z opłat. Jeżeli jednakże chciałbyś wesprzeć proces rozwoju aplikacji, możesz zakupić pewną liczbę tokenów, które po zakończeniu okresu bezpłatnego korzystania z systemu będą umożliwiały korzystanie z pełnej jego funkcjonalności. Aby zakupić tokeny, użyj poniższego formularza."
+  "donations": "Aktualnie wszystkie funkcje systemu są zwolnione z opłat. Jeżeli jednakże chciałbyś wesprzeć proces rozwoju aplikacji, możesz zakupić pewną liczbę tokenów, które po zakończeniu okresu bezpłatnego korzystania z systemu będą umożliwiały korzystanie z pełnej jego funkcjonalności. Aby zakupić tokeny, użyj poniższego formularza.",
+  "donations_dashboard": "Aktualnie wszystkie funkcje systemu są zwolnione z opłat. Jeżeli jednakże chciałbyś wesprzeć proces rozwoju aplikacji, możesz zakupić pewną liczbę tokenów, które po zakończeniu okresu bezpłatnego korzystania z systemu będą umożliwiały korzystanie z pełnej jego funkcjonalności.",
+  "what_are_tokens_for_dashboard": "Żeby móc korzystać z niektórych funkcji systemu trzeba mieć dodatnie saldo tokenów. Tokeny zużywają się w tempie 1 token na jeden dzień. Innymi słowy, jeżeli posiadasz 30 tokenów, to przez 30 dni będziesz mógł korzystać ze wszystkich funkcji systemu.",
+  "buy_tokens": "Kup tokeny"
 }

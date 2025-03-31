@@ -5,10 +5,20 @@ import { getCookie } from "@/utils/cookies";
 import { useFetchTranslations } from "@/utils/fetchTranslations";
 import "@/styles/globals.css";
 import Checkout from "@/components/Checkout";
-
+import { fetchBoolParameterByName, isParameterEnabled } from "@/utils/api";
 const AccountPage = () => {
   const [translations, setTranslations] = useState<Record<string, string> | null>(null);
   const [userData, setUserData] = useState<Record<string, string> | null>(null);
+
+  const [freeAccess, setFreeAccess] = useState<boolean>(true); // domyślnie true
+
+  useEffect(() => {
+    const checkFreeAccess = async () => {
+      const param = await fetchBoolParameterByName("free_access");
+      setFreeAccess(isParameterEnabled(param));
+    };
+    checkFreeAccess();
+  }, []);
 
   // Pobieranie tłumaczeń
   useFetchTranslations(setTranslations, getCookie);
@@ -65,6 +75,14 @@ const AccountPage = () => {
         </span>{" "}
         {translations.tokens_on_your_account || "tokenów na swoim koncie"}.
       </p>
+      {freeAccess ? (
+        <p className="italic text-gray-600">{translations.donations}</p>
+      ) : (
+        <p className="italic text-gray-600">
+          {translations.what_are_tokens_for}
+        </p>
+      )}
+
 
       {/* Osadzenie formularza płatności */}
       <div className="mt-6">
