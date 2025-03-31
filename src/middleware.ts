@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { fetchBoolParameterByName } from "@/utils/api";
+import { fetchBoolParameterByName, isParameterEnabled } from "@/utils/api";
 
 export async function middleware(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
@@ -50,8 +50,16 @@ export async function middleware(request: NextRequest) {
           "free_access",
           request.cookies
         );
-        console.log("Wartość parametru free_access:", freeAccessParam);
-        console.log("free access = ", freeAccessParam);
+
+        if (!isParameterEnabled(freeAccessParam)) {
+          console.log("Free access is disabled");
+            const restrictedPaths = ["/user/xrd-file-list", "/user/uploads"];
+            if (data.balance <= 0 && restrictedPaths.some(path => pathname.startsWith(path))) {
+            console.log("User has no balance and is trying to access a restricted path");
+            return NextResponse.redirect(new URL("/user/account", request.url));
+            }
+        }
+
         return response;
       }
       if (pathname === "/") {

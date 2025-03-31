@@ -66,6 +66,17 @@ const getAuthServerHeaders = (
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
+/**
+ * Sprawdza, czy parametr logiczny jest włączony (value === true).
+ * Zwraca false jeśli parametr jest null lub ma value === false.
+ */
+export function isParameterEnabled(
+  param: BoolParameter | boolean | null | undefined
+): boolean {
+  if (typeof param === "boolean") return param;
+  return param?.value === true;
+}
+
 if (!backendUrl) throw new Error("Brak zmiennej NEXT_PUBLIC_BACKEND_URL");
 
 export const fetchBoolParameters = async (): Promise<BoolParameter[]> => {
