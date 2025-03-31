@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { fetchBoolParameterByName, isParameterEnabled } from "@/utils/api";
+import {
+  fetchBoolParameterByName,
+  isParameterEnabled,
+  isRestrictedPath,
+  fetchRestrictedPaths,
+} from "@/utils/api";
 
 export async function middleware(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
@@ -53,11 +58,19 @@ export async function middleware(request: NextRequest) {
 
         if (!isParameterEnabled(freeAccessParam)) {
           console.log("Free access is disabled");
-            const restrictedPaths = ["/user/xrd-file-list", "/user/uploads"];
-            if (data.balance <= 0 && restrictedPaths.some(path => pathname.startsWith(path))) {
-            console.log("User has no balance and is trying to access a restricted path");
+
+          const restrictedPaths = await fetchRestrictedPaths(request.cookies);
+          if (
+            !isParameterEnabled(freeAccessParam) &&
+            data.balance <= 0 &&
+            restrictedPaths &&
+            isRestrictedPath(pathname, restrictedPaths)
+          ) {
+            console.log(
+              "Użytkownik nie ma salda i próbuje wejść na płatną ścieżkę"
+            );
             return NextResponse.redirect(new URL("/user/account", request.url));
-            }
+          }
         }
 
         return response;

@@ -763,6 +763,14 @@ video {
   min-height: 100vh;
 }
 
+.w-2 {
+  width: 0.5rem;
+}
+
+.w-2\/3 {
+  width: 66.666667%;
+}
+
 .w-32 {
   width: 8rem;
 }

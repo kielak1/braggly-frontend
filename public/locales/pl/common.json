@@ -61,7 +61,6 @@
   "access_denied": "Brak dostępu. Niewystarczające uprawnienia.",
   "loading": "Ładowanie ...",
   "confirm_payment": "Potwierdź płatność",
-  "what_are_tokens_for": "Tokeny umożliwiają korzystanie z niektórych funkcji systemu Braggly. Zużywają się w tempie jednego tokena na dzień. Niektóre aktywności w przyszłości mogą konsumować więcej tokenów.",
   "no_packages": "brak pakietów",
   "selected_package": "wybrany pakiet",
   "back": "cofnij",
@@ -107,5 +106,10 @@
   "app_purpose_description": "Braggly to nowoczesna platforma do analizy danych dyfrakcji rentgenowskiej (XRD). Prześlij swoje pliki XRD, analizuj je za pomocą zaawansowanych narzędzi i przeglądaj bibliotekę publicznie udostępnionych danych XRD od społeczności.",
   "no_parameters": "Brak parametrów",
   "param_sidebar": "Parametry systemowe",
-  "parameters_header": "Parametry systemowe"
+  "parameters_header": "Parametry systemowe",
+  "no_paths": "Brak zdefiniowanych ścieżek",
+  "resticted_paths": "Zdefiniowane ścieżki",
+  "restricted_paths_header": "Lista ścieżek, dla których dostęp jest płatny",
+  "what_are_tokens_for": "Żeby móc korzystać z niektórych funkcji systemu trzeba mieć dodatnie saldo tokenów. Tokeny zużywają się w tempie 1 token na jeden dzień. Innymi słowy, jeżeli posiadasz 30 tokenów, to przez 30 dni będziesz mógł korzystać ze wszystkich funkcji systemu. Aby zakupić tokeny, użyj poniższego formularza.",
+  "donations": "Aktualnie wszystkie funkcje systemu są zwolnione z opłat. Jeżeli jednakże chciałbyś wesprzeć proces rozwoju aplikacji, możesz zakupić pewną liczbę tokenów, które po zakończeniu okresu bezpłatnego korzystania z systemu będą umożliwiały korzystanie z pełnej jego funkcjonalności. Aby zakupić tokeny, użyj poniższego formularza."
 }

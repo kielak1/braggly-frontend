@@ -69,7 +69,7 @@ const ParametersDashboard = () => {
                     checked={param.value}
                     onChange={() => handleToggle(param)}
                   />
-                  {param.value ? "true" : "false"}
+                  {/* {param.value ? "true" : "false"} */}
                 </label>
                 <button
                   onClick={() => handleDelete(param.name)}

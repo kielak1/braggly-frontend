@@ -61,7 +61,6 @@
   "access_denied": "Access denied. Insufficient permissions.",
   "loading": "Loading...",
   "confirm_payment": "Confirm Payment",
-  "what_are_tokens_for": "Tokens allow you to use certain features of the Braggly system. They are consumed at a rate of one token per day. Some activities in the future may consume more tokens.",
   "no_packages": "lack of packages",
   "selected_package": "selected package",
   "back": "go back",
@@ -107,5 +106,10 @@
   "app_purpose_description": "Braggly is a cutting-edge platform for X-ray Diffraction (XRD) analysis. Upload your XRD files, analyze them with advanced tools, and explore a library of publicly shared XRD data from the community.",
   "no_parameters": "No parameters",
   "param_sidebar": "System parameters",
-  "parameters_header": "System parameters"
+  "parameters_header": "System parameters",
+  "no_paths": "No defined paths",
+  "resticted_paths": "Defined paths",
+  "restricted_paths_header": "List of paths with paid access",
+  "what_are_tokens_for": "To access certain features of the system, you need to have a positive token balance. Tokens are consumed at a rate of 1 token per day. In other words, if you have 30 tokens, you will be able to use all system features for 30 days. To purchase tokens, use the form below.",
+  "donations": "Currently, all system features are available free of charge. However, if you would like to support the development of the application, you can purchase a number of tokens. After the free access period ends, these tokens will allow you to continue using the full functionality of the system. To purchase tokens, use the form below."
 }

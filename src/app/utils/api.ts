@@ -45,6 +45,11 @@ export type BoolParameter = {
   name: string;
   value: boolean;
 };
+// types/api.ts lub w tym samym pliku
+export type RestrictedPath = {
+  id: number;
+  path: string;
+};
 
 const getAuthHeaders = (): Record<string, string> => {
   const token = localStorage.getItem("token");
@@ -65,6 +70,95 @@ const getAuthServerHeaders = (
 };
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+export const fetchRestrictedPaths = async (
+  cookies?: RequestCookies
+): Promise<RestrictedPath[] | null> => {
+  try {
+    const headers = cookies ? getAuthServerHeaders(cookies) : getAuthHeaders();
+    const response = await fetch(`${backendUrl}/parameters/restricted-paths`, {
+      method: "GET",
+      headers,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Błąd serwera: ${response.status} - ${errorText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Błąd podczas pobierania restricted paths:", error);
+    return null;
+  }
+};
+
+export const addRestrictedPath = async (
+  path: string,
+  cookies?: RequestCookies
+): Promise<RestrictedPath | null> => {
+  try {
+    const headers = cookies ? getAuthServerHeaders(cookies) : getAuthHeaders();
+    const url = `${backendUrl}/parameters/restricted-paths?path=${encodeURIComponent(path)}`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Błąd dodawania ścieżki: ${response.status} - ${errorText}`
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Błąd podczas dodawania restricted path:", error);
+    return null;
+  }
+};
+
+export const deleteRestrictedPath = async (
+  path: string,
+  cookies?: RequestCookies
+): Promise<boolean> => {
+  try {
+    const headers = cookies ? getAuthServerHeaders(cookies) : getAuthHeaders();
+    const url = `${backendUrl}/parameters/restricted-paths?path=${encodeURIComponent(path)}`;
+    const response = await fetch(url, {
+      method: "DELETE",
+      headers,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Błąd usuwania ścieżki: ${response.status} - ${errorText}`
+      );
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Błąd podczas usuwania restricted path:", error);
+    return false;
+  }
+};
+
+/**
+ * Sprawdza, czy podana ścieżka zaczyna się od którejkolwiek ze ścieżek płatnych.
+ *
+ * @param currentPath - aktualna ścieżka użytkownika (np. "/user/uploads/file.pdf")
+ * @param restrictedList - lista płatnych ścieżek z backendu
+ * @returns true jeśli ścieżka wymaga dodatniego salda
+ */
+export function isRestrictedPath(
+  currentPath: string,
+  restrictedList: { path: string }[]
+): boolean {
+  return restrictedList.some(({ path }) => currentPath.startsWith(path));
+}
+
 
 /**
  * Sprawdza, czy parametr logiczny jest włączony (value === true).

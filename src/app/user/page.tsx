@@ -10,13 +10,29 @@ import {
   UsageHistory,
 } from "@/utils/api"; // Importujemy potrzebne funkcje i typy
 import "@/styles/globals.css";
+import { fetchBoolParameterByName, isParameterEnabled } from "@/utils/api";
 
 const Dashboard = () => {
-  const [translations, setTranslations] = useState<Record<string, string> | null>(null);
+  const [translations, setTranslations] = useState<Record<
+    string,
+    string
+  > | null>(null);
   const [userData, setUserData] = useState<Record<string, string> | null>(null);
-  const [purchaseHistory, setPurchaseHistory] = useState<PurchaseHistory[] | null>(null);
+  const [purchaseHistory, setPurchaseHistory] = useState<
+    PurchaseHistory[] | null
+  >(null);
   const [usageHistory, setUsageHistory] = useState<UsageHistory[] | null>(null);
   const [isLoading, setIsLoading] = useState(true); // Stan ładowania
+
+  const [freeAccess, setFreeAccess] = useState<boolean>(true); // domyślnie true
+
+  useEffect(() => {
+    const checkFreeAccess = async () => {
+      const param = await fetchBoolParameterByName("free_access");
+      setFreeAccess(isParameterEnabled(param));
+    };
+    checkFreeAccess();
+  }, []);
 
   // Pobieranie tłumaczeń
   useFetchTranslations(setTranslations, getCookie);
@@ -33,7 +49,10 @@ const Dashboard = () => {
           const parsedData = JSON.parse(storedData);
           if (typeof parsedData === "object" && parsedData !== null) {
             const formattedData = Object.fromEntries(
-              Object.entries(parsedData).map(([key, value]) => [key, String(value)])
+              Object.entries(parsedData).map(([key, value]) => [
+                key,
+                String(value),
+              ])
             );
             setUserData(formattedData);
 
@@ -67,19 +86,22 @@ const Dashboard = () => {
     <div className="max-w-3xl mx-auto p-6 bg-gray-100 rounded-lg shadow-md mt-6">
       <h1 className="text-3xl font-bold text-gray-800 mb-4">
         {translations.greeting}{" "}
-        <span className="text-blue-600">{userData.username || "Brak nazwy"}</span>,{" "}
-        {translations.welcome}
+        <span className="text-blue-600">
+          {userData.username || "Brak nazwy"}
+        </span>
+        , {translations.welcome}
       </h1>
-      <p className="text-lg text-gray-700 mb-6">
-        {translations.you_have}{" "}
-        <span className="font-semibold text-green-600">{userData.balance || "0"}</span>{" "}
-        {translations.tokens_on_your_account}.
-      </p>
 
-      <p className="italic text-gray-600">
-        {translations.what_are_tokens_for}
-      </p>
+      {freeAccess ? (
+        <p className="italic text-gray-600">{translations.donations}</p>
+      ) : (
+        <p className="italic text-gray-600">
+          {translations.what_are_tokens_for}
+        </p>
+      )}
 
+      <p className="italic text-gray-600">{translations.what_are_tokens_for}</p>
+      <p className="italic text-gray-600">{translations.donations}</p>
       {/* Lista historii zakupów */}
       <div className="mb-6">
         <h2 className="text-xl font-bold text-gray-800 mb-2">
@@ -92,20 +114,33 @@ const Dashboard = () => {
           {purchaseHistory && purchaseHistory.length > 0 ? (
             <ul className="space-y-2">
               {purchaseHistory
-              .slice()
-              .sort((a, b) => new Date(b.purchaseDate).getTime() - new Date(a.purchaseDate).getTime())
-              .map((item) => (
-              <li key={item.id} className="text-gray-700 flex justify-between items-center">
-                <span>
-                {translations.bought || "Kupiono"}{" "}
-                <span className="font-semibold">{item.creditsPurchased}</span>{" "}
-                {translations.credits || "kredytów"} {translations.zaco}{" "}
-                <span className="font-semibold">{(item.amountPaid / 100).toFixed(2)} zł</span> -{" "}
-                {new Date(item.purchaseDate).toLocaleString()}
-                </span>
-                <span className="text-sm text-gray-500">{item.paymentId}</span>
-              </li>
-              ))}
+                .slice()
+                .sort(
+                  (a, b) =>
+                    new Date(b.purchaseDate).getTime() -
+                    new Date(a.purchaseDate).getTime()
+                )
+                .map((item) => (
+                  <li
+                    key={item.id}
+                    className="text-gray-700 flex justify-between items-center"
+                  >
+                    <span>
+                      {translations.bought || "Kupiono"}{" "}
+                      <span className="font-semibold">
+                        {item.creditsPurchased}
+                      </span>{" "}
+                      {translations.credits || "kredytów"} {translations.zaco}{" "}
+                      <span className="font-semibold">
+                        {(item.amountPaid / 100).toFixed(2)} zł
+                      </span>{" "}
+                      - {new Date(item.purchaseDate).toLocaleString()}
+                    </span>
+                    <span className="text-sm text-gray-500">
+                      {item.paymentId}
+                    </span>
+                  </li>
+                ))}
             </ul>
           ) : (
             <p className="text-gray-500">
@@ -127,15 +162,19 @@ const Dashboard = () => {
           {usageHistory && usageHistory.length > 0 ? (
             <ul className="space-y-2">
               {usageHistory
-              .slice()
-              .sort((a, b) => new Date(b.usageDate).getTime() - new Date(a.usageDate).getTime())
-              .map((item) => (
-                <li key={item.id} className="text-gray-700">
-                {translations.used || "Użyto"} {item.creditsUsed}{" "}
-                {translations.credits || "tokenów"} (
-                {item.usageType}) - {new Date(item.usageDate).toLocaleString()}
-                </li>
-              ))}
+                .slice()
+                .sort(
+                  (a, b) =>
+                    new Date(b.usageDate).getTime() -
+                    new Date(a.usageDate).getTime()
+                )
+                .map((item) => (
+                  <li key={item.id} className="text-gray-700">
+                    {translations.used || "Użyto"} {item.creditsUsed}{" "}
+                    {translations.credits || "tokenów"} ({item.usageType}) -{" "}
+                    {new Date(item.usageDate).toLocaleString()}
+                  </li>
+                ))}
             </ul>
           ) : (
             <p className="text-gray-500">

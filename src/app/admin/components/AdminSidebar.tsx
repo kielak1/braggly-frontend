@@ -52,6 +52,12 @@ const AdminSidebar = () => {
           >
             {translations.param_sidebar || "parametry"}
           </Link>
+          <Link
+            href="/admin/restricted-paths"
+            className="block p-2 rounded hover:bg-gray-700"
+          >
+            {translations.resticted_paths || "Płatne usługi"}
+          </Link>
         </li>
       </ul>
     </aside>
