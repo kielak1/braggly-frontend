@@ -1,11 +1,16 @@
 "use client";
 
-import { getCookie } from "@/utils/cookies";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { signIn, signOut, useSession } from "next-auth/react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { fetchWhoAmI, WhoAmIResponse } from "@/utils/api";
+import { getCookie } from "@/utils/cookies";
+import { jwtDecode } from "jwt-decode";
+
+type JwtPayload = {
+  exp: number;
+};
 
 export default function Navbar() {
   const router = useRouter();
@@ -16,6 +21,8 @@ export default function Navbar() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [userData, setUserData] = useState<WhoAmIResponse | null>(null);
+
   const [translations, setTranslations] = useState({
     login: "Zaloguj",
     logout: "Wyloguj",
@@ -25,32 +32,40 @@ export default function Navbar() {
     loggedAs: "Zalogowany jako",
   });
 
-  const [userData, setUserData] = useState<WhoAmIResponse | null>(null);
-
   const saveToken = (token: string) => {
     localStorage.setItem("token", token);
     document.cookie = `token=${token}; path=/; SameSite=Lax; Secure`;
   };
 
-  const clearToken = () => {
+  const saveUserData = (data: WhoAmIResponse) => {
+    localStorage.setItem("userData", JSON.stringify(data));
+    setUserData(data);
+  };
+
+  const clearAuthData = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userData");
     document.cookie = `token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;`;
   };
 
   const handleFullLogout = useCallback(async () => {
-    clearToken();
-    setUserData(null);
+    clearAuthData();
     setIsLoggedIn(false);
+    setUserData(null);
     await signOut({ redirect: false });
     router.push("/");
   }, [router]);
 
   const verifyAndSetUser = useCallback(async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.warn("verifyAndSetUser: brak tokena");
+      return handleFullLogout();
+    }
+
     const data = await fetchWhoAmI();
     if (data) {
-      setUserData(data);
-      localStorage.setItem("userData", JSON.stringify(data));
+      saveUserData(data);
       setIsLoggedIn(true);
 
       if (data.role === "ADMIN" && !pathname.startsWith("/admin")) {
@@ -64,35 +79,114 @@ export default function Navbar() {
   }, [pathname, router, handleFullLogout]);
 
   useEffect(() => {
-    const checkLocalToken = async () => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        await verifyAndSetUser();
-      }
-    };
-    checkLocalToken();
-    window.addEventListener("storage", checkLocalToken);
-    return () => window.removeEventListener("storage", checkLocalToken);
-  }, [verifyAndSetUser]);
+    if (!session?.idToken) return;
 
+    const interval = setInterval(async () => {
+      const jwt = localStorage.getItem("token");
+      if (!jwt) return;
+
+      try {
+        // const decoded: JwtPayload = jwtDecode(jwt);
+        const decoded = jwtDecode<JwtPayload>(jwt);
+        const now = Math.floor(Date.now() / 1000);
+        const timeLeft = decoded.exp - now;
+
+        if (timeLeft < 120) {
+          console.log("🔄 Token bliski wygaśnięcia, odświeżam...");
+
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/google`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ token: session.idToken }),
+            }
+          );
+
+          const data = await res.json();
+          if (data.token) {
+            localStorage.setItem("token", data.token);
+            document.cookie = `token=${data.token}; path=/; SameSite=Lax; Secure`;
+            console.log("✅ Token odświeżony");
+          } else {
+            console.warn("❌ Brak tokena w odpowiedzi backendu");
+          }
+        }
+      } catch (err) {
+        console.error(
+          "❌ Błąd podczas dekodowania lub odświeżania tokena:",
+          err
+        );
+      }
+    }, 60000); // sprawdzamy co 60s
+
+    return () => clearInterval(interval);
+  }, [session?.idToken]);
+
+  // Obsługa tokena z localStorage (login/hasło)
   useEffect(() => {
-    if (session?.backendToken) {
-      saveToken(session.backendToken);
+    const token = localStorage.getItem("token");
+    if (token) {
+      setIsLoggedIn(true);
       verifyAndSetUser();
     }
-  }, [session, verifyAndSetUser]);
+    window.addEventListener("storage", verifyAndSetUser);
+    return () => window.removeEventListener("storage", verifyAndSetUser);
+  }, [verifyAndSetUser]);
 
+  // Obsługa tokena z Google (next-auth)
+  useEffect(() => {
+    const googleIdToken = session?.idToken;
+    if (!googleIdToken) return;
+
+    // Wyślij do backendu
+    const loginWithGoogleBackend = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/google`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ token: googleIdToken }),
+          }
+        );
+
+        if (!res.ok) {
+          throw new Error("Błąd logowania przez backend");
+        }
+
+        const data = await res.json();
+        const jwt = data.token;
+        if (!jwt) throw new Error("Brak tokena w odpowiedzi");
+
+        // Zapisz JWT do localStorage i cookies
+        saveToken(jwt);
+        setIsLoggedIn(true);
+        verifyAndSetUser();
+      } catch (error) {
+        console.error("Google login -> backend error:", error);
+        handleFullLogout();
+      }
+    };
+
+    loginWithGoogleBackend();
+  }, [session?.idToken]);
+
+  // Pobieranie tłumaczeń
   useEffect(() => {
     const locale = getCookie("locale") || "en";
     async function fetchTranslations() {
       try {
-        const response = await fetch(`/api/i18n?locale=${locale}`);
-        if (response.ok) {
-          const data = await response.json();
-          setTranslations(data);
-        }
+        const res = await fetch(`/api/i18n?locale=${locale}`);
+        if (!res.ok) throw new Error("Błąd tłumaczeń");
+        const data = await res.json();
+        setTranslations(data);
       } catch (error) {
-        console.error("Błąd pobierania tłumaczeń:", error);
+        console.error("Błąd tłumaczeń:", error);
       }
     }
     fetchTranslations();
@@ -101,9 +195,8 @@ export default function Navbar() {
   const handleLogin = async () => {
     setErrorMessage("");
     try {
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL!;
       const originUrl = process.env.ORIGIN_URL || "";
-      if (!backendUrl) throw new Error("Brak backend URL");
 
       const response = await fetch(`${backendUrl}/api/auth/login`, {
         method: "POST",
@@ -131,7 +224,8 @@ export default function Navbar() {
       saveToken(data.token);
       setUsername("");
       setPassword("");
-      await verifyAndSetUser();
+      setIsLoggedIn(true);
+      verifyAndSetUser();
     } catch (error) {
       console.error("Błąd logowania:", error);
       setErrorMessage("Wystąpił błąd podczas logowania.");
@@ -139,9 +233,9 @@ export default function Navbar() {
   };
 
   const handleLogout = () => {
-    clearToken();
-    setUserData(null);
+    clearAuthData();
     setIsLoggedIn(false);
+    setUserData(null);
     router.push("/");
   };
 
