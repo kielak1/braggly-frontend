@@ -90,6 +90,7 @@ export default function Navbar() {
     if (session?.backendToken) {
       setLocalStorageToken(session.backendToken);
       localStorage.setItem("token", session.backendToken);
+      document.cookie = `token=${session.backendToken}; path=/; SameSite=Lax; Secure`;
       setIsLoggedIn(true);
       fetchWhoAmI().then((data) => {
         if (data) {
@@ -103,34 +104,25 @@ export default function Navbar() {
     }
   }, [session]);
 
-  // Przekierowanie na podstawie roli użytkownika
+  //Przekierowanie na podstawie roli użytkownika
   useEffect(() => {
-    if (
-      !pathname.startsWith("/privacy-policy") &&
-      !pathname.startsWith("/terms") &&
-      !pathname.startsWith("/public")
-    ) {
-      if (localStorageToken) {
-        fetchWhoAmI().then((data) => {
-          if (data) {
-            setUserData(data);
-            if (data.role === "ADMIN") {
-              if (!pathname.startsWith("/admin")) {
-                router.push("/admin");
-              }
-            } else {
-              if (!pathname.startsWith("/user")) {
-                router.push("/user");
-              }
+    if (localStorageToken) {
+      fetchWhoAmI().then((data) => {
+        if (data) {
+          setUserData(data);
+          if (data.role === "ADMIN") {
+            if (!pathname.startsWith("/admin")) {
+              router.push("/admin");
             }
           } else {
-            handleFullLogout(); // Token nieważny
+            if (!pathname.startsWith("/user")) {
+              router.push("/user");
+            }
           }
-        });
-      } else {
-        router.push("/");
-        setUserData(null);
-      }
+        } else {
+          handleFullLogout(); // Token nieważny
+        }
+      });
     }
   }, [localStorageToken, router, pathname]);
 
@@ -171,6 +163,7 @@ export default function Navbar() {
 
       const token = data.token;
       localStorage.setItem("token", token);
+      document.cookie = `token=${token}; path=/; SameSite=Lax; Secure`;
       setLocalStorageToken(token);
       setIsLoggedIn(true);
       setErrorMessage("");
@@ -194,6 +187,8 @@ export default function Navbar() {
       setLocalStorageToken(null);
       setUserData(null);
       setIsLoggedIn(false);
+      document.cookie =
+        "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
       router.push("/");
     } catch (error) {
       console.error("Błąd podczas wylogowywania:", error);
@@ -209,6 +204,8 @@ export default function Navbar() {
       setUserData(null);
       setIsLoggedIn(false);
       await signOut({ redirect: false });
+      document.cookie =
+        "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
       router.push("/");
     } catch (error) {
       console.error("Błąd podczas pełnego wylogowywania:", error);

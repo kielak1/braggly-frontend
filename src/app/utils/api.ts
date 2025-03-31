@@ -1,4 +1,6 @@
 // src/app/utils/api.ts
+import { getCookie, getServerCookie } from "@/utils/cookies";
+import { RequestCookies } from "next/dist/compiled/@edge-runtime/cookies"; // lub napisz własny typ
 
 export interface WhoAmIResponse {
   role: string;
@@ -52,11 +54,19 @@ const getAuthHeaders = (): Record<string, string> => {
   };
 };
 
+const getAuthServerHeaders = (
+  cookies: RequestCookies
+): Record<string, string> => {
+  const token = getServerCookie(cookies, "token"); // cookies, nie request
+  if (!token) throw new Error("Brak tokena w cookies");
+  return {
+    Authorization: `Bearer ${token}`,
+  };
+};
+
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-
 if (!backendUrl) throw new Error("Brak zmiennej NEXT_PUBLIC_BACKEND_URL");
-
 
 export const fetchBoolParameters = async (): Promise<BoolParameter[]> => {
   const res = await fetch(`${backendUrl}/parameters/list`, {
@@ -66,7 +76,6 @@ export const fetchBoolParameters = async (): Promise<BoolParameter[]> => {
   if (!res.ok) throw new Error("Błąd pobierania parametrów");
   return res.json();
 };
-
 
 export const deleteBoolParameter = async (name: string): Promise<boolean> => {
   const res = await fetch(
@@ -91,6 +100,30 @@ export const updateBoolParameter = async (
     }
   );
   return res.ok;
+};
+
+export const fetchBoolParameterByName = async (
+  name: string,
+  cookies?: RequestCookies
+): Promise<BoolParameter | null> => {
+  try {
+    const headers = cookies ? getAuthServerHeaders(cookies) : getAuthHeaders();
+    const response = await fetch(
+      `${backendUrl}/parameters/get?name=${encodeURIComponent(name)}`,
+      {
+        method: "GET",
+        headers,
+      }
+    );
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Błąd serwera: ${response.status} - ${errorText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Błąd podczas pobierania parametru:", error);
+    return null;
+  }
 };
 
 export const quickAnalysisXrdFile = async (file: File): Promise<any> => {
