@@ -1,7 +1,7 @@
 "use client";
 
 import { getCookie } from "@/utils/cookies";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { signIn, signOut, useSession } from "next-auth/react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -10,7 +10,8 @@ import { fetchWhoAmI, WhoAmIResponse } from "@/utils/api";
 export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -23,61 +24,73 @@ export default function Navbar() {
     error: "Nieprawidłowy login lub hasło",
     loggedAs: "Zalogowany jako",
   });
-  const [localStorageToken, setLocalStorageToken] = useState<string | null>(
-    null
-  );
+
   const [userData, setUserData] = useState<WhoAmIResponse | null>(null);
 
-  // Weryfikacja ważności tokena
-  const verifyToken = async (): Promise<boolean> => {
-    const data = await fetchWhoAmI();
-    return !!data; // Zwraca true, jeśli dane są zwrócone, false w przeciwnym razie
+  const saveToken = (token: string) => {
+    localStorage.setItem("token", token);
+    document.cookie = `token=${token}; path=/; SameSite=Lax; Secure`;
   };
 
-  // Sprawdzanie tokena przy ładowaniu strony
+  const clearToken = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userData");
+    document.cookie = `token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;`;
+  };
+
+  const handleFullLogout = useCallback(async () => {
+    clearToken();
+    setUserData(null);
+    setIsLoggedIn(false);
+    await signOut({ redirect: false });
+    router.push("/");
+  }, [router]);
+
+  const verifyAndSetUser = useCallback(async () => {
+    const data = await fetchWhoAmI();
+    if (data) {
+      setUserData(data);
+      localStorage.setItem("userData", JSON.stringify(data));
+      setIsLoggedIn(true);
+
+      if (data.role === "ADMIN" && !pathname.startsWith("/admin")) {
+        router.push("/admin");
+      } else if (data.role === "USER" && !pathname.startsWith("/user")) {
+        router.push("/user");
+      }
+    } else {
+      handleFullLogout();
+    }
+  }, [pathname, router, handleFullLogout]);
+
   useEffect(() => {
-    const checkToken = async () => {
-      try {
-        if (typeof window !== "undefined") {
-          const token = localStorage.getItem("token");
-          if (token) {
-            const isValid = await verifyToken();
-            if (isValid) {
-              setIsLoggedIn(true);
-              setLocalStorageToken(token);
-              const storedUserData = localStorage.getItem("userData");
-              if (storedUserData) {
-                setUserData(JSON.parse(storedUserData));
-              }
-            } else {
-              handleFullLogout(); // Token nieważny - pełne wylogowanie
-            }
-          } else {
-            setIsLoggedIn(false);
-            setLocalStorageToken(null);
-            setUserData(null);
-          }
-        }
-      } catch (error) {
-        console.error("Błąd podczas weryfikacji tokena:", error);
-        handleFullLogout();
+    const checkLocalToken = async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        await verifyAndSetUser();
       }
     };
+    checkLocalToken();
+    window.addEventListener("storage", checkLocalToken);
+    return () => window.removeEventListener("storage", checkLocalToken);
+  }, [verifyAndSetUser]);
 
-    checkToken();
-    window.addEventListener("storage", checkToken);
-    return () => window.removeEventListener("storage", checkToken);
-  }, []);
+  useEffect(() => {
+    if (session?.backendToken) {
+      saveToken(session.backendToken);
+      verifyAndSetUser();
+    }
+  }, [session, verifyAndSetUser]);
 
-  // Pobieranie tłumaczeń
   useEffect(() => {
     const locale = getCookie("locale") || "en";
     async function fetchTranslations() {
       try {
         const response = await fetch(`/api/i18n?locale=${locale}`);
-        if (!response.ok) throw new Error("Błąd pobierania tłumaczeń");
-        const data = await response.json();
-        setTranslations(data);
+        if (response.ok) {
+          const data = await response.json();
+          setTranslations(data);
+        }
       } catch (error) {
         console.error("Błąd pobierania tłumaczeń:", error);
       }
@@ -85,56 +98,12 @@ export default function Navbar() {
     fetchTranslations();
   }, []);
 
-  // Obsługa sesji NextAuth
-  useEffect(() => {
-    if (session?.backendToken) {
-      setLocalStorageToken(session.backendToken);
-      localStorage.setItem("token", session.backendToken);
-      document.cookie = `token=${session.backendToken}; path=/; SameSite=Lax; Secure`;
-      setIsLoggedIn(true);
-      fetchWhoAmI().then((data) => {
-        if (data) {
-          setUserData(data); // fetchWhoAmI już zapisuje dane w localStorage
-        } else {
-          handleFullLogout(); // Token z sesji jest nieważny
-        }
-      });
-    } else if (session && !localStorageToken) {
-      handleFullLogout(); // Sesja Google istnieje, ale brak tokena
-    }
-  }, [session]);
-
-  //Przekierowanie na podstawie roli użytkownika
-  useEffect(() => {
-    if (localStorageToken) {
-      fetchWhoAmI().then((data) => {
-        if (data) {
-          setUserData(data);
-          if (data.role === "ADMIN") {
-            if (!pathname.startsWith("/admin")) {
-              router.push("/admin");
-            }
-          } else {
-            if (!pathname.startsWith("/user")) {
-              router.push("/user");
-            }
-          }
-        } else {
-          handleFullLogout(); // Token nieważny
-        }
-      });
-    }
-  }, [localStorageToken, router, pathname]);
-
-  // Logowanie tradycyjne
   const handleLogin = async () => {
     setErrorMessage("");
     try {
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
       const originUrl = process.env.ORIGIN_URL || "";
-      if (!backendUrl) {
-        throw new Error("Brak zmiennej środowiskowej NEXT_PUBLIC_BACKEND_URL");
-      }
+      if (!backendUrl) throw new Error("Brak backend URL");
 
       const response = await fetch(`${backendUrl}/api/auth/login`, {
         method: "POST",
@@ -157,64 +126,23 @@ export default function Navbar() {
       }
 
       const data = await response.json();
-      if (!data.token) {
-        throw new Error("Brak tokena w odpowiedzi serwera");
-      }
+      if (!data.token) throw new Error("Brak tokena");
 
-      const token = data.token;
-      localStorage.setItem("token", token);
-      document.cookie = `token=${token}; path=/; SameSite=Lax; Secure`;
-      setLocalStorageToken(token);
-      setIsLoggedIn(true);
-      setErrorMessage("");
-
-      fetchWhoAmI().then((userData) => {
-        if (userData) {
-          setUserData(userData);
-        }
-      });
+      saveToken(data.token);
+      setUsername("");
+      setPassword("");
+      await verifyAndSetUser();
     } catch (error) {
       console.error("Błąd logowania:", error);
       setErrorMessage("Wystąpił błąd podczas logowania.");
     }
   };
 
-  // Wylogowanie tradycyjne
   const handleLogout = () => {
-    try {
-      localStorage.removeItem("token");
-      localStorage.removeItem("userData");
-      setLocalStorageToken(null);
-      setUserData(null);
-      setIsLoggedIn(false);
-      document.cookie =
-        "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-      router.push("/");
-    } catch (error) {
-      console.error("Błąd podczas wylogowywania:", error);
-    }
-  };
-
-  // Pełne wylogowanie (NextAuth + localStorage)
-  const handleFullLogout = async () => {
-    try {
-      localStorage.removeItem("token");
-      localStorage.removeItem("userData");
-      setLocalStorageToken(null);
-      setUserData(null);
-      setIsLoggedIn(false);
-      await signOut({ redirect: false });
-      document.cookie =
-        "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-      router.push("/");
-    } catch (error) {
-      console.error("Błąd podczas pełnego wylogowywania:", error);
-    }
-  };
-
-  // Wylogowanie z Google
-  const handleGoogleLogout = async () => {
-    await handleFullLogout();
+    clearToken();
+    setUserData(null);
+    setIsLoggedIn(false);
+    router.push("/");
   };
 
   return (
@@ -222,10 +150,13 @@ export default function Navbar() {
       <LanguageSwitcher />
       <h1 className="text-3xl font-bold text-blue-600">Braggly</h1>
       <div className="flex items-center space-x-4">
-        {session || isLoggedIn ? (
+        {isLoggedIn ? (
           <div className="flex items-center space-x-4">
+            <span className="text-sm">
+              {translations.loggedAs}: {userData?.username}
+            </span>
             <button
-              onClick={session ? handleGoogleLogout : handleLogout}
+              onClick={session ? handleFullLogout : handleLogout}
               className="bg-red-500 px-4 py-2 rounded"
             >
               {session ? translations.googleLogout : translations.logout}
