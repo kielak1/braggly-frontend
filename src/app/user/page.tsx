@@ -8,9 +8,10 @@ import {
   fetchUsageHistory,
   PurchaseHistory,
   UsageHistory,
-} from "@/utils/api"; // Importujemy potrzebne funkcje i typy
+  fetchBoolParameterByName,
+  isParameterEnabled,
+} from "@/utils/api";
 import "@/styles/globals.css";
-import { fetchBoolParameterByName, isParameterEnabled } from "@/utils/api";
 
 const Dashboard = () => {
   const [translations, setTranslations] = useState<Record<
@@ -22,10 +23,13 @@ const Dashboard = () => {
     PurchaseHistory[] | null
   >(null);
   const [usageHistory, setUsageHistory] = useState<UsageHistory[] | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // Stan ładowania
+  const [isLoading, setIsLoading] = useState(true);
+  const [freeAccess, setFreeAccess] = useState<boolean>(true);
 
-  const [freeAccess, setFreeAccess] = useState<boolean>(true); // domyślnie true
+  // Pobieranie tłumaczeń
+  useFetchTranslations(setTranslations, getCookie);
 
+  // Sprawdzenie flagi darmowego dostępu
   useEffect(() => {
     const checkFreeAccess = async () => {
       const param = await fetchBoolParameterByName("free_access");
@@ -34,169 +38,83 @@ const Dashboard = () => {
     checkFreeAccess();
   }, []);
 
-  // Pobieranie tłumaczeń
-  useFetchTranslations(setTranslations, getCookie);
-
-  // Pobieranie danych z localStorage i historii przy montowaniu komponentu
+  // Pobieranie danych z localStorage i historii
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
-
-      // Pobieranie danych z localStorage
-      const storedData = localStorage.getItem("userData");
+      const storedData = localStorage.getItem("user");
       if (storedData) {
         try {
-          const parsedData = JSON.parse(storedData);
-          if (typeof parsedData === "object" && parsedData !== null) {
-            const formattedData = Object.fromEntries(
-              Object.entries(parsedData).map(([key, value]) => [
-                key,
-                String(value),
-              ])
-            );
-            setUserData(formattedData);
+          const formattedData = JSON.parse(storedData);
+          setUserData(formattedData);
 
-            // Pobieranie historii tylko jeśli mamy userId
-            const userId = Number(formattedData.id);
-            if (userId) {
-              const purchaseData = await fetchPurchaseHistory(userId);
-              setPurchaseHistory(purchaseData);
-              const usageData = await fetchUsageHistory(userId);
-              setUsageHistory(usageData);
-            }
+          // Pobieranie historii tylko jeśli mamy userId
+          const userId = Number(formattedData.id);
+          if (userId) {
+            const purchaseData = await fetchPurchaseHistory(userId);
+            setPurchaseHistory(purchaseData);
+            const usageData = await fetchUsageHistory(userId);
+            setUsageHistory(usageData);
           }
         } catch (error) {
           console.error("Błąd parsowania danych z localStorage:", error);
-          setUserData({});
         }
       }
-
       setIsLoading(false);
     };
 
     fetchData();
   }, []);
-
-  // Jeśli dane nie są załadowane, pokaż stan ładowania
-  if (!translations || !userData || isLoading) {
-    return <div>Ładowanie...</div>;
+  if (!translations) {
+    return <div>Ładowanie tłumaczeń</div>;
   }
-
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-gray-100 rounded-lg shadow-md mt-6">
-      <h1 className="text-3xl font-bold text-gray-800 mb-4">
-        {translations.greeting}{" "}
-        <span className="text-blue-600">
-          {userData.username || "Brak nazwy"}
-        </span>
-        , {translations.welcome}
-      </h1>
+    <div className="p-4 space-y-6">
+      <h1 className="text-2xl font-bold">User Dashboard</h1>
 
-      <p className="text-lg text-gray-700 mb-6">
-        {translations.you_have}{" "}
-        <span className="font-semibold text-green-600">
-          {userData.balance || "0"}
-        </span>{" "}
-        {translations.tokens_on_your_account}.
-      </p>
+      {/* Górna część: dwa komponenty po lewej + info box po prawej */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+        <div className="col-span-2 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white border rounded-lg p-4 shadow-sm min-h-[180px]">
+              <h2 className="font-semibold text-lg mb-2">📂 My XRD files</h2>
+              <p className="text-sm text-gray-500">
+                Placeholder for user file list
+              </p>
+            </div>
+            <div className="bg-white border rounded-lg p-4 shadow-sm min-h-[180px]">
+              <h2 className="font-semibold text-lg mb-2">
+                🌐 Public XRD files
+              </h2>
+              <p className="text-sm text-gray-500">
+                Placeholder for public file list
+              </p>
+            </div>
+          </div>
+        </div>
 
-      {freeAccess ? (
-        <p className="italic text-gray-600">
-          {translations.donations_dashboard}
-        </p>
-      ) : (
-        <p className="italic text-gray-600">
-          {translations.what_are_tokens_for_dashboard}
-        </p>
-      )}
-      <div className="flex justify-center mb-6">
-        <a
-          href="/user/account"
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow transition duration-200"
-        >
-          {translations.buy_tokens || "Kup tokeny"}
-        </a>
-      </div>
-
-      {/* Lista historii zakupów */}
-      <div className="mb-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-2">
-          {translations.purchase_history || "Historia zakupów"}
-        </h2>
-        <div
-          className="bg-white p-4 rounded shadow"
-          style={{ maxHeight: "200px", overflowY: "auto" }} // Stała wysokość z suwakiem
-        >
-          {purchaseHistory && purchaseHistory.length > 0 ? (
-            <ul className="space-y-2">
-              {purchaseHistory
-                .slice()
-                .sort(
-                  (a, b) =>
-                    new Date(b.purchaseDate).getTime() -
-                    new Date(a.purchaseDate).getTime()
-                )
-                .map((item) => (
-                  <li
-                    key={item.id}
-                    className="text-gray-700 flex justify-between items-center"
-                  >
-                    <span>
-                      {translations.bought || "Kupiono"}{" "}
-                      <span className="font-semibold">
-                        {item.creditsPurchased}
-                      </span>{" "}
-                      {translations.credits || "kredytów"} {translations.zaco}{" "}
-                      <span className="font-semibold">
-                        {(item.amountPaid / 100).toFixed(2)} zł
-                      </span>{" "}
-                      - {new Date(item.purchaseDate).toLocaleString()}
-                    </span>
-                    <span className="text-sm text-gray-500">
-                      {item.paymentId}
-                    </span>
-                  </li>
-                ))}
-            </ul>
-          ) : (
-            <p className="text-gray-500">
-              {translations.no_purchases || "Brak historii zakupów"}
-            </p>
-          )}
+        <div className="bg-white border rounded-lg p-4 shadow-sm min-h-[100%]">
+          <h2 className="font-semibold text-lg mb-2">
+            {translations.welcome}
+            📦 Purchase History / Info
+          </h2>
+          <p className="text-sm text-gray-500">
+            Placeholder for stats or token history
+          </p>
         </div>
       </div>
 
-      {/* Lista historii użycia */}
-      <div>
-        <h2 className="text-xl font-bold text-gray-800 mb-2">
-          {translations.usage_history || "Historia użycia"}
+      <div className="bg-white border rounded-lg p-4 shadow-sm min-h-[200px]">
+        <h2 className="font-semibold text-lg mb-2">
+          📊 Files selected for analysis
         </h2>
-        <div
-          className="bg-white p-4 rounded shadow"
-          style={{ maxHeight: "200px", overflowY: "auto" }} // Stała wysokość z suwakiem
-        >
-          {usageHistory && usageHistory.length > 0 ? (
-            <ul className="space-y-2">
-              {usageHistory
-                .slice()
-                .sort(
-                  (a, b) =>
-                    new Date(b.usageDate).getTime() -
-                    new Date(a.usageDate).getTime()
-                )
-                .map((item) => (
-                  <li key={item.id} className="text-gray-700">
-                    {translations.used || "Użyto"} {item.creditsUsed}{" "}
-                    {translations.credits || "tokenów"} ({item.usageType}) -{" "}
-                    {new Date(item.usageDate).toLocaleString()}
-                  </li>
-                ))}
-            </ul>
-          ) : (
-            <p className="text-gray-500">
-              {translations.no_usage || "Brak historii użycia"}
-            </p>
-          )}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="border p-4 min-h-[100px] rounded bg-gray-50">
+            filelist
+          </div>
+          <div className="border p-4 min-h-[100px] rounded bg-gray-50">
+            button area – analysis options
+          </div>
         </div>
       </div>
     </div>
