@@ -1,17 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getCookie } from "@/utils/cookies";
-import { useFetchTranslations } from "@/utils/fetchTranslations";
 import "@/styles/globals.css";
 import Checkout from "@/components/Checkout";
 import { fetchBoolParameterByName, isParameterEnabled } from "@/utils/api";
+import { useTranslations } from "@/context/TranslationsContext"; // ✅
+
 const AccountPage = () => {
-  const [translations, setTranslations] = useState<Record<string, string> | null>(null);
+  const { translations } = useTranslations(); // ✅ tłumaczenia globalne
   const [userData, setUserData] = useState<Record<string, string> | null>(null);
+  const [freeAccess, setFreeAccess] = useState<boolean>(true);
 
-  const [freeAccess, setFreeAccess] = useState<boolean>(true); // domyślnie true
-
+  // Sprawdzenie flagi dostępu
   useEffect(() => {
     const checkFreeAccess = async () => {
       const param = await fetchBoolParameterByName("free_access");
@@ -20,10 +20,7 @@ const AccountPage = () => {
     checkFreeAccess();
   }, []);
 
-  // Pobieranie tłumaczeń
-  useFetchTranslations(setTranslations, getCookie);
-
-  // Funkcja do aktualizacji userData z localStorage
+  // Pobieranie danych użytkownika z localStorage przy montowaniu komponentu
   const updateUserData = () => {
     try {
       const storedData = localStorage.getItem("userData");
@@ -48,12 +45,11 @@ const AccountPage = () => {
     }
   };
 
-  // Pobieranie danych użytkownika z localStorage przy montowaniu komponentu
   useEffect(() => {
     updateUserData();
   }, []);
 
-  // Jeśli tłumaczenia lub dane z localStorage nie są załadowane, pokaż stan ładowania
+  // Obsługa ładowania
   if (!translations || !userData) {
     return (
       <div className="text-center text-gray-600 text-lg mt-6">Ładowanie...</div>
@@ -75,18 +71,22 @@ const AccountPage = () => {
         </span>{" "}
         {translations.tokens_on_your_account || "tokenów na swoim koncie"}.
       </p>
+
       {freeAccess ? (
-        <p className="italic text-gray-600">{translations.donations}</p>
+        <p className="italic text-gray-600">
+          {translations.donations ||
+            "Dostęp tymczasowo jest darmowy. Możesz jednak wesprzeć projekt dobrowolną wpłatą 💖"}
+        </p>
       ) : (
         <p className="italic text-gray-600">
-          {translations.what_are_tokens_for}
+          {translations.what_are_tokens_for ||
+            "Tokeny służą do zakupu analiz i usług XRD."}
         </p>
       )}
 
-
       {/* Osadzenie formularza płatności */}
       <div className="mt-6">
-        <Checkout updateUserData={updateUserData} /> {/* Przekazujemy funkcję aktualizującą */}
+        <Checkout updateUserData={updateUserData} />
       </div>
     </div>
   );

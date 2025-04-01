@@ -8,8 +8,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { getCookie } from "@/utils/cookies";
-import { useFetchTranslations } from "@/utils/fetchTranslations";
+import { useTranslations } from "@/context/TranslationsContext"; // ✅ NOWE
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -22,7 +21,6 @@ import {
   Legend,
 } from "chart.js";
 
-// Rejestracja komponentów Chart.js
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -48,13 +46,11 @@ type Props = {
 };
 
 const XrdAnalysisModal = ({ fileId, open, onClose }: Props) => {
-  const [translations, setTranslations] = useState<Record<string, string> | null>(null);
+  const { translations } = useTranslations(); // ✅ NOWE
   const [chartData, setChartData] = useState<any>(null);
   const [peaks, setPeaks] = useState<Peak[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useFetchTranslations(setTranslations, getCookie);
 
   useEffect(() => {
     if (!open || !fileId) return;
@@ -63,13 +59,10 @@ const XrdAnalysisModal = ({ fileId, open, onClose }: Props) => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`${backendUrl}/api/xrd/analyze/${fileId}`, {
-          method: "GET",
-        });
+        const res = await fetch(`${backendUrl}/api/xrd/analyze/${fileId}`);
         if (!res.ok) throw new Error("Błąd pobierania analizy");
         const data = await res.json();
 
-        // Dostosowanie nazw pól, jeśli backend używa "twoTheta" zamiast "angles"
         const angles = data.twoTheta || data.angles;
         const intensities = data.intensities;
         const peaksData = data.peaks;
@@ -78,23 +71,21 @@ const XrdAnalysisModal = ({ fileId, open, onClose }: Props) => {
           throw new Error("Invalid response format from backend");
         }
 
-        // Ustawienie danych dla wykresu
         setChartData({
           labels: angles,
           datasets: [
             {
               label: translations?.intensity || "Intensity",
               data: intensities,
-              borderColor: "#1E90FF", // Jasnoniebieski kolor linii
+              borderColor: "#1E90FF",
               borderWidth: 2,
               fill: false,
               tension: 0.1,
-              pointRadius: 0, // Usunięcie punktów na linii dla lepszej czytelności
+              pointRadius: 0,
             },
           ],
         });
 
-        // Walidacja i ustawienie pików
         const validatedPeaks = peaksData.filter(
           (peak: any) =>
             typeof peak.angle === "number" &&
@@ -106,7 +97,10 @@ const XrdAnalysisModal = ({ fileId, open, onClose }: Props) => {
           setError("Some peaks were invalid and filtered out");
         }
       } catch (err) {
-        setError(translations?.analysis_fetch_error || "❌ Nie udało się pobrać danych analizy");
+        setError(
+          translations?.analysis_fetch_error ||
+            "❌ Nie udało się pobrać danych analizy"
+        );
       } finally {
         setLoading(false);
       }
@@ -138,7 +132,7 @@ const XrdAnalysisModal = ({ fileId, open, onClose }: Props) => {
                 data={chartData}
                 options={{
                   responsive: true,
-                  maintainAspectRatio: false, // Pozwala na ręczne ustawienie wysokości
+                  maintainAspectRatio: false,
                   plugins: {
                     title: {
                       display: true,
@@ -173,7 +167,7 @@ const XrdAnalysisModal = ({ fileId, open, onClose }: Props) => {
                       ticks: {
                         font: { size: 12 },
                         color: "#666",
-                        maxTicksLimit: 20, // Ograniczenie liczby etykiet dla lepszej czytelności
+                        maxTicksLimit: 20,
                       },
                       grid: { display: false },
                     },

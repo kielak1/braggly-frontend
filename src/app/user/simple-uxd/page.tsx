@@ -1,9 +1,7 @@
-// src/app/user/uploads/page.tsx
 "use client";
 
 import { useState } from "react";
-import { getCookie } from "@/utils/cookies";
-import { useFetchTranslations } from "@/utils/fetchTranslations";
+import { useTranslations } from "@/context/TranslationsContext";
 import { quickAnalysisXrdFile } from "@/utils/api";
 import { Line } from "react-chartjs-2";
 import {
@@ -35,17 +33,12 @@ interface Peak {
 }
 
 const SimpleUXD = () => {
-  const [translations, setTranslations] = useState<Record<
-    string,
-    string
-  > | null>(null);
+  const { translations } = useTranslations(); // ✅
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [chartData, setChartData] = useState<any>(null);
   const [peaks, setPeaks] = useState<Peak[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  useFetchTranslations(setTranslations, getCookie);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -109,10 +102,7 @@ const SimpleUXD = () => {
   if (!translations) {
     return (
       <div className="max-w-4xl mx-auto p-6 text-center">
-        <p className="text-gray-700">
-          {/* {translations?.loading || "Ładowanie..."} */}
-          Ładowanie..
-        </p>
+        <p className="text-gray-700">Ładowanie...</p>
       </div>
     );
   }
@@ -122,6 +112,7 @@ const SimpleUXD = () => {
       <h1 className="text-3xl font-bold text-gray-800 mb-4">
         {translations.simple_uxd || "Szybka analiza pliku UXD"}
       </h1>
+
       <div className="flex items-center space-x-4 mb-4">
         <label
           htmlFor="fileInput"
@@ -146,6 +137,7 @@ const SimpleUXD = () => {
             : translations?.analyze_button || "Analyze"}
         </button>
       </div>
+
       {selectedFile && (
         <p className="mt-2 text-gray-600">
           {translations.selected_file || "Selected File"}: {selectedFile.name}

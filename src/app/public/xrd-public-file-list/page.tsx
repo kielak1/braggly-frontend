@@ -1,23 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getCookie } from "@/utils/cookies";
-import { useFetchTranslations } from "@/utils/fetchTranslations";
 import { FlaskConical } from "lucide-react";
 import XrdAnalysisModal from "@/public/components/XrdAnalysisModal";
+import { useTranslations } from "@/context/TranslationsContext"; // ✅ nowy hook
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const XrdPublicFileList = () => {
-  const [translations, setTranslations] = useState<Record<string, string> | null>(null);
+  const { translations } = useTranslations(); // ✅ użycie kontekstu
   const [files, setFiles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [selectedFileIdForAnalysis, setSelectedFileIdForAnalysis] = useState<number | null>(null);
+  const [selectedFileIdForAnalysis, setSelectedFileIdForAnalysis] = useState<
+    number | null
+  >(null);
   const [showAnalysisModal, setShowAnalysisModal] = useState(false);
-
-  useFetchTranslations(setTranslations, getCookie);
 
   const fetchPublicFiles = async () => {
     try {
@@ -40,18 +39,31 @@ const XrdPublicFileList = () => {
   }, []);
 
   if (!translations) return <p className="text-center">Ładowanie...</p>;
-  if (loading) return <p className="text-center">⏳ Pobieranie plików...</p>;
+  if (loading)
+    return (
+      <p className="text-center">
+        ⏳ {translations.loading_files || "Pobieranie plików..."}
+      </p>
+    );
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
     <div className="max-w-5xl mx-auto p-6 mt-6 bg-white rounded-xl shadow-md">
-      <h1 className="text-2xl font-bold mb-4">{translations.public_files || "Public Files"}</h1>
+      <h1 className="text-2xl font-bold mb-4">
+        {translations.public_files || "Public Files"}
+      </h1>
       <table className="w-full table-auto border-collapse">
         <thead>
           <tr className="bg-gray-200 text-left">
-            <th className="p-2">{translations.list_user_filename || "Nazwa"}</th>
-            <th className="p-2">{translations.list_original_filename || "Oryginalny plik"}</th>
-            <th className="p-2">{translations.list_uploaded_at || "Data przesłania"}</th>
+            <th className="p-2">
+              {translations.list_user_filename || "Nazwa"}
+            </th>
+            <th className="p-2">
+              {translations.list_original_filename || "Oryginalny plik"}
+            </th>
+            <th className="p-2">
+              {translations.list_uploaded_at || "Data przesłania"}
+            </th>
             <th className="p-2">{translations.list_actions || "Akcje"}</th>
           </tr>
         </thead>

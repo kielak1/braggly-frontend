@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect, useCallback } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import {
@@ -7,9 +8,8 @@ import {
   useElements,
   PaymentElement,
 } from "@stripe/react-stripe-js";
-import { useFetchTranslations } from "@/utils/fetchTranslations";
+import { useTranslations } from "@/context/TranslationsContext"; // ✅
 import { fetchCreditPackages, CreditPackage } from "@/utils/api";
-import { getCookie } from "@/utils/cookies";
 import {
   CheckCircleIcon,
   ExclamationCircleIcon,
@@ -18,19 +18,18 @@ import {
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
 
 const CheckoutForm = ({ updateUserData }: { updateUserData: () => void }) => {
-  const [translations, setTranslations] = useState<Record<
-    string,
-    string
-  > | null>(null);
-  useFetchTranslations(setTranslations, getCookie);
+  const { translations } = useTranslations(); // ✅
+
   const [creditPackages, setCreditPackages] = useState<CreditPackage[] | null>(
     null
   );
+  const [refresh, setRefresh] = useState(false);
+
   const loadCreditPackages = useCallback(async () => {
     const packages = await fetchCreditPackages();
     setCreditPackages(packages);
   }, []);
-  const [refresh, setRefresh] = useState(false);
+
   useEffect(() => {
     loadCreditPackages();
   }, [loadCreditPackages, refresh]);
@@ -41,7 +40,6 @@ const CheckoutForm = ({ updateUserData }: { updateUserData: () => void }) => {
   );
   const [clientSecret, setClientSecret] = useState<string | null>(null);
 
-  // Pobieramy dane użytkownika z localStorage
   const storedUserData = localStorage.getItem("userData");
   let username = "unknown_user";
   let user_id = "unknown_id";
@@ -55,15 +53,14 @@ const CheckoutForm = ({ updateUserData }: { updateUserData: () => void }) => {
     }
   }
 
-  // Funkcja do tworzenia PaymentIntent dla wybranego pakietu
   const createPaymentIntent = async (pkg: CreditPackage) => {
     const response = await fetch("/api/payments/create-payment-intent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         amount: pkg.priceInCents,
-        username: username,
-        user_id: user_id,
+        username,
+        user_id,
         package_id: pkg.id,
       }),
     });
@@ -77,7 +74,6 @@ const CheckoutForm = ({ updateUserData }: { updateUserData: () => void }) => {
     setSelectedPackage(pkg);
   };
 
-  // Funkcja resetująca formularz
   const resetForm = () => {
     setClientSecret(null);
     setSelectedPackage(null);
@@ -145,9 +141,9 @@ const CheckoutForm = ({ updateUserData }: { updateUserData: () => void }) => {
               setMessage={setMessage}
               onSuccess={() => {
                 resetForm();
-                updateUserData(); // Wywołujemy aktualizację userData po sukcesie
+                updateUserData();
               }}
-              resetForm={resetForm} // Dodajemy resetForm jako prop
+              resetForm={resetForm}
             />
           </Elements>
         </>
@@ -158,10 +154,10 @@ const CheckoutForm = ({ updateUserData }: { updateUserData: () => void }) => {
           className={`mt-4 p-4 rounded-lg flex items-center justify-center space-x-2 shadow-lg max-w-md mx-auto ${
             !message.includes("Błąd")
               ? "bg-green-50 text-green-800 border border-green-200"
-              :  "bg-red-50 text-red-800 border border-red-200"
+              : "bg-red-50 text-red-800 border border-red-200"
           }`}
         >
-          {!message.toLowerCase().includes("Błąd") ? (
+          {!message.toLowerCase().includes("błąd") ? (
             <CheckCircleIcon className="h-6 w-6 text-green-600" />
           ) : (
             <ExclamationCircleIcon className="h-6 w-6 text-red-600" />
@@ -180,7 +176,7 @@ const CheckoutFormInner = ({
   message,
   setMessage,
   onSuccess,
-  resetForm, // Dodajemy resetForm do propsów
+  resetForm,
 }: {
   clientSecret: string;
   selectedPackage: CreditPackage;
@@ -188,7 +184,7 @@ const CheckoutFormInner = ({
   message: string;
   setMessage: (message: string) => void;
   onSuccess: () => void;
-  resetForm: () => void; // Typ dla resetForm
+  resetForm: () => void;
 }) => {
   const stripe = useStripe();
   const elements = useElements();
@@ -222,7 +218,6 @@ const CheckoutFormInner = ({
     } else if (paymentIntent && paymentIntent.status === "succeeded") {
       setMessage(`${translations.payment_success} ${paymentIntent.id}`);
 
-      // Ręczna aktualizacja salda w localStorage
       const storedUserData = localStorage.getItem("userData");
       if (storedUserData) {
         const parsedData = JSON.parse(storedUserData);
@@ -231,7 +226,7 @@ const CheckoutFormInner = ({
         localStorage.setItem("userData", JSON.stringify(parsedData));
       }
 
-      onSuccess(); // Wywołujemy reset i aktualizację userData
+      onSuccess();
     }
   };
 
@@ -247,8 +242,8 @@ const CheckoutFormInner = ({
           {translations.confirm_payment}
         </button>
         <button
-          type="button" // Typ button, aby nie submitować formularza
-          onClick={resetForm} // Wywołanie resetForm
+          type="button"
+          onClick={resetForm}
           className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
         >
           {translations.back || "Cofnij"}

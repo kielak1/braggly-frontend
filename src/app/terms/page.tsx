@@ -1,16 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getCookie } from "@/utils/cookies";
-import { useFetchTranslations } from "@/utils/fetchTranslations";
+import { useTranslations } from "@/context/TranslationsContext"; // ✅
 
 export default function TermsPage() {
-  const [translations, setTranslations] = useState<Record<
-    string,
-    string
-  > | null>(null);
-
-  useFetchTranslations(setTranslations, getCookie);
+  const { translations } = useTranslations(); // ✅
 
   if (!translations) {
     return <div>Ładowanie...</div>;
@@ -18,7 +11,9 @@ export default function TermsPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">{translations.terms_title}</h1>
+      <h1 className="text-3xl font-bold mb-6">
+        {translations.terms_title || "Regulamin korzystania z serwisu"}
+      </h1>
       <div className="space-y-4 text-justify">
         <p>{translations.general}</p>
         <p>{translations.storage}</p>

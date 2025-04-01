@@ -1,19 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react"; // Dodano useEffect do pobierania z localStorage
-import { getCookie } from "@/utils/cookies";
-import { useFetchTranslations } from "@/utils/fetchTranslations";
+import { useState, useEffect } from "react";
+import { useTranslations } from "@/context/TranslationsContext"; // ✅ użycie kontekstu
 import "@/styles/globals.css";
 
 const Dashboard = () => {
-  const [translations, setTranslations] = useState<Record<
-    string,
-    string
-  > | null>(null);
-  const [userData, setUserData] = useState<Record<string, string> | null>(null); // Stan na dane z localStorage
-
-  // Pobieranie tłumaczeń
-  useFetchTranslations(setTranslations, getCookie);
+  const { translations } = useTranslations(); // ✅ tłumaczenia globalnie
+  const [userData, setUserData] = useState<Record<string, string> | null>(null);
 
   // Pobieranie danych z localStorage przy montowaniu komponentu
   useEffect(() => {
@@ -21,7 +14,6 @@ const Dashboard = () => {
     if (storedData) {
       try {
         const parsedData = JSON.parse(storedData);
-        // Upewnij się, że dane są zgodne z Record<string, string>
         if (typeof parsedData === "object" && parsedData !== null) {
           const formattedData = Object.fromEntries(
             Object.entries(parsedData).map(([key, value]) => [
@@ -33,12 +25,11 @@ const Dashboard = () => {
         }
       } catch (error) {
         console.error("Błąd parsowania danych z localStorage:", error);
-        setUserData({}); // Fallback w przypadku błędu
+        setUserData({});
       }
     }
-  }, []); // Pusty array zależności, bo efekt wykonuje się tylko raz
+  }, []);
 
-  // Jeśli tłumaczenia lub dane z localStorage nie są załadowane, pokaż stan ładowania
   if (!translations || !userData) {
     return <div>Ładowanie...</div>;
   }
@@ -52,7 +43,7 @@ const Dashboard = () => {
         </span>
         , {translations.welcome}
       </h1>
-      <p className="text-lg text-gray-700">{translations.you_are_admin} !</p>
+      <p className="text-lg text-gray-700">{translations.you_are_admin}!</p>
     </div>
   );
 };

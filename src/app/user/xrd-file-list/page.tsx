@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getCookie } from "@/utils/cookies";
-import { useFetchTranslations } from "@/utils/fetchTranslations";
+import { useTranslations } from "@/context/TranslationsContext";
 import { Pencil, Trash2, FlaskConical } from "lucide-react";
 import XrdAnalysisModal from "../components/XrdAnalysisModal";
 
@@ -17,7 +16,7 @@ const getAuthHeaders = (): Record<string, string> => {
 };
 
 const XrdFileList = () => {
-  const [translations, setTranslations] = useState<Record<string, string> | null>(null);
+  const { translations } = useTranslations(); // ✅
   const [files, setFiles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,10 +24,10 @@ const XrdFileList = () => {
   const [editingFileId, setEditingFileId] = useState<number | null>(null);
   const [editedFile, setEditedFile] = useState<Partial<any> | null>(null);
 
-  const [selectedFileIdForAnalysis, setSelectedFileIdForAnalysis] = useState<number | null>(null);
+  const [selectedFileIdForAnalysis, setSelectedFileIdForAnalysis] = useState<
+    number | null
+  >(null);
   const [showAnalysisModal, setShowAnalysisModal] = useState(false);
-
-  useFetchTranslations(setTranslations, getCookie);
 
   const fetchFiles = async () => {
     try {
@@ -41,7 +40,9 @@ const XrdFileList = () => {
       setFiles(data);
     } catch (err) {
       console.error(err);
-      setError("❌ Nie udało się pobrać plików");
+      setError(
+        translations?.file_fetch_error || "❌ Nie udało się pobrać plików"
+      );
     } finally {
       setLoading(false);
     }
@@ -54,19 +55,34 @@ const XrdFileList = () => {
   }, []);
 
   if (!translations) return <p className="text-center">Ładowanie...</p>;
-  if (loading) return <p className="text-center">⏳ Pobieranie plików...</p>;
+  if (loading)
+    return (
+      <p className="text-center">
+        ⏳ {translations.loading_files || "Pobieranie plików..."}
+      </p>
+    );
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
     <div className="max-w-5xl mx-auto p-6 mt-6 bg-white rounded-xl shadow-md">
-      <h1 className="text-2xl font-bold mb-4">{translations.uploaded_files || "Uploaded Files"}</h1>
+      <h1 className="text-2xl font-bold mb-4">
+        {translations.uploaded_files || "Uploaded Files"}
+      </h1>
       <table className="w-full table-auto border-collapse">
         <thead>
           <tr className="bg-gray-200 text-left">
-            <th className="p-2">{translations.list_user_filename || "Nazwa"}</th>
-            <th className="p-2">{translations.list_original_filename || "Oryginalny plik"}</th>
-            <th className="p-2">{translations.list_public_visible || "Publiczny?"}</th>
-            <th className="p-2">{translations.list_uploaded_at || "Data przesłania"}</th>
+            <th className="p-2">
+              {translations.list_user_filename || "Nazwa"}
+            </th>
+            <th className="p-2">
+              {translations.list_original_filename || "Oryginalny plik"}
+            </th>
+            <th className="p-2">
+              {translations.list_public_visible || "Publiczny?"}
+            </th>
+            <th className="p-2">
+              {translations.list_uploaded_at || "Data przesłania"}
+            </th>
             <th className="p-2">{translations.list_actions || "Akcje"}</th>
           </tr>
         </thead>
@@ -93,12 +109,21 @@ const XrdFileList = () => {
                 <button
                   className="text-red-600 hover:text-red-800"
                   onClick={async () => {
-                    if (!confirm("Czy na pewno chcesz usunąć plik?")) return;
+                    if (
+                      !confirm(
+                        translations?.confirm_delete ||
+                          "Czy na pewno chcesz usunąć plik?"
+                      )
+                    )
+                      return;
                     try {
-                      const res = await fetch(`${backendUrl}/api/xrd/files/${file.id}`, {
-                        method: "DELETE",
-                        headers: getAuthHeaders(),
-                      });
+                      const res = await fetch(
+                        `${backendUrl}/api/xrd/files/${file.id}`,
+                        {
+                          method: "DELETE",
+                          headers: getAuthHeaders(),
+                        }
+                      );
                       if (!res.ok) throw new Error("Błąd usuwania");
                       await fetchFiles();
                     } catch (err) {
@@ -125,9 +150,13 @@ const XrdFileList = () => {
 
       {editingFileId && editedFile && (
         <div className="mt-6 p-4 border border-gray-300 rounded bg-gray-50">
-          <h2 className="text-xl font-semibold mb-2">✏️ Edytuj plik</h2>
+          <h2 className="text-xl font-semibold mb-2">
+            ✏️ {translations.edit_file || "Edytuj plik"}
+          </h2>
           <div className="mb-3">
-            <label className="block font-medium mb-1">Nazwa użytkownika</label>
+            <label className="block font-medium mb-1">
+              {translations.filename || "Nazwa użytkownika"}
+            </label>
             <input
               type="text"
               value={editedFile.userFilename || ""}
@@ -143,11 +172,14 @@ const XrdFileList = () => {
                 type="checkbox"
                 checked={editedFile.publicVisible || false}
                 onChange={(e) =>
-                  setEditedFile({ ...editedFile, publicVisible: e.target.checked })
+                  setEditedFile({
+                    ...editedFile,
+                    publicVisible: e.target.checked,
+                  })
                 }
                 className="mr-2"
               />
-              Udostępnij publicznie
+              {translations.make_public || "Udostępnij publicznie"}
             </label>
           </div>
           <div className="space-x-2">
@@ -155,11 +187,14 @@ const XrdFileList = () => {
               className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
               onClick={async () => {
                 try {
-                  const res = await fetch(`${backendUrl}/api/xrd/files/${editingFileId}`, {
-                    method: "PUT",
-                    headers: getAuthHeaders(),
-                    body: JSON.stringify(editedFile),
-                  });
+                  const res = await fetch(
+                    `${backendUrl}/api/xrd/files/${editingFileId}`,
+                    {
+                      method: "PUT",
+                      headers: getAuthHeaders(),
+                      body: JSON.stringify(editedFile),
+                    }
+                  );
                   if (!res.ok) throw new Error("Błąd zapisu");
                   setEditingFileId(null);
                   setEditedFile(null);
@@ -169,7 +204,7 @@ const XrdFileList = () => {
                 }
               }}
             >
-              Zapisz
+              {translations.save || "Zapisz"}
             </button>
             <button
               className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
@@ -178,7 +213,7 @@ const XrdFileList = () => {
                 setEditedFile(null);
               }}
             >
-              Anuluj
+              {translations.cancel || "Anuluj"}
             </button>
           </div>
         </div>

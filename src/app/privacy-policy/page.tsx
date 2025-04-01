@@ -1,13 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { getCookie } from "@/utils/cookies";
-import { useFetchTranslations } from "@/utils/fetchTranslations";
+import { useTranslations } from "@/context/TranslationsContext"; // ✅ kontekst tłumaczeń
 
 export default function PrivacyPolicyPage() {
-  const [translations, setTranslations] = useState<Record<string, string> | null>(null);
-
-  useFetchTranslations(setTranslations, getCookie);
+  const { translations } = useTranslations(); // ✅ globalne tłumaczenia
 
   if (!translations) {
     return <div>Ładowanie...</div>;

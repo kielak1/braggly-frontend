@@ -1,19 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { getCookie } from "@/utils/cookies";
-import { useFetchTranslations } from "@/utils/fetchTranslations";
+import { useTranslations } from "@/context/TranslationsContext"; // ✅ nowy import
 
 const AdminSidebar = () => {
-  const [translations, setTranslations] = useState<Record<
-    string,
-    string
-  > | null>(null);
+  const { translations } = useTranslations(); // ✅ użycie kontekstu
 
-  useFetchTranslations(setTranslations, getCookie);
-
-  // Jeśli tłumaczenia nie są jeszcze załadowane, pokaż stan ładowania
   if (!translations) {
     return (
       <aside className="w-64 bg-gray-900 text-white h-screen p-4">

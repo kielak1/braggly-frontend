@@ -5,14 +5,15 @@ import { useRouter, usePathname } from "next/navigation";
 import { signIn, signOut, useSession } from "next-auth/react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { fetchWhoAmI, WhoAmIResponse } from "@/utils/api";
-import { getCookie } from "@/utils/cookies";
 import { jwtDecode } from "jwt-decode";
+import { useTranslations } from "@/context/TranslationsContext";
 
 type JwtPayload = {
   exp: number;
 };
 
 export default function Navbar() {
+  const { translations } = useTranslations(); // ✅ Hook zawsze na górze
   const router = useRouter();
   const pathname = usePathname();
   const { data: session } = useSession();
@@ -22,15 +23,6 @@ export default function Navbar() {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [userData, setUserData] = useState<WhoAmIResponse | null>(null);
-
-  const [translations, setTranslations] = useState({
-    login: "Zaloguj",
-    logout: "Wyloguj",
-    googleLogin: "Zaloguj przez Google",
-    googleLogout: "Wyloguj Google",
-    error: "Nieprawidłowy login lub hasło",
-    loggedAs: "Zalogowany jako",
-  });
 
   const saveToken = (token: string) => {
     localStorage.setItem("token", token);
@@ -68,9 +60,19 @@ export default function Navbar() {
       saveUserData(data);
       setIsLoggedIn(true);
 
-      if (data.role === "ADMIN" && !pathname.startsWith("/admin")) {
+      if (
+        data.role === "ADMIN" &&
+        !pathname.startsWith("/admin") &&
+        !pathname.startsWith("/terms") &&
+        !pathname.startsWith("/privacy-policy")
+      ) {
         router.push("/admin");
-      } else if (data.role === "USER" && !pathname.startsWith("/user")) {
+      } else if (
+        data.role === "USER" &&
+        !pathname.startsWith("/user") &&
+        !pathname.startsWith("/terms") &&
+        !pathname.startsWith("/privacy-policy")
+      ) {
         router.push("/user");
       }
     } else {
@@ -86,14 +88,11 @@ export default function Navbar() {
       if (!jwt) return;
 
       try {
-        // const decoded: JwtPayload = jwtDecode(jwt);
         const decoded = jwtDecode<JwtPayload>(jwt);
         const now = Math.floor(Date.now() / 1000);
         const timeLeft = decoded.exp - now;
 
         if (timeLeft < 120) {
-          console.log("🔄 Token bliski wygaśnięcia, odświeżam...");
-
           const res = await fetch(
             `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/google`,
             {
@@ -109,23 +108,18 @@ export default function Navbar() {
           if (data.token) {
             localStorage.setItem("token", data.token);
             document.cookie = `token=${data.token}; path=/; SameSite=Lax; Secure`;
-            console.log("✅ Token odświeżony");
           } else {
             console.warn("❌ Brak tokena w odpowiedzi backendu");
           }
         }
       } catch (err) {
-        console.error(
-          "❌ Błąd podczas dekodowania lub odświeżania tokena:",
-          err
-        );
+        console.error("❌ Błąd podczas odświeżania tokena:", err);
       }
-    }, 60000); // sprawdzamy co 60s
+    }, 60000);
 
     return () => clearInterval(interval);
   }, [session?.idToken]);
 
-  // Obsługa tokena z localStorage (login/hasło)
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -136,12 +130,10 @@ export default function Navbar() {
     return () => window.removeEventListener("storage", verifyAndSetUser);
   }, [verifyAndSetUser]);
 
-  // Obsługa tokena z Google (next-auth)
   useEffect(() => {
     const googleIdToken = session?.idToken;
     if (!googleIdToken) return;
 
-    // Wyślij do backendu
     const loginWithGoogleBackend = async () => {
       try {
         const res = await fetch(
@@ -155,15 +147,12 @@ export default function Navbar() {
           }
         );
 
-        if (!res.ok) {
-          throw new Error("Błąd logowania przez backend");
-        }
+        if (!res.ok) throw new Error("Błąd logowania przez backend");
 
         const data = await res.json();
         const jwt = data.token;
         if (!jwt) throw new Error("Brak tokena w odpowiedzi");
 
-        // Zapisz JWT do localStorage i cookies
         saveToken(jwt);
         setIsLoggedIn(true);
         verifyAndSetUser();
@@ -175,22 +164,6 @@ export default function Navbar() {
 
     loginWithGoogleBackend();
   }, [session?.idToken]);
-
-  // Pobieranie tłumaczeń
-  useEffect(() => {
-    const locale = getCookie("locale") || "en";
-    async function fetchTranslations() {
-      try {
-        const res = await fetch(`/api/i18n?locale=${locale}`);
-        if (!res.ok) throw new Error("Błąd tłumaczeń");
-        const data = await res.json();
-        setTranslations(data);
-      } catch (error) {
-        console.error("Błąd tłumaczeń:", error);
-      }
-    }
-    fetchTranslations();
-  }, []);
 
   const handleLogin = async () => {
     setErrorMessage("");
@@ -211,7 +184,7 @@ export default function Navbar() {
 
       if (!response.ok) {
         if (response.status === 401) {
-          setErrorMessage(translations.error);
+          setErrorMessage(translations?.error || "Błąd logowania");
         } else {
           setErrorMessage(`Błąd serwera: ${response.status}`);
         }
@@ -244,7 +217,7 @@ export default function Navbar() {
       <LanguageSwitcher />
       <h1 className="text-3xl font-bold text-blue-600">Braggly</h1>
       <div className="flex items-center space-x-4">
-        {isLoggedIn ? (
+        {translations && isLoggedIn ? (
           <div className="flex items-center space-x-4">
             <span className="text-sm">
               {translations.loggedAs}: {userData?.username}
@@ -256,7 +229,7 @@ export default function Navbar() {
               {session ? translations.googleLogout : translations.logout}
             </button>
           </div>
-        ) : (
+        ) : translations ? (
           <div className="flex items-center space-x-2">
             {errorMessage && (
               <p className="text-red-500 text-sm">{errorMessage}</p>
@@ -288,7 +261,7 @@ export default function Navbar() {
               {translations.googleLogin}
             </button>
           </div>
-        )}
+        ) : null}
       </div>
     </nav>
   );

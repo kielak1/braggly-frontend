@@ -1,18 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { getCookie } from "@/utils/cookies";
-import { useFetchTranslations } from "@/utils/fetchTranslations";
+import { useTranslations } from "@/context/TranslationsContext"; // ✅
 
 const Sidebar = () => {
-  const [translations, setTranslations] = useState<Record<string, string> | null>(null);
+  const { translations } = useTranslations(); // ✅
 
-  useFetchTranslations(setTranslations, getCookie);
-
-  // Jeśli tłumaczenia nie są jeszcze załadowane, pokaż stan ładowania
   if (!translations) {
-    return <aside className="w-64 bg-gray-900 text-white h-screen p-4">Ładowanie...</aside>;
+    return (
+      <aside className="w-64 bg-gray-900 text-white h-screen p-4">
+        Ładowanie...
+      </aside>
+    );
   }
 
   return (
@@ -25,27 +24,42 @@ const Sidebar = () => {
           </Link>
         </li>
         <li>
-          <Link href="/user/account" className="block p-2 rounded hover:bg-gray-700">
+          <Link
+            href="/user/account"
+            className="block p-2 rounded hover:bg-gray-700"
+          >
             {translations.account}
           </Link>
         </li>
         <li>
-          <Link href="/user/simple-uxd" className="block p-2 rounded hover:bg-gray-700">
+          <Link
+            href="/user/simple-uxd"
+            className="block p-2 rounded hover:bg-gray-700"
+          >
             {translations.simple_uxd}
           </Link>
         </li>
         <li>
-          <Link href="/user/uploads" className="block p-2 rounded hover:bg-gray-700">
+          <Link
+            href="/user/uploads"
+            className="block p-2 rounded hover:bg-gray-700"
+          >
             {translations.uploads}
           </Link>
         </li>
         <li>
-          <Link href="/user/xrd-file-list" className="block p-2 rounded hover:bg-gray-700">
+          <Link
+            href="/user/xrd-file-list"
+            className="block p-2 rounded hover:bg-gray-700"
+          >
             {translations.xrd_file_list}
           </Link>
         </li>
         <li>
-          <Link href="/user/xrd-public-file-list" className="block p-2 rounded hover:bg-gray-700">
+          <Link
+            href="/user/xrd-public-file-list"
+            className="block p-2 rounded hover:bg-gray-700"
+          >
             {translations.xrd_public_file_list}
           </Link>
         </li>

@@ -1,10 +1,7 @@
 "use client";
 
-import { useState, useEffect, Dispatch, SetStateAction } from "react";
-import { getCookie } from "@/utils/cookies";
-import { useFetchTranslations } from "@/utils/fetchTranslations";
+import { useState, useEffect } from "react";
 import {
-  fetchWhoAmI,
   fetchUsers,
   createUser,
   deleteUser,
@@ -16,17 +13,12 @@ import {
   User,
 } from "@/utils/api";
 import "@/styles/globals.css";
+import { useTranslations } from "@/context/TranslationsContext"; // ✅
 
-type TranslationsSetter = Dispatch<
-  SetStateAction<Record<string, string> | null>
->;
 type UserRole = "USER" | "ADMIN";
 
 const Dashboard = () => {
-  const [translations, setTranslations] = useState<Record<
-    string,
-    string
-  > | null>(null);
+  const { translations } = useTranslations(); // ✅ globalne tłumaczenia
   const [users, setUsers] = useState<User[]>([]);
   const [creditPackages, setCreditPackages] = useState<CreditPackage[]>([]);
   const [newUser, setNewUser] = useState({ username: "", password: "" });
@@ -38,8 +30,6 @@ const Dashboard = () => {
   );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useFetchTranslations(setTranslations as TranslationsSetter, getCookie);
 
   useEffect(() => {
     const pobierzDane = async () => {
@@ -56,9 +46,9 @@ const Dashboard = () => {
         setIsLoading(false);
       }
     };
-
     pobierzDane();
   }, []);
+
   const handleCreateUser = async () => {
     if (!newUser.username || !newUser.password) {
       setError("Proszę wypełnić nazwę użytkownika i hasło.");
@@ -67,11 +57,9 @@ const Dashboard = () => {
     setIsLoading(true);
     try {
       const success = await createUser(newUser.username, newUser.password);
-      if (!success) {
-        throw new Error("Nie udało się utworzyć użytkownika.");
-      }
-      const zaktualizowaniUzytkownicy = await fetchUsers();
-      if (zaktualizowaniUzytkownicy) setUsers(zaktualizowaniUzytkownicy);
+      if (!success) throw new Error("Nie udało się utworzyć użytkownika.");
+      const updatedUsers = await fetchUsers();
+      if (updatedUsers) setUsers(updatedUsers);
       setNewUser({ username: "", password: "" });
     } catch (err: any) {
       if (err.message.includes("403")) {
@@ -91,19 +79,17 @@ const Dashboard = () => {
   };
 
   const handleDeleteUser = async (username: string) => {
-    // Dodajemy potwierdzenie usunięcia
     const confirmMessage = translations?.confirm_delete_user
       ? translations.confirm_delete_user.replace("{username}", username)
       : `Czy na pewno chcesz usunąć użytkownika ${username}?`;
     const confirmed = window.confirm(confirmMessage);
-
-    if (!confirmed) return; // Jeśli użytkownik kliknie "Anuluj", przerywamy
+    if (!confirmed) return;
 
     setIsLoading(true);
     try {
       await deleteUser(username);
-      const zaktualizowaniUzytkownicy = await fetchUsers();
-      if (zaktualizowaniUzytkownicy) setUsers(zaktualizowaniUzytkownicy);
+      const updatedUsers = await fetchUsers();
+      if (updatedUsers) setUsers(updatedUsers);
     } catch (err) {
       setError("Błąd podczas usuwania użytkownika");
     } finally {
@@ -116,8 +102,8 @@ const Dashboard = () => {
     setIsLoading(true);
     try {
       await setUserRole(selectedUserId, selectedRole);
-      const zaktualizowaniUzytkownicy = await fetchUsers();
-      if (zaktualizowaniUzytkownicy) setUsers(zaktualizowaniUzytkownicy);
+      const updatedUsers = await fetchUsers();
+      if (updatedUsers) setUsers(updatedUsers);
     } catch (err) {
       setError("Błąd podczas ustawiania roli");
     } finally {
@@ -147,8 +133,8 @@ const Dashboard = () => {
         selectedPackageId
       );
       if (success) {
-        const zaktualizowaniUzytkownicy = await fetchUsers();
-        if (zaktualizowaniUzytkownicy) setUsers(zaktualizowaniUzytkownicy);
+        const updatedUsers = await fetchUsers();
+        if (updatedUsers) setUsers(updatedUsers);
         setError(null);
       } else {
         setError("Nie udało się przypisać kredytów");
@@ -198,6 +184,7 @@ const Dashboard = () => {
         ))}
       </ul>
 
+      {/* Dodawanie użytkownika */}
       <div className="mt-6 p-4 bg-white rounded shadow">
         <h2 className="text-xl font-bold mb-2">
           {translations.add_user || "Dodaj użytkownika"}
@@ -224,6 +211,7 @@ const Dashboard = () => {
         </button>
       </div>
 
+      {/* Zmiana roli */}
       <div className="mt-6 p-4 bg-white rounded shadow">
         <h2 className="text-xl font-bold mb-2">
           {translations.set_role || "Ustaw rolę"}
@@ -257,6 +245,7 @@ const Dashboard = () => {
         </button>
       </div>
 
+      {/* Zmiana hasła */}
       <div className="mt-6 p-4 bg-white rounded shadow">
         <h2 className="text-xl font-bold mb-2">
           {translations.set_password || "Ustaw hasło"}
@@ -289,6 +278,7 @@ const Dashboard = () => {
         </button>
       </div>
 
+      {/* Przypisanie kredytów */}
       <div className="mt-6 p-4 bg-white rounded shadow">
         <h2 className="text-xl font-bold mb-2">
           {translations.assign_credits || "Przypisz kredyty"}

@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { getCookie } from "@/utils/cookies";
-import { useFetchTranslations } from "@/utils/fetchTranslations";
 import {
   fetchCreditPackages,
   deleteCreditPackage,
@@ -10,12 +8,10 @@ import {
   CreditPackage,
 } from "@/utils/api";
 import "@/styles/globals.css";
+import { useTranslations } from "@/context/TranslationsContext"; // ✅
 
 const Dashboard = () => {
-  const [translations, setTranslations] = useState<Record<
-    string,
-    string
-  > | null>(null);
+  const { translations } = useTranslations(); // ✅
   const [userData, setUserData] = useState<Record<string, string> | null>(null);
   const [creditPackages, setCreditPackages] = useState<CreditPackage[] | null>(
     null
@@ -24,8 +20,6 @@ const Dashboard = () => {
   const [newPrice, setNewPrice] = useState(0);
   const [refresh, setRefresh] = useState(false);
 
-  useFetchTranslations(setTranslations, getCookie);
-
   const loadCreditPackages = useCallback(async () => {
     const packages = await fetchCreditPackages();
     setCreditPackages(packages);
@@ -33,7 +27,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     loadCreditPackages();
-  }, [loadCreditPackages, refresh]); // Dodano loadCreditPackages do zależności
+  }, [loadCreditPackages, refresh]);
 
   useEffect(() => {
     const storedData = localStorage.getItem("userData");
@@ -57,19 +51,23 @@ const Dashboard = () => {
   }, []);
 
   const handleDelete = async (id: number) => {
-    if (await deleteCreditPackage(id)) {
-      setRefresh((prev) => !prev);
+    const msg =
+      translations?.confirm_delete_package?.replace("{id}", id.toString()) ||
+      `Czy na pewno chcesz usunąć pakiet o ID ${id}?`;
+    if (confirm(msg)) {
+      if (await deleteCreditPackage(id)) {
+        setRefresh((prev) => !prev);
+      }
     }
   };
 
   const handleAddPackage = async () => {
     if (newCredits <= 0 || newPrice <= 0) {
-      if (translations && translations.invalid_package_values) {
-        alert(translations.invalid_package_values);
-      } else {
-        alert("Wartości kredytów i ceny muszą być większe od zera.");
-      }
-      return; // Przerwij dodawanie pakietu
+      alert(
+        translations?.invalid_package_values ||
+          "Wartości kredytów i ceny muszą być większe od zera."
+      );
+      return;
     }
 
     const newPackage = await addCreditPackage(newCredits, newPrice);
@@ -87,7 +85,7 @@ const Dashboard = () => {
   return (
     <div className="max-w-3xl mx-auto p-6 bg-gray-100 rounded-lg shadow-md mt-6">
       <h1 className="text-3xl font-bold text-gray-800 mb-4">
-        {translations.packages_header}
+        {translations.packages_header || "Pakiety kredytów"}
       </h1>
       <ul className="space-y-4">
         {creditPackages.length > 0 ? (
@@ -98,41 +96,46 @@ const Dashboard = () => {
             >
               <span>
                 {translations.credits}: {pkg.credits}, {translations.price}:{" "}
-                {pkg.priceInCents / 100} zł
+                {(pkg.priceInCents / 100).toFixed(2)} zł
               </span>
               <button
                 onClick={() => handleDelete(pkg.id)}
                 className="bg-red-500 text-white px-3 py-1 rounded"
               >
-                {translations.delete}
+                {translations.delete || "Usuń"}
               </button>
             </li>
           ))
         ) : (
-          <li className="text-gray-500">{translations.no_packages}</li>
+          <li className="text-gray-500">
+            {translations.no_packages || "Brak pakietów."}
+          </li>
         )}
       </ul>
+
       <div className="mt-6 p-4 bg-white rounded shadow">
-        <h2 className="text-xl font-bold mb-2">{translations.add_package}</h2>
+        <h2 className="text-xl font-bold mb-2">
+          {translations.add_package || "Dodaj pakiet"}
+        </h2>
         <input
           type="number"
           value={newCredits}
           onChange={(e) => setNewCredits(Number(e.target.value))}
-          placeholder={translations.credits}
+          placeholder={translations.credits || "Kredyty"}
           className="border p-2 mr-2"
         />
         <input
           type="number"
           value={newPrice}
           onChange={(e) => setNewPrice(Number(e.target.value))}
-          placeholder={translations.price}
+          placeholder={translations.price || "Cena"}
           className="border p-2 mr-2"
         />
         <button
           onClick={handleAddPackage}
           className="bg-green-500 text-white px-3 py-1 rounded"
         >
-          {translations.add}
+          {translations.add || "Dodaj"}
         </button>
       </div>
     </div>

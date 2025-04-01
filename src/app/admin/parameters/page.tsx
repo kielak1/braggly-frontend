@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { getCookie } from "@/utils/cookies";
-import { useFetchTranslations } from "@/utils/fetchTranslations";
 import {
   fetchBoolParameters,
   deleteBoolParameter,
@@ -10,16 +8,12 @@ import {
   BoolParameter,
 } from "@/utils/api";
 import "@/styles/globals.css";
+import { useTranslations } from "@/context/TranslationsContext"; // ✅
 
 const ParametersDashboard = () => {
-  const [translations, setTranslations] = useState<Record<
-    string,
-    string
-  > | null>(null);
+  const { translations } = useTranslations(); // ✅
   const [parameters, setParameters] = useState<BoolParameter[] | null>(null);
   const [refresh, setRefresh] = useState(false);
-
-  useFetchTranslations(setTranslations, getCookie);
 
   const loadBoolParameters = useCallback(async () => {
     const list = await fetchBoolParameters();
@@ -38,7 +32,10 @@ const ParametersDashboard = () => {
   };
 
   const handleDelete = async (name: string) => {
-    if (confirm(`Czy na pewno chcesz usunąć parametr "${name}"?`)) {
+    const msg =
+      translations?.confirm_delete_param?.replace("{name}", name) ||
+      `Czy na pewno chcesz usunąć parametr "${name}"?`;
+    if (confirm(msg)) {
       const success = await deleteBoolParameter(name);
       if (success) {
         setRefresh((prev) => !prev);
@@ -69,7 +66,6 @@ const ParametersDashboard = () => {
                     checked={param.value}
                     onChange={() => handleToggle(param)}
                   />
-                  {/* {param.value ? "true" : "false"} */}
                 </label>
                 <button
                   onClick={() => handleDelete(param.name)}

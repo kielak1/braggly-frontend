@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getCookie } from "@/utils/cookies";
-import { useFetchTranslations } from "@/utils/fetchTranslations";
+import { useTranslations } from "@/context/TranslationsContext"; // ✅ tu
 import {
   fetchPurchaseHistory,
   fetchUsageHistory,
@@ -14,10 +13,8 @@ import {
 import "@/styles/globals.css";
 
 const Dashboard = () => {
-  const [translations, setTranslations] = useState<Record<
-    string,
-    string
-  > | null>(null);
+  const { translations } = useTranslations(); // ✅ użycie contextu
+
   const [userData, setUserData] = useState<Record<string, string> | null>(null);
   const [purchaseHistory, setPurchaseHistory] = useState<
     PurchaseHistory[] | null
@@ -26,10 +23,6 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [freeAccess, setFreeAccess] = useState<boolean>(true);
 
-  // Pobieranie tłumaczeń
-  useFetchTranslations(setTranslations, getCookie);
-
-  // Sprawdzenie flagi darmowego dostępu
   useEffect(() => {
     const checkFreeAccess = async () => {
       const param = await fetchBoolParameterByName("free_access");
@@ -38,7 +31,6 @@ const Dashboard = () => {
     checkFreeAccess();
   }, []);
 
-  // Pobieranie danych z localStorage i historii
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -48,7 +40,6 @@ const Dashboard = () => {
           const formattedData = JSON.parse(storedData);
           setUserData(formattedData);
 
-          // Pobieranie historii tylko jeśli mamy userId
           const userId = Number(formattedData.id);
           if (userId) {
             const purchaseData = await fetchPurchaseHistory(userId);
@@ -65,9 +56,11 @@ const Dashboard = () => {
 
     fetchData();
   }, []);
+
   if (!translations) {
     return <div>Ładowanie tłumaczeń</div>;
   }
+
   return (
     <div className="p-4 space-y-6">
       <h1 className="text-2xl font-bold">User Dashboard</h1>

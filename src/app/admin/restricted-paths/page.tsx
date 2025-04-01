@@ -1,26 +1,20 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { getCookie } from "@/utils/cookies";
-import { useFetchTranslations } from "@/utils/fetchTranslations";
+import { useTranslations } from "@/context/TranslationsContext"; // ✅
 import {
   fetchRestrictedPaths,
   addRestrictedPath,
   deleteRestrictedPath,
 } from "@/utils/api";
-import type { RestrictedPath } from "@/utils/api"; // upewnij się, że masz ten typ
+import type { RestrictedPath } from "@/utils/api";
 import "@/styles/globals.css";
 
 const RestrictedPaths = () => {
-  const [translations, setTranslations] = useState<Record<
-    string,
-    string
-  > | null>(null);
+  const { translations } = useTranslations(); // ✅
   const [paths, setPaths] = useState<RestrictedPath[] | null>(null);
   const [newPath, setNewPath] = useState<string>("");
   const [refresh, setRefresh] = useState(false);
-
-  useFetchTranslations(setTranslations, getCookie);
 
   const loadPaths = useCallback(async () => {
     const list = await fetchRestrictedPaths();
@@ -45,7 +39,10 @@ const RestrictedPaths = () => {
   };
 
   const handleDeletePath = async (path: string) => {
-    if (confirm(`Czy na pewno chcesz usunąć ścieżkę "${path}"?`)) {
+    const msg =
+      translations?.confirm_delete_path?.replace("{path}", path) ||
+      `Czy na pewno chcesz usunąć ścieżkę "${path}"?`;
+    if (confirm(msg)) {
       const deleted = await deleteRestrictedPath(path);
       if (deleted) {
         setRefresh((prev) => !prev);

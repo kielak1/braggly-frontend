@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { getCookie } from "@/utils/cookies";
-import { useFetchTranslations } from "@/utils/fetchTranslations";
-
+import { useTranslations } from "@/context/TranslationsContext";
 import "@/styles/globals.css";
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -14,22 +12,20 @@ const getAuthHeaders = (): Record<string, string> => {
     Authorization: `Bearer ${token}`,
   };
 };
+
 const UploadUXD = () => {
-  const [translations, setTranslations] = useState<Record<
-    string,
-    string
-  > | null>(null);
+  const { translations } = useTranslations(); // ✅
   const [file, setFile] = useState<File | null>(null);
   const [filename, setFilename] = useState("");
   const [publicVisible, setPublicVisible] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  useFetchTranslations(setTranslations, getCookie);
-
   const handleUpload = async () => {
     if (!file || !filename) {
-      setMessage("Proszę podać nazwę i wybrać plik.");
+      setMessage(
+        translations?.upload_missing_info || "Proszę podać nazwę i wybrać plik."
+      );
       return;
     }
 
@@ -44,24 +40,31 @@ const UploadUXD = () => {
 
       const res = await fetch(`${backendUrl}/api/xrd/upload`, {
         method: "POST",
-        headers: {
-          ...getAuthHeaders(),
-        },
+        headers: getAuthHeaders(),
         body: formData,
       });
 
       const result = await res.json();
       if (res.ok) {
-        setMessage("✅ Plik został pomyślnie przesłany.");
+        setMessage(
+          translations?.upload_success || "✅ Plik został pomyślnie przesłany."
+        );
         setFile(null);
         setFilename("");
         setPublicVisible(true);
       } else {
-        setMessage(result?.message || "❌ Błąd podczas przesyłania pliku.");
+        setMessage(
+          result?.message ||
+            translations?.upload_failed ||
+            "❌ Błąd podczas przesyłania pliku."
+        );
       }
     } catch (err) {
       console.error(err);
-      setMessage("❌ Wystąpił błąd sieci lub brak połączenia z backendem.");
+      setMessage(
+        translations?.upload_network_error ||
+          "❌ Wystąpił błąd sieci lub brak połączenia z backendem."
+      );
     } finally {
       setLoading(false);
     }
@@ -83,7 +86,7 @@ const UploadUXD = () => {
 
       <div className="mb-4">
         <label className="block text-gray-700 font-semibold mb-2">
-          Nazwa pliku użytkownika
+          {translations.file_label || "Nazwa pliku użytkownika"}
         </label>
         <input
           type="text"
@@ -95,7 +98,7 @@ const UploadUXD = () => {
 
       <div className="mb-4">
         <label className="block text-gray-700 font-semibold mb-2">
-          Wybierz plik UXD
+          {translations.select_file || "Wybierz plik UXD"}
         </label>
         <input
           type="file"
@@ -112,7 +115,9 @@ const UploadUXD = () => {
           onChange={() => setPublicVisible(!publicVisible)}
           className="mr-2"
         />
-        <label className="text-gray-700">Udostępnij publicznie</label>
+        <label className="text-gray-700">
+          {translations.make_public || "Udostępnij publicznie"}
+        </label>
       </div>
 
       <button
@@ -120,7 +125,9 @@ const UploadUXD = () => {
         disabled={loading}
         className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
       >
-        {loading ? "Wysyłanie..." : "Wyślij"}
+        {loading
+          ? translations?.uploading || "Wysyłanie..."
+          : translations?.upload_button || "Wyślij"}
       </button>
 
       {message && (
