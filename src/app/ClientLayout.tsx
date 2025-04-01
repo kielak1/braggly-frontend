@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import * as gtag from "@/lib/gtag";
+import { TranslationsProvider } from "@/context/TranslationsContext";
 
 export default function ClientLayout({
   children,
@@ -21,8 +22,10 @@ export default function ClientLayout({
 
   return (
     <SessionProvider>
-      <Navbar />
-      {children}
+      <TranslationsProvider>
+        <Navbar />
+        {children}
+      </TranslationsProvider>
     </SessionProvider>
   );
 }
