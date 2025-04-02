@@ -1,8 +1,6 @@
 // components/SelectedFilesCard.tsx
 "use client";
 
-import { FC } from "react";
-
 interface Props {
   userId: number;
   userName: string;
@@ -11,7 +9,13 @@ interface Props {
   freeAccess: boolean;
 }
 
-const SelectedFilesCard: FC<Props> = () => {
+const SelectedFilesCard = ({
+  userId,
+  userName,
+  balance,
+  role,
+  freeAccess,
+}: Props) => {
   return (
     <div className="bg-white border rounded-lg p-4 shadow-sm min-h-[200px]">
       <h2 className="font-semibold text-lg mb-2">
