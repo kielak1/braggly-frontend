@@ -72,7 +72,7 @@ const PurchaseInfoCard = ({
       </h2>
 
       {history && history.length > 0 ? (
-        <div className="w-full border border-gray-200 rounded-md overflow-hidden">
+        <div className="w-full border border-gray-200 rounded-md overflow-hidden max-h-[300px] overflow-y-auto">
           <div className="grid grid-cols-3 bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700">
             <div>{translations.purchase_date || "Data zakupu"}</div>
             <div>{translations.tokens || "Liczba tokenów"}</div>
