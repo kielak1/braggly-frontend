@@ -72,7 +72,7 @@ const UserFilesCard = ({ userId }: Props) => {
       <h2 className="font-semibold text-lg mb-2">
         📂 {translations.uploaded_files || "My XRD files"}
       </h2>
-      <div className="space-y-2 max-h-[250px] overflow-y-auto">
+      <div className="space-y-2 max-h-[350px] overflow-y-auto">
         {files.map((file) => (
           <div
             key={file.id}
@@ -82,6 +82,9 @@ const UserFilesCard = ({ userId }: Props) => {
               <div className="font-medium">{file.userFilename}</div>
               <div className="text-xs text-gray-500">
                 {file.originalFilename}
+              </div>{" "}
+              <div className="text-xs text-gray-400">
+                {file.uploadedAt?.split("T")[0]}
               </div>
             </div>
             <div className="flex space-x-2">
