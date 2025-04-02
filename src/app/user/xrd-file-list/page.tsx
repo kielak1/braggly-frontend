@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useTranslations } from "@/context/TranslationsContext";
 import { Pencil, Trash2, FlaskConical } from "lucide-react";
 import XrdAnalysisModal from "../components/XrdAnalysisModal";
@@ -16,7 +16,7 @@ const getAuthHeaders = (): Record<string, string> => {
 };
 
 const XrdFileList = () => {
-  const { translations } = useTranslations(); // ✅
+  const { translations } = useTranslations();
   const [files, setFiles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +29,7 @@ const XrdFileList = () => {
   >(null);
   const [showAnalysisModal, setShowAnalysisModal] = useState(false);
 
-  const fetchFiles = async () => {
+  const fetchFiles = useCallback(async () => {
     try {
       const res = await fetch(`${backendUrl}/api/xrd/files`, {
         method: "GET",
@@ -46,13 +46,13 @@ const XrdFileList = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [translations]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (!localStorage.getItem("token")) return;
     fetchFiles();
-  }, []);
+  }, [fetchFiles]);
 
   if (!translations) return <p className="text-center">Ładowanie...</p>;
   if (loading)

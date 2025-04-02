@@ -35,6 +35,22 @@ const XrdPublicFileList = () => {
   };
 
   useEffect(() => {
+    const fetchPublicFiles = async () => {
+      try {
+        const res = await fetch(`${backendUrl}/api/xrd/public-files`, {
+          method: "GET",
+        });
+        if (!res.ok) throw new Error("Błąd pobierania publicznych plików");
+        const data = await res.json();
+        setFiles(data);
+      } catch (err) {
+        console.error(err);
+        setError("❌ Nie udało się pobrać publicznych plików");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchPublicFiles();
   }, []);
 

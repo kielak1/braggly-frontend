@@ -26,31 +26,32 @@ const XrdPublicFileList = () => {
   >(null);
   const [showAnalysisModal, setShowAnalysisModal] = useState(false);
 
-  const fetchPublicFiles = async () => {
-    try {
-      const res = await fetch(`${backendUrl}/api/xrd/public-files`, {
-        method: "GET",
-        headers: getAuthHeaders(),
-      });
-      if (!res.ok) throw new Error("Błąd pobierania publicznych plików");
-      const data = await res.json();
-      setFiles(data);
-    } catch (err) {
-      console.error(err);
-      setError(
-        translations?.file_fetch_error ||
-          "❌ Nie udało się pobrać publicznych plików"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (!localStorage.getItem("token")) return;
+
+    const fetchPublicFiles = async () => {
+      try {
+        const res = await fetch(`${backendUrl}/api/xrd/public-files`, {
+          method: "GET",
+          headers: getAuthHeaders(),
+        });
+        if (!res.ok) throw new Error("Błąd pobierania publicznych plików");
+        const data = await res.json();
+        setFiles(data);
+      } catch (err) {
+        console.error(err);
+        setError(
+          translations?.file_fetch_error ||
+            "❌ Nie udało się pobrać publicznych plików"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchPublicFiles();
-  }, []);
+  }, [translations]);
 
   if (!translations) return <p className="text-center">Ładowanie...</p>;
   if (loading)

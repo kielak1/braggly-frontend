@@ -163,7 +163,7 @@ export default function Navbar() {
     };
 
     loginWithGoogleBackend();
-  }, [session?.idToken]);
+  }, [session?.idToken, verifyAndSetUser, handleFullLogout]);
 
   const handleLogin = async () => {
     setErrorMessage("");
