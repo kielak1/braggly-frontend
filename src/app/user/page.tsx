@@ -4,7 +4,11 @@ import { useState, useEffect } from "react";
 import { useTranslations } from "@/context/TranslationsContext";
 import { fetchBoolParameterByName, isParameterEnabled } from "@/utils/api";
 import "@/styles/globals.css";
+
 import PurchaseInfoCard from "@/user/components/PurchaseInfoCard";
+import UserFilesCard from "@/user/components/UserFilesCard";
+import PublicFilesCard from "@/user/components/PublicFilesCard";
+import SelectedFilesCard from "@/user/components/SelectedFilesCard";
 
 const Dashboard = () => {
   const { translations } = useTranslations();
@@ -45,6 +49,13 @@ const Dashboard = () => {
   const balance = Number(userData?.balance);
   const role = userData?.role;
 
+  const sharedProps = {
+    userId,
+    userName: userName || "",
+    balance,
+    role: role || "",
+    freeAccess,
+  };
 
   return (
     <div className="p-4 space-y-6">
@@ -53,47 +64,15 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         <div className="col-span-2 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-white border rounded-lg p-4 shadow-sm min-h-[180px]">
-              <h2 className="font-semibold text-lg mb-2">📂 My XRD files</h2>
-              <p className="text-sm text-gray-500">
-                Placeholder for user file list
-              </p>
-            </div>
-            <div className="bg-white border rounded-lg p-4 shadow-sm min-h-[180px]">
-              <h2 className="font-semibold text-lg mb-2">
-                🌐 Public XRD files
-              </h2>
-              <p className="text-sm text-gray-500">
-                Placeholder for public file list
-              </p>
-            </div>
+            <UserFilesCard {...sharedProps} />
+            <PublicFilesCard {...sharedProps} />
           </div>
         </div>
 
-        <div className="bg-white border rounded-lg p-4 shadow-sm min-h-[100%]">
-          <PurchaseInfoCard
-            userId={userId}
-            userName={userName || ""}
-            balance={balance}
-            role={role || ""}
-            freeAccess={freeAccess}
-          />
-        </div>
+        <PurchaseInfoCard {...sharedProps} />
       </div>
 
-      <div className="bg-white border rounded-lg p-4 shadow-sm min-h-[200px]">
-        <h2 className="font-semibold text-lg mb-2">
-          📊 Files selected for analysis
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="border p-4 min-h-[100px] rounded bg-gray-50">
-            filelist
-          </div>
-          <div className="border p-4 min-h-[100px] rounded bg-gray-50">
-            button area – analysis options
-          </div>
-        </div>
-      </div>
+      <SelectedFilesCard {...sharedProps} />
     </div>
   );
 };
