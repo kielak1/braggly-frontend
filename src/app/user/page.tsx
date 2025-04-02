@@ -2,14 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "@/context/TranslationsContext";
-import {
-  fetchPurchaseHistory,
-  fetchUsageHistory,
-  PurchaseHistory,
-  UsageHistory,
-  fetchBoolParameterByName,
-  isParameterEnabled,
-} from "@/utils/api";
+import { fetchBoolParameterByName, isParameterEnabled } from "@/utils/api";
 import "@/styles/globals.css";
 import PurchaseInfoCard from "@/user/components/PurchaseInfoCard";
 
@@ -17,11 +10,6 @@ const Dashboard = () => {
   const { translations } = useTranslations();
 
   const [userData, setUserData] = useState<Record<string, string> | null>(null);
-  const [purchaseHistory, setPurchaseHistory] = useState<
-    PurchaseHistory[] | null
-  >(null);
-  const [usageHistory, setUsageHistory] = useState<UsageHistory[] | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [freeAccess, setFreeAccess] = useState<boolean>(true);
 
   useEffect(() => {
@@ -33,31 +21,16 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-
-      const storedData = localStorage.getItem("userData"); // ✅ poprawnie
+    const fetchData = () => {
+      const storedData = localStorage.getItem("userData");
       if (storedData) {
         try {
           const parsed = JSON.parse(storedData);
           setUserData(parsed);
-
-          const userId = Number(parsed.id); // ✅ sprawdzenie typu
-          if (!isNaN(userId)) {
-            const purchaseData = await fetchPurchaseHistory(userId);
-            setPurchaseHistory(purchaseData);
-
-            const usageData = await fetchUsageHistory(userId);
-            setUsageHistory(usageData);
-          } else {
-            console.warn("userId is NaN");
-          }
         } catch (error) {
           console.error("Błąd parsowania danych z localStorage:", error);
         }
       }
-
-      setIsLoading(false);
     };
 
     fetchData();
@@ -67,7 +40,11 @@ const Dashboard = () => {
     return <div>Ładowanie tłumaczeń...</div>;
   }
 
-  const userId = Number(userData?.id); // ✅ teraz userId będzie poprawny
+  const userId = Number(userData?.id);
+  const userName = userData?.username;
+  const balance = Number(userData?.balance);
+  const role = userData?.role;
+
 
   return (
     <div className="p-4 space-y-6">
@@ -94,7 +71,13 @@ const Dashboard = () => {
         </div>
 
         <div className="bg-white border rounded-lg p-4 shadow-sm min-h-[100%]">
-          <PurchaseInfoCard userId={userId} />
+          <PurchaseInfoCard
+            userId={userId}
+            userName={userName || ""}
+            balance={balance}
+            role={role || ""}
+            freeAccess={freeAccess}
+          />
         </div>
       </div>
 
