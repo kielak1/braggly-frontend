@@ -133,12 +133,13 @@
   "uploading": "Uploading...",
   "you_own": "owns",
   "add_files": "add files",
-  "analysis_options": "analysis options",
   "analyze": "analyze",
   "confirm_make_private": "Are you sure you want to remove this file from the public list?",
   "or_drag_here": "or drag them here",
   "remove_from_public": "Remove from public",
   "remove_from_selected": "Remove from selected",
   "selected_files": "Selected file",
-  "drag_here": "Drag files here to analyze"
+  "drag_here": "Drag files here to analyze",
+  "comparison_analysis": "Comparison Analysis",
+  "comparison_min_files": "Select at least two files for comparison analysis"
 }

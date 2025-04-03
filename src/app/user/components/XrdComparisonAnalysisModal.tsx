@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { useTranslations } from "@/context/TranslationsContext";
 import { Line } from "react-chartjs-2";
 import {
@@ -14,8 +20,17 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { X } from "lucide-react"; // Importujemy ikonę X z lucide-react
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -37,7 +52,7 @@ interface FilePeaks {
 }
 
 type Props = {
-  files: any[];  // Pliki wybrane do analizy
+  files: any[]; // Pliki wybrane do analizy
   open: boolean;
   onClose: () => void;
 };
@@ -59,14 +74,17 @@ const XrdComparisonAnalysisModal = ({ files, open, onClose }: Props) => {
       try {
         const resData = await Promise.all(
           files.map(async (file) => {
-            const res = await fetch(`${backendUrl}/api/xrd/analyze/${file.id}`, {
-              method: "GET",
-              headers: getAuthHeaders(),
-            });
+            const res = await fetch(
+              `${backendUrl}/api/xrd/analyze/${file.id}`,
+              {
+                method: "GET",
+                headers: getAuthHeaders(),
+              }
+            );
             if (!res.ok) throw new Error("Błąd pobierania analizy");
 
             const data = await res.json();
-            return data;  // Zwróć dane analizy dla każdego pliku
+            return data; // Zwróć dane analizy dla każdego pliku
           })
         );
 
@@ -109,6 +127,15 @@ const XrdComparisonAnalysisModal = ({ files, open, onClose }: Props) => {
           <DialogTitle className="text-2xl font-bold text-gray-800">
             {translations?.analysis || "Analiza danych XRD"}
           </DialogTitle>
+
+          {/* Przycisk zamknięcia w prawym górnym rogu */}
+          <button
+            className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+            onClick={onClose}
+            aria-label="Close"
+          >
+            <X className="w-6 h-6" />
+          </button>
         </DialogHeader>
 
         {loading && (
@@ -212,7 +239,10 @@ const XrdComparisonAnalysisModal = ({ files, open, onClose }: Props) => {
                     </thead>
                     <tbody>
                       {filePeaks.peaks.map((peak: Peak, peakIndex: number) => (
-                        <tr key={peakIndex} className="hover:bg-gray-50 transition-colors">
+                        <tr
+                          key={peakIndex}
+                          className="hover:bg-gray-50 transition-colors"
+                        >
                           <td className="border-b p-3 text-gray-600 text-sm">
                             {peak.angle.toFixed(2)}
                           </td>
@@ -233,12 +263,7 @@ const XrdComparisonAnalysisModal = ({ files, open, onClose }: Props) => {
         )}
 
         <DialogFooter className="mt-6">
-          <button
-            className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-            onClick={onClose}
-          >
-            {translations?.close_window || "Zamknij"}
-          </button>
+          {/* Można dodać dodatkowe przyciski, jeśli konieczne */}
         </DialogFooter>
       </DialogContent>
     </Dialog>

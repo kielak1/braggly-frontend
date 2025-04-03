@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "@/context/TranslationsContext";
 import { FlaskConical, X } from "lucide-react";
 import XrdAnalysisModal from "@/user/components/XrdAnalysisModal";
@@ -45,7 +45,18 @@ const SelectedFilesCard = ({
     number | null
   >(null);
   const [showAnalysisModal, setShowAnalysisModal] = useState(false);
-  const [showComparisonModal, setShowComparisonModal] = useState(false); // Nowy stan dla porównania
+  const [showComparisonModal, setShowComparisonModal] = useState(false);
+
+  // Nowy stan do kontrolowania widoczności i aktywności przycisku porównania
+  const [canCompare, setCanCompare] = useState(false);
+
+  useEffect(() => {
+    // Obliczamy stan canCompare na podstawie wybranych plików i innych warunków
+    const hasEnoughFiles = selectedFiles.length >= 2; // Na razie uzależniamy od liczby plików
+    const additionalConditionsMet = true; // Zastąp tymi warunkami, które będą potrzebne (np. stan płatności)
+
+    setCanCompare(hasEnoughFiles && additionalConditionsMet);
+  }, [selectedFiles]); // Używamy selectedFiles do obliczania canCompare
 
   const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -142,18 +153,16 @@ const SelectedFilesCard = ({
           )}
         </div>
         <div className="border p-4 min-h-[100px] rounded bg-gray-50">
-          {selectedFiles.length >= 2 && (
-            <button
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-              onClick={handleComparisonAnalysis}
-            >
-              {translations?.comparison_analysis || "Compare Analysis"}
-            </button>
-          )}
-          <p className="text-sm text-gray-500">
-            {translations?.analysis_options ||
-              "Analysis options coming soon..."}
-          </p>
+          {/* Wyświetlanie przycisku tylko, jeśli canCompare jest true */}
+          <button
+            className={`${
+              canCompare ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400 cursor-not-allowed"
+            } text-white px-4 py-2 rounded`}
+            onClick={handleComparisonAnalysis}
+            disabled={!canCompare} // Wyłączamy przycisk, gdy canCompare jest false
+          >
+            {translations?.comparison_analysis || "Compare Analysis"}
+          </button>
         </div>
       </div>
 

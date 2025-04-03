@@ -133,12 +133,13 @@
   "uploading": "Przesyłanie...",
   "you_own": "posiada",
   "add_files": "dodaj pliki",
-  "analysis_options": "opcje analizy",
   "analyze": "analizuj",
   "confirm_make_private": "Czy na pewno chcesz usunąć ten plik z listy publicznych?",
   "or_drag_here": "albo przeciągnij je tutaj",
   "remove_from_public": "Usuń z publicznych",
   "remove_from_selected": "Usuń z wybranych",
   "selected_files": "Wybrane pliki",
-  "drag_here": "Przeciągnij pliki tutaj, aby je analizować"
+  "drag_here": "Przeciągnij pliki tutaj, aby je analizować",
+  "comparison_analysis": "Analiza porównawcza",
+  "comparison_min_files": "Wybierz co najmniej dwa pliki do analizy porównawczej"
 }
