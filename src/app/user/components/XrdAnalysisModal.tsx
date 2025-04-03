@@ -57,6 +57,7 @@ const XrdAnalysisModal = ({ fileId, open, onClose }: Props) => {
   const [peaks, setPeaks] = useState<Peak[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fileMeta, setFileMeta] = useState<any>(null);
 
   useEffect(() => {
     if (!open || !fileId) return;
@@ -80,6 +81,14 @@ const XrdAnalysisModal = ({ fileId, open, onClose }: Props) => {
         if (!angles || !intensities || !peaksData) {
           throw new Error("Invalid response format from backend");
         }
+
+      const resMeta = await fetch(`${backendUrl}/api/xrd/files/${fileId}`, {
+          method: "GET",
+          headers: getAuthHeaders(),
+        });
+        if (!resMeta.ok) throw new Error("Błąd pobierania szczegółów pliku");
+        const dataMeta = await resMeta.json();
+        setFileMeta(dataMeta);
 
         setChartData({
           labels: angles,
@@ -146,7 +155,10 @@ const XrdAnalysisModal = ({ fileId, open, onClose }: Props) => {
                   plugins: {
                     title: {
                       display: true,
-                      text: translations?.xrd_pattern || "XRD Pattern",
+                      text:
+                        fileMeta?.userFilename ||
+                        translations?.xrd_pattern ||
+                        "XRD Pattern",
                       font: { size: 20, weight: "bold" },
                       color: "#333",
                       padding: 20,

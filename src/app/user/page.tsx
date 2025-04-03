@@ -68,10 +68,8 @@ const Dashboard = () => {
             <PublicFilesCard {...sharedProps} />
           </div>
         </div>
-
         <PurchaseInfoCard {...sharedProps} />
       </div>
-
       <SelectedFilesCard {...sharedProps} />
     </div>
   );

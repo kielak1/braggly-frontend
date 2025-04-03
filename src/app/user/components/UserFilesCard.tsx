@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { Pencil, Trash2, FlaskConical } from "lucide-react";
 import { useTranslations } from "@/context/TranslationsContext";
-import XrdAnalysisModal from "@/public/components/XrdAnalysisModal";
+import XrdAnalysisModal from "@/user/components/XrdAnalysisModal";
 
 interface Props {
   userId: number;
