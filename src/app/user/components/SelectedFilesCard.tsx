@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslations } from "@/context/TranslationsContext";
-import { FlaskConical } from "lucide-react";
+import { FlaskConical, X } from "lucide-react";
 import XrdAnalysisModal from "@/user/components/XrdAnalysisModal";
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -64,6 +64,11 @@ const SelectedFilesCard = ({
     }
   };
 
+  const handleRemoveFile = (fileId: number) => {
+    setSelectedFiles((prev) => prev.filter((file) => file.id !== fileId));
+    setSelectedFileIds((prev) => prev.filter((id) => id !== fileId));
+  };
+
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
   };
@@ -96,16 +101,28 @@ const SelectedFilesCard = ({
                       {file.uploadedAt?.split("T")[0]}
                     </div>
                   </div>
-                  <button
-                    className="text-green-600 hover:text-green-800"
-                    onClick={() => {
-                      setSelectedFileIdForAnalysis(file.id);
-                      setShowAnalysisModal(true);
-                    }}
-                    title={translations?.analyze || "Analyze"}
-                  >
-                    <FlaskConical className="w-4 h-4" />
-                  </button>
+                  <div className="flex space-x-2">
+                    <button
+                      className="text-green-600 hover:text-green-800"
+                      onClick={() => {
+                        setSelectedFileIdForAnalysis(file.id);
+                        setShowAnalysisModal(true);
+                      }}
+                      title={translations?.analyze || "Analyze"}
+                    >
+                      <FlaskConical className="w-4 h-4" />
+                    </button>
+                    <button
+                      className="text-gray-500 hover:text-red-600"
+                      onClick={() => handleRemoveFile(file.id)}
+                      title={
+                        translations?.remove_from_selected ||
+                        "Remove from selection"
+                      }
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
                 </li>
               ))}
             </ul>
