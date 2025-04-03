@@ -124,6 +124,27 @@ const UserFilesCard = ({ userId }: Props) => {
     await fetchFiles();
   };
 
+  const handleDeleteFile = async (fileId: number, filename: string) => {
+    const confirmText =
+      translations?.confirm_delete ||
+      `Czy na pewno chcesz usunąć plik "${filename}"?`;
+
+    if (!window.confirm(confirmText)) return;
+
+    try {
+      const res = await fetch(`${backendUrl}/api/xrd/files/${fileId}`, {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      });
+
+      if (!res.ok) throw new Error("Błąd usuwania pliku");
+
+      await fetchFiles();
+    } catch (err) {
+      console.error("❌ Błąd podczas usuwania pliku:", err);
+    }
+  };
+
   // Wczesne zwroty po wszystkich hookach
   if (!translations) return <p className="text-center">Loading...</p>;
   if (loading)
@@ -184,9 +205,11 @@ const UserFilesCard = ({ userId }: Props) => {
               >
                 <Pencil className="w-4 h-4" />
               </button>
+
               <button
                 className="text-red-600 hover:text-red-800"
                 title={translations.cancel || "Delete"}
+                onClick={() => handleDeleteFile(file.id, file.userFilename)}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
