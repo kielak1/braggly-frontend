@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Pencil, Trash2, FlaskConical } from "lucide-react";
 import { useTranslations } from "@/context/TranslationsContext";
 import XrdAnalysisModal from "@/user/components/XrdAnalysisModal";
+import XrdEditModal from "@/user/components/XrdEditModal";
 
 interface Props {
   userId: number;
@@ -32,6 +33,10 @@ const UserFilesCard = ({ userId }: Props) => {
   const [selectedFileIdForAnalysis, setSelectedFileIdForAnalysis] = useState<
     number | null
   >(null);
+  const [selectedFileForEdit, setSelectedFileForEdit] = useState<any | null>(
+    null
+  );
+  const [showEditModal, setShowEditModal] = useState(false);
   const [showAnalysisModal, setShowAnalysisModal] = useState(false);
   const [uploadMessage, setUploadMessage] = useState<string | null>(null);
 
@@ -202,10 +207,13 @@ const UserFilesCard = ({ userId }: Props) => {
               <button
                 className="text-blue-600 hover:text-blue-800"
                 title={translations.edit_file || "Edit"}
+                onClick={() => {
+                  setSelectedFileForEdit(file);
+                  setShowEditModal(true);
+                }}
               >
                 <Pencil className="w-4 h-4" />
               </button>
-
               <button
                 className="text-red-600 hover:text-red-800"
                 title={translations.cancel || "Delete"}
@@ -236,6 +244,17 @@ const UserFilesCard = ({ userId }: Props) => {
             setShowAnalysisModal(false);
             setSelectedFileIdForAnalysis(null);
           }}
+        />
+      )}
+      {selectedFileForEdit !== null && (
+        <XrdEditModal
+          file={selectedFileForEdit}
+          open={showEditModal}
+          onClose={() => {
+            setShowEditModal(false);
+            setSelectedFileForEdit(null);
+          }}
+          onSave={fetchFiles}
         />
       )}
     </div>
