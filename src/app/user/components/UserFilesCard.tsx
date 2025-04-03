@@ -29,11 +29,11 @@ const UserFilesCard = ({ userId }: Props) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
-
   const [selectedFileIdForAnalysis, setSelectedFileIdForAnalysis] = useState<
     number | null
   >(null);
   const [showAnalysisModal, setShowAnalysisModal] = useState(false);
+  const [uploadMessage, setUploadMessage] = useState<string | null>(null);
 
   const fetchFiles = useCallback(async () => {
     try {
@@ -55,11 +55,21 @@ const UserFilesCard = ({ userId }: Props) => {
     }
   }, [translations]);
 
+  // Pierwszy useEffect
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (!localStorage.getItem("token")) return;
     fetchFiles();
   }, [fetchFiles]);
+
+  // Drugi useEffect (przeniesiony na górę)
+  useEffect(() => {
+    if (!uploadMessage) return;
+    const timeout = setTimeout(() => {
+      setUploadMessage(null);
+    }, 5000);
+    return () => clearTimeout(timeout);
+  }, [uploadMessage]);
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -68,6 +78,53 @@ const UserFilesCard = ({ userId }: Props) => {
 
   const handleDragLeave = () => setDragOver(false);
 
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setDragOver(false);
+    setUploadMessage(null);
+
+    const filesDropped = e.dataTransfer.files;
+    const uploadedFiles: string[] = [];
+
+    for (let i = 0; i < filesDropped.length; i++) {
+      const file = filesDropped[i];
+      const filename = file.name.replace(/\.[^/.]+$/, "");
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("name", filename);
+      formData.append("publicVisible", "false");
+
+      try {
+        const res = await fetch(`${backendUrl}/api/xrd/upload`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+          },
+          body: formData,
+        });
+
+        if (res.ok) {
+          uploadedFiles.push(file.name);
+        } else {
+          console.error(`❌ Błąd przesyłania: ${file.name}`);
+        }
+      } catch (err) {
+        console.error(`❌ Błąd sieci dla pliku: ${file.name}`, err);
+      }
+    }
+
+    if (uploadedFiles.length > 0) {
+      setUploadMessage(
+        `✅ Przesłano ${uploadedFiles.length} plików: ${uploadedFiles.join(", ")}`
+      );
+    } else {
+      setUploadMessage("❌ Nie udało się przesłać żadnych plików.");
+    }
+
+    await fetchFiles();
+  };
+
+  // Wczesne zwroty po wszystkich hookach
   if (!translations) return <p className="text-center">Loading...</p>;
   if (loading)
     return (
@@ -76,36 +133,6 @@ const UserFilesCard = ({ userId }: Props) => {
       </p>
     );
   if (error) return <p className="text-center text-red-500">{error}</p>;
-
-  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    const item = e.dataTransfer.items?.[0];
-    if (item && item.kind === "file") {
-      const file = item.getAsFile();
-      if (file) {
-        const filename = file.name.replace(/\.[^/.]+$/, "");
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("name", filename);
-        formData.append("publicVisible", "false");
-
-        try {
-          const res = await fetch(`${backendUrl}/api/xrd/upload`, {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-            },
-            body: formData,
-          });
-
-          if (!res.ok) throw new Error("Upload failed");
-          await fetchFiles(); // odśwież listę plików
-        } catch (err) {
-          console.error("❌ Błąd przesyłania pliku przez drag & drop:", err);
-        }
-      }
-    }
-  };
 
   return (
     <div
@@ -117,6 +144,13 @@ const UserFilesCard = ({ userId }: Props) => {
       <h2 className="font-semibold text-lg mb-2">
         📂 {translations.uploaded_files || "My XRD files"}
       </h2>
+
+      {uploadMessage && (
+        <div className="mb-4 p-3 rounded-md bg-green-100 border border-green-300 text-green-800 text-sm shadow-sm transition-all duration-500">
+          {uploadMessage}
+        </div>
+      )}
+
       <div className="space-y-2 max-h-[350px] overflow-y-auto">
         {files.map((file) => (
           <div
