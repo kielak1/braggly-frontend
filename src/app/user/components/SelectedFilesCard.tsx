@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "@/context/TranslationsContext";
 import { FlaskConical, X } from "lucide-react";
 import XrdAnalysisModal from "@/user/components/XrdAnalysisModal";
+import XrdComparisonAnalysisModal from "@/user/components/XrdComparisonAnalysisModal"; // Nowy modal dla porównania
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 const getAuthHeaders = (): Record<string, string> => {
@@ -44,6 +45,7 @@ const SelectedFilesCard = ({
     number | null
   >(null);
   const [showAnalysisModal, setShowAnalysisModal] = useState(false);
+  const [showComparisonModal, setShowComparisonModal] = useState(false); // Nowy stan dla porównania
 
   const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -73,6 +75,17 @@ const SelectedFilesCard = ({
     e.preventDefault();
   };
 
+  const handleComparisonAnalysis = () => {
+    if (selectedFiles.length >= 2) {
+      setShowComparisonModal(true);
+    } else {
+      alert(
+        translations?.comparison_min_files ||
+          "Wybierz co najmniej dwa pliki do analizy porównawczej."
+      );
+    }
+  };
+
   return (
     <div
       className="bg-white border rounded-lg p-4 shadow-sm min-h-[200px]"
@@ -80,13 +93,13 @@ const SelectedFilesCard = ({
       onDragOver={handleDragOver}
     >
       <h2 className="font-semibold text-lg mb-2">
-        📊 {translations?.selected_files || "Files selected for analysis"}
+        📊 {translations?.selected_files || "Pliki wybrane do analizy"}
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="border p-4 min-h-[100px] rounded bg-gray-50">
           {selectedFiles.length === 0 ? (
             <p className="text-sm text-gray-500 italic">
-              {translations?.drag_here || "Drag files here to analyze"}
+              {translations?.drag_here || "Przeciągnij pliki tutaj do analizy"}
             </p>
           ) : (
             <ul className="text-sm space-y-1">
@@ -129,6 +142,14 @@ const SelectedFilesCard = ({
           )}
         </div>
         <div className="border p-4 min-h-[100px] rounded bg-gray-50">
+          {selectedFiles.length >= 2 && (
+            <button
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              onClick={handleComparisonAnalysis}
+            >
+              {translations?.comparison_analysis || "Compare Analysis"}
+            </button>
+          )}
           <p className="text-sm text-gray-500">
             {translations?.analysis_options ||
               "Analysis options coming soon..."}
@@ -144,6 +165,14 @@ const SelectedFilesCard = ({
             setShowAnalysisModal(false);
             setSelectedFileIdForAnalysis(null);
           }}
+        />
+      )}
+
+      {showComparisonModal && (
+        <XrdComparisonAnalysisModal
+          files={selectedFiles}
+          open={showComparisonModal}
+          onClose={() => setShowComparisonModal(false)}
         />
       )}
     </div>
