@@ -20,7 +20,6 @@ const getAuthHeaders = (): Record<string, string> => {
   if (!token) throw new Error("Brak tokena w localStorage");
   return {
     Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
   };
 };
 
@@ -29,6 +28,7 @@ const UserFilesCard = ({ userId }: Props) => {
   const [files, setFiles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
 
   const [selectedFileIdForAnalysis, setSelectedFileIdForAnalysis] = useState<
     number | null
@@ -39,7 +39,10 @@ const UserFilesCard = ({ userId }: Props) => {
     try {
       const res = await fetch(`${backendUrl}/api/xrd/files`, {
         method: "GET",
-        headers: getAuthHeaders(),
+        headers: {
+          ...getAuthHeaders(),
+          "Content-Type": "application/json",
+        },
       });
       if (!res.ok) throw new Error("Błąd pobierania plików");
       const data = await res.json();
@@ -58,6 +61,13 @@ const UserFilesCard = ({ userId }: Props) => {
     fetchFiles();
   }, [fetchFiles]);
 
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setDragOver(true);
+  };
+
+  const handleDragLeave = () => setDragOver(false);
+
   if (!translations) return <p className="text-center">Loading...</p>;
   if (loading)
     return (
@@ -67,8 +77,43 @@ const UserFilesCard = ({ userId }: Props) => {
     );
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const item = e.dataTransfer.items?.[0];
+    if (item && item.kind === "file") {
+      const file = item.getAsFile();
+      if (file) {
+        const filename = file.name.replace(/\.[^/.]+$/, "");
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("name", filename);
+        formData.append("publicVisible", "false");
+
+        try {
+          const res = await fetch(`${backendUrl}/api/xrd/upload`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+            },
+            body: formData,
+          });
+
+          if (!res.ok) throw new Error("Upload failed");
+          await fetchFiles(); // odśwież listę plików
+        } catch (err) {
+          console.error("❌ Błąd przesyłania pliku przez drag & drop:", err);
+        }
+      }
+    }
+  };
+
   return (
-    <div className="bg-white border rounded-lg p-4 shadow-sm min-h-[180px]">
+    <div
+      className={`bg-white border rounded-lg p-4 shadow-sm min-h-[180px] ${dragOver ? "border-blue-400 bg-blue-50" : ""}`}
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+    >
       <h2 className="font-semibold text-lg mb-2">
         📂 {translations.uploaded_files || "My XRD files"}
       </h2>
@@ -86,7 +131,7 @@ const UserFilesCard = ({ userId }: Props) => {
               <div className="font-medium">{file.userFilename}</div>
               <div className="text-xs text-gray-500">
                 {file.originalFilename}
-              </div>{" "}
+              </div>
               <div className="text-xs text-gray-400">
                 {file.uploadedAt?.split("T")[0]}
               </div>
