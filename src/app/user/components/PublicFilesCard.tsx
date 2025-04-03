@@ -86,6 +86,10 @@ const PublicFilesCard = ({
           <div
             key={file.id}
             className="flex justify-between items-center p-2 bg-gray-50 rounded hover:bg-gray-100 transition"
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.setData("text/plain", String(file.id));
+            }}
           >
             <div className="flex-1">
               <div className="font-medium">{file.userFilename}</div>
