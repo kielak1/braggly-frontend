@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useTranslations } from "@/context/TranslationsContext";
-import { FlaskConical } from "lucide-react";
+import { FlaskConical, EyeOff } from "lucide-react";
 import XrdAnalysisModal from "@/user/components/XrdAnalysisModal";
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -23,18 +23,11 @@ interface Props {
   freeAccess: boolean;
 }
 
-const PublicFilesCard = ({
-  userId,
-  userName,
-  balance,
-  role,
-  freeAccess,
-}: Props) => {
+const PublicFilesCard = ({ userId }: Props) => {
   const { translations } = useTranslations();
   const [files, setFiles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   const [selectedFileIdForAnalysis, setSelectedFileIdForAnalysis] = useState<
     number | null
   >(null);
@@ -72,7 +65,6 @@ const PublicFilesCard = ({
     if (!fileId || isNaN(fileId)) return;
 
     try {
-      // 1. Pobierz pełne dane pliku
       const fetchRes = await fetch(`${backendUrl}/api/xrd/files/${fileId}`, {
         method: "GET",
         headers: getAuthHeaders(),
@@ -80,7 +72,6 @@ const PublicFilesCard = ({
       if (!fetchRes.ok) throw new Error("Błąd pobierania szczegółów pliku");
       const fileData = await fetchRes.json();
 
-      // 2. Wyślij aktualizację z zachowaniem istniejących danych
       const updateRes = await fetch(`${backendUrl}/api/xrd/files/${fileId}`, {
         method: "PUT",
         headers: getAuthHeaders(),
@@ -94,6 +85,39 @@ const PublicFilesCard = ({
       await fetchPublicFiles();
     } catch (err) {
       console.error("❌ Błąd podczas ustawiania pliku jako publiczny:", err);
+    }
+  };
+  const handleMakePrivate = async (fileId: number, filename: string) => {
+    const confirmText =
+      translations?.confirm_make_private ||
+      `Czy na pewno chcesz usunąć plik "${filename}" z listy publicznych?`;
+
+    if (!window.confirm(confirmText)) return;
+
+    try {
+      // 🔁 najpierw pobierz dane
+      const fetchRes = await fetch(`${backendUrl}/api/xrd/files/${fileId}`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+      if (!fetchRes.ok) throw new Error("Błąd pobierania szczegółów pliku");
+
+      const fileData = await fetchRes.json();
+
+      // 📤 wyślij aktualizację z oryginalnymi danymi
+      const updateRes = await fetch(`${backendUrl}/api/xrd/files/${fileId}`, {
+        method: "PUT",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          userFilename: fileData.userFilename,
+          publicVisible: false,
+        }),
+      });
+      if (!updateRes.ok) throw new Error("Błąd aktualizacji pliku");
+
+      await fetchPublicFiles();
+    } catch (err) {
+      console.error("❌ Błąd podczas aktualizacji widoczności pliku:", err);
     }
   };
 
@@ -139,6 +163,17 @@ const PublicFilesCard = ({
               </div>
             </div>
             <div className="flex space-x-2">
+              {file.userId === userId && (
+                <button
+                  className="text-yellow-600 hover:text-yellow-800"
+                  onClick={() => handleMakePrivate(file.id, file.userFilename)}
+                  title={
+                    translations.remove_from_public || "Remove from public"
+                  }
+                >
+                  <EyeOff className="w-4 h-4" />
+                </button>
+              )}
               <button
                 className="text-green-600 hover:text-green-800"
                 onClick={() => {
