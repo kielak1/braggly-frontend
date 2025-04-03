@@ -31,6 +31,11 @@ interface Peak {
   dspacing: number;
 }
 
+interface FilePeaks {
+  fileName: string;
+  peaks: Peak[];
+}
+
 type Props = {
   files: any[];  // Pliki wybrane do analizy
   open: boolean;
@@ -40,7 +45,7 @@ type Props = {
 const XrdComparisonAnalysisModal = ({ files, open, onClose }: Props) => {
   const { translations } = useTranslations(); // ✅
   const [chartData, setChartData] = useState<any>(null);
-  const [peaks, setPeaks] = useState<Peak[]>([]);
+  const [peaks, setPeaks] = useState<FilePeaks[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -82,7 +87,10 @@ const XrdComparisonAnalysisModal = ({ files, open, onClose }: Props) => {
           })),
         });
 
-        const allPeaks = peaksData.flat();  // Złącz wszystkie dane szczytów
+        const allPeaks = peaksData.map((peaks, index) => ({
+          fileName: files[index].userFilename,
+          peaks,
+        }));
         setPeaks(allPeaks);
       } catch (err) {
         setError("❌ Nie udało się pobrać danych analizy porównawczej");
@@ -112,7 +120,7 @@ const XrdComparisonAnalysisModal = ({ files, open, onClose }: Props) => {
 
         {chartData && (
           <div className="mt-6 bg-white p-4 rounded-lg shadow-md">
-            <div className="h-[300px]">
+            <div className="h-[450px]">
               <Line
                 data={chartData}
                 options={{
@@ -121,9 +129,7 @@ const XrdComparisonAnalysisModal = ({ files, open, onClose }: Props) => {
                   plugins: {
                     title: {
                       display: true,
-                      text:
-                        translations?.xrd_pattern ||
-                        "XRD Pattern",
+                      text: translations?.xrd_pattern || "XRD Pattern",
                       font: { size: 20, weight: "bold" },
                       color: "#333",
                       padding: 20,
@@ -186,38 +192,43 @@ const XrdComparisonAnalysisModal = ({ files, open, onClose }: Props) => {
             <h2 className="text-xl font-bold text-gray-800 mb-4">
               {translations?.detected_peaks || "Detected Peaks"}
             </h2>
-            <div className="max-h-60 overflow-y-auto border rounded-lg">
-              <table className="w-full border-collapse">
-                <thead className="bg-gray-100 sticky top-0">
-                  <tr>
-                    <th className="border-b p-3 text-left text-gray-700 font-semibold text-sm">
-                      2θ (degrees)
-                    </th>
-                    <th className="border-b p-3 text-left text-gray-700 font-semibold text-sm">
-                      {translations?.intensity || "Intensity (counts)"}
-                    </th>
-                    <th className="border-b p-3 text-left text-gray-700 font-semibold text-sm">
-                      d-spacing (Å)
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {peaks.map((peak, index) => (
-                    <tr key={index} className="hover:bg-gray-50 transition-colors">
-                      <td className="border-b p-3 text-gray-600 text-sm">
-                        {peak.angle.toFixed(2)}
-                      </td>
-                      <td className="border-b p-3 text-gray-600 text-sm">
-                        {peak.intensity}
-                      </td>
-                      <td className="border-b p-3 text-gray-600 text-sm">
-                        {peak.dspacing.toFixed(2)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            {peaks.map((filePeaks, fileIndex) => (
+              <div key={fileIndex} className="mb-6">
+                <h3 className="text-lg font-semibold">{filePeaks.fileName}</h3>
+                <div className="max-h-60 overflow-y-auto border rounded-lg">
+                  <table className="w-full border-collapse">
+                    <thead className="bg-gray-100 sticky top-0">
+                      <tr>
+                        <th className="border-b p-3 text-left text-gray-700 font-semibold text-sm">
+                          2θ (degrees)
+                        </th>
+                        <th className="border-b p-3 text-left text-gray-700 font-semibold text-sm">
+                          {translations?.intensity || "Intensity (counts)"}
+                        </th>
+                        <th className="border-b p-3 text-left text-gray-700 font-semibold text-sm">
+                          d-spacing (Å)
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filePeaks.peaks.map((peak: Peak, peakIndex: number) => (
+                        <tr key={peakIndex} className="hover:bg-gray-50 transition-colors">
+                          <td className="border-b p-3 text-gray-600 text-sm">
+                            {peak.angle.toFixed(2)}
+                          </td>
+                          <td className="border-b p-3 text-gray-600 text-sm">
+                            {peak.intensity}
+                          </td>
+                          <td className="border-b p-3 text-gray-600 text-sm">
+                            {peak.dspacing.toFixed(2)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
