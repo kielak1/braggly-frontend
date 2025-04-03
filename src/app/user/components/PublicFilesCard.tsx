@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useTranslations } from "@/context/TranslationsContext";
 import { FlaskConical } from "lucide-react";
 import XrdAnalysisModal from "@/user/components/XrdAnalysisModal";
@@ -40,32 +40,66 @@ const PublicFilesCard = ({
   >(null);
   const [showAnalysisModal, setShowAnalysisModal] = useState(false);
 
+  const fetchPublicFiles = useCallback(async () => {
+    try {
+      const res = await fetch(`${backendUrl}/api/xrd/public-files`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+      if (!res.ok) throw new Error("Błąd pobierania publicznych plików");
+      const data = await res.json();
+      setFiles(data);
+    } catch (err) {
+      console.error(err);
+      setError(
+        translations?.file_fetch_error ||
+          "❌ Nie udało się pobrać plików publicznych"
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, [translations]);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (!localStorage.getItem("token")) return;
-
-    const fetchPublicFiles = async () => {
-      try {
-        const res = await fetch(`${backendUrl}/api/xrd/public-files`, {
-          method: "GET",
-          headers: getAuthHeaders(),
-        });
-        if (!res.ok) throw new Error("Błąd pobierania publicznych plików");
-        const data = await res.json();
-        setFiles(data);
-      } catch (err) {
-        console.error(err);
-        setError(
-          translations?.file_fetch_error ||
-            "❌ Nie udało się pobrać plików publicznych"
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchPublicFiles();
-  }, [translations]);
+  }, [fetchPublicFiles]);
+
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const fileId = Number(e.dataTransfer.getData("text/plain"));
+    if (!fileId || isNaN(fileId)) return;
+
+    try {
+      // 1. Pobierz pełne dane pliku
+      const fetchRes = await fetch(`${backendUrl}/api/xrd/files/${fileId}`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+      if (!fetchRes.ok) throw new Error("Błąd pobierania szczegółów pliku");
+      const fileData = await fetchRes.json();
+
+      // 2. Wyślij aktualizację z zachowaniem istniejących danych
+      const updateRes = await fetch(`${backendUrl}/api/xrd/files/${fileId}`, {
+        method: "PUT",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          userFilename: fileData.userFilename,
+          publicVisible: true,
+        }),
+      });
+      if (!updateRes.ok) throw new Error("Błąd aktualizacji pliku");
+
+      await fetchPublicFiles();
+    } catch (err) {
+      console.error("❌ Błąd podczas ustawiania pliku jako publiczny:", err);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
 
   if (!translations) return <p className="text-center">Loading...</p>;
   if (loading)
@@ -77,7 +111,11 @@ const PublicFilesCard = ({
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
-    <div className="bg-white border rounded-lg p-4 shadow-sm min-h-[180px]">
+    <div
+      className="bg-white border rounded-lg p-4 shadow-sm min-h-[180px]"
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
+    >
       <h2 className="font-semibold text-lg mb-2">
         🌐 {translations.public_files || "Public XRD files"}
       </h2>
