@@ -131,5 +131,14 @@
   "upload_network_error": "Error de red durante la subida",
   "upload_success": "Subida exitosa",
   "uploading": "Subiendo...",
-  "you_own": "posee"
+  "you_own": "posee",
+  "add_files": "agregar archivos",
+  "analysis_options": "opciones de análisis",
+  "analyze": "analizar",
+  "confirm_make_private": "¿Estás seguro de que quieres quitar este archivo de la lista pública?",
+  "or_drag_here": "o arrástralos aquí",
+  "remove_from_public": "Eliminar de públicos",
+  "remove_from_selected": "Eliminar de seleccionados",
+  "selected_files": "Archivos seleccionados",
+  "drag_here": "Arrastra los archivos aquí para analizarlo"
 }

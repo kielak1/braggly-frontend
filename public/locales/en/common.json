@@ -131,5 +131,14 @@
   "upload_network_error": "Network error during upload",
   "upload_success": "Upload successful",
   "uploading": "Uploading...",
-  "you_own": "owns"
+  "you_own": "owns",
+  "add_files": "add files",
+  "analysis_options": "analysis options",
+  "analyze": "analyze",
+  "confirm_make_private": "Are you sure you want to remove this file from the public list?",
+  "or_drag_here": "or drag them here",
+  "remove_from_public": "Remove from public",
+  "remove_from_selected": "Remove from selected",
+  "selected_files": "Selected file",
+  "drag_here": "Drag files here to analyze"
 }
