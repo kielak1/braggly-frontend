@@ -143,6 +143,13 @@ const UserFilesCard = ({ userId }: Props) => {
     >
       <h2 className="font-semibold text-lg mb-2">
         📂 {translations.uploaded_files || "My XRD files"}
+        <span className="ml-2 text-sm text-gray-500 font-normal">
+          (
+          <a href="/user/uploads" className="underline hover:text-blue-600">
+            {translations.add_files || "add files"}
+          </a>{" "}
+          {translations.or_drag_here || "or drag them here"})
+        </span>
       </h2>
 
       {uploadMessage && (
