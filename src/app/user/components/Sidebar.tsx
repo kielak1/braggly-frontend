@@ -23,6 +23,13 @@ const Sidebar = () => {
             {translations.dashboard}
           </Link>
         </li>
+
+        <li>
+          <Link href="/user/cod_dashboard" className="block p-2 rounded hover:bg-gray-700">
+            {translations.cod_dashboard||"COD Dashboard"}
+            
+          </Link>
+        </li>
         <li>
           <Link
             href="/user/account"
@@ -63,6 +70,8 @@ const Sidebar = () => {
             {translations.xrd_public_file_list}
           </Link>
         </li>
+
+
       </ul>
     </aside>
   );

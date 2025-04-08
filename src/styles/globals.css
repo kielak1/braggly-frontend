@@ -1787,6 +1787,10 @@ video {
   background-color: rgb(156 163 175 / var(--tw-bg-opacity, 1));
 }
 
+.disabled\:opacity-50:disabled {
+  opacity: 0.5;
+}
+
 .data-\[state\=open\]\:bg-accent[data-state="open"] {
   background-color: hsl(var(--accent));
 }
