@@ -46,13 +46,29 @@ const CODDashboard = () => {
 
   const fetchCifData = async (ids: string[]) => {
     const all: CodCifData[] = [];
+
     for (const id of ids) {
-      const res = await fetch(`${API_BASE}/api/cod/cif/${id}`, {
-        headers: getAuthHeaders(),
-      });
-      const json = await res.json();
-      all.push({ ...json, codId: id });
+      try {
+        const res = await fetch(`${API_BASE}/api/cod/cif/${id}`, {
+          headers: getAuthHeaders(),
+        });
+
+        if (!res.ok) {
+          console.error(
+            `Błąd podczas pobierania CIF dla ID ${id}:`,
+            res.status
+          );
+          throw new Error(`Nie udało się pobrać CIF dla ID ${id}`);
+        }
+
+        const json = await res.json();
+        all.push({ ...json, codId: id });
+      } catch (e) {
+        console.error("Wyjątek podczas pobierania CIF:", e);
+        throw e; // przerywa całość i pokaże komunikat błędu
+      }
     }
+
     setResults(all);
   };
 
@@ -83,7 +99,9 @@ const CODDashboard = () => {
         setAiResponse(ai); // 💡 zapisz odpowiedź AI
 
         if (ai.elementCount < 3) {
-          setError("Dla związków z mniej niż 3 pierwiastkami musisz być podany COD ID.");
+          setError(
+            "Dla związków z mniej niż 3 pierwiastkami musisz być podany COD ID."
+          );
           setLoading(false);
           return;
         }
@@ -107,7 +125,7 @@ const CODDashboard = () => {
             done = true;
             ids = await fetch(
               `${API_BASE}/api/cod/id?formula=${encodeURIComponent(ai.formulaCOD)}`,
-              { headers: getAuthHeaders() }
+              { method: "GET", headers: getAuthHeaders() }
             ).then((r) => r.json());
           } else {
             setError("Brak wyników.");
