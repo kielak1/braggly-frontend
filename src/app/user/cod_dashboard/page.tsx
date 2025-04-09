@@ -155,14 +155,12 @@ const CODDashboard = () => {
                 }
                 className="w-full text-left px-4 py-2 bg-gray-100 font-semibold"
               >
-                COD ID: {res.codId} 
+                COD ID: {res.codId} {res.name ? `– ${res.name}` : ""}
               </button>
 
               {expanded === res.codId && (
                 <div className="grid grid-cols-2 gap-4 p-4 text-sm bg-white">
-                  <div>
-                  {res.name ? `– ${res.name}` : ""}
-                  </div>
+        
                   <div>
                     <strong>Wzór:</strong> {res.formula}
                   </div>
