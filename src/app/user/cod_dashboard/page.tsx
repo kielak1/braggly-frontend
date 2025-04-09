@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useTranslations } from "@/context/TranslationsContext";
+import CodImportStatusList from "@/user/components/CodImportStatusList";
+import { useCodSearch } from "@/context/CodContext";
 
 const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -43,6 +45,7 @@ const CODDashboard = () => {
   const [results, setResults] = useState<CodCifData[]>([]);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [aiResponse, setAiResponse] = useState<AiResponse | null>(null); // 💡 nowy stan
+  const { setFormula } = useCodSearch(); // dodaj do użycia kontekstu
 
   const fetchCifData = async (ids: string[]) => {
     const all: CodCifData[] = [];
@@ -78,6 +81,7 @@ const CODDashboard = () => {
     setProgress(null);
     setCodIds([]);
     setAiResponse(null); // 💡 czyść poprzednią odpowiedź
+
     setLoading(true);
 
     const isCodId = /^\d+$/.test(input.trim());
@@ -97,7 +101,7 @@ const CODDashboard = () => {
         }).then((r) => r.json());
 
         setAiResponse(ai); // 💡 zapisz odpowiedź AI
-
+        setFormula(ai.queryCOD);
         if (ai.elementCount < 3) {
           setError(
             "Dla związków z mniej niż 3 pierwiastkami musisz być podany COD ID."
@@ -150,7 +154,7 @@ const CODDashboard = () => {
   return (
     <div className="p-4 max-w-4xl mx-auto space-y-4">
       <h1 className="text-2xl font-bold">COD Dashboard</h1>
-
+   <div><CodImportStatusList /></div>   
       <div className="flex gap-2">
         <input
           type="text"
