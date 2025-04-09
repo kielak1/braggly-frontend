@@ -91,7 +91,7 @@ const CODDashboard = () => {
           setProgress(resp.progress ?? null);
 
           if (resp.queryRunning) {
-            await new Promise((r) => setTimeout(r, 2000));
+            await new Promise((r) => setTimeout(r, 600));
           } else if (resp.alreadyQueried && resp.completed) {
             done = true;
             ids = await fetch(
