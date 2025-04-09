@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import * as gtag from "@/lib/gtag";
 import { TranslationsProvider } from "@/context/TranslationsContext";
+import { CodProvider } from "@/context/CodContext";
 
 export default function ClientLayout({
   children,
@@ -23,8 +24,10 @@ export default function ClientLayout({
   return (
     <SessionProvider>
       <TranslationsProvider>
-        <Navbar />
-        {children}
+        <CodProvider>
+          <Navbar />
+          {children}
+        </CodProvider>
       </TranslationsProvider>
     </SessionProvider>
   );
