@@ -26,6 +26,13 @@ interface CodCifData {
   volume: string;
 }
 
+interface AiResponse {
+  elementCount: number;
+  queryCOD: string;
+  formulaCOD: string;
+  compoundName: string;
+}
+
 const CODDashboard = () => {
   const { translations } = useTranslations();
   const [input, setInput] = useState("");
@@ -35,6 +42,7 @@ const CODDashboard = () => {
   const [codIds, setCodIds] = useState<string[]>([]);
   const [results, setResults] = useState<CodCifData[]>([]);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [aiResponse, setAiResponse] = useState<AiResponse | null>(null); // 💡 nowy stan
 
   const fetchCifData = async (ids: string[]) => {
     const all: CodCifData[] = [];
@@ -53,6 +61,7 @@ const CODDashboard = () => {
     setResults([]);
     setProgress(null);
     setCodIds([]);
+    setAiResponse(null); // 💡 czyść poprzednią odpowiedź
     setLoading(true);
 
     const isCodId = /^\d+$/.test(input.trim());
@@ -71,8 +80,10 @@ const CODDashboard = () => {
           body: JSON.stringify(input),
         }).then((r) => r.json());
 
+        setAiResponse(ai); // 💡 zapisz odpowiedź AI
+
         if (ai.elementCount < 3) {
-          setError("Zbyt prosty związek – nie podlega analizie.");
+          setError("Dla związków z mniej niż 3 pierwiastkami musisz być podany COD ID.");
           setLoading(false);
           return;
         }
@@ -139,12 +150,29 @@ const CODDashboard = () => {
         </button>
       </div>
 
-      {progress !== null && (
-        <div className="text-sm text-gray-600">Postęp analizy: {progress}%</div>
-      )}
-
       {error && <div className="text-red-500 text-sm">{error}</div>}
 
+      {aiResponse && (
+        <div className="text-sm text-gray-700 border p-3 rounded bg-gray-50">
+          <div>
+            <strong>Liczba pierwiastków:</strong> {aiResponse.elementCount}
+          </div>
+          <div>
+            <strong>Format zapytania do bazy COD:</strong> {aiResponse.queryCOD}
+          </div>
+          <div>
+            <strong>Rozpoznzna formuła:</strong> {aiResponse.formulaCOD}
+          </div>{" "}
+          <div>
+            <strong>Rozpoznana nazwa:</strong> {aiResponse.compoundName}
+          </div>
+        </div>
+      )}
+      {progress !== null && (
+        <div className="text-sm text-gray-600">
+          Postęp importu danych z bazy COD: {progress}%
+        </div>
+      )}
       {results.length > 0 && (
         <div className="space-y-2">
           {results.map((res) => (
@@ -160,7 +188,6 @@ const CODDashboard = () => {
 
               {expanded === res.codId && (
                 <div className="grid grid-cols-2 gap-4 p-4 text-sm bg-white">
-        
                   <div>
                     <strong>Wzór:</strong> {res.formula}
                   </div>
