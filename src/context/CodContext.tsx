@@ -20,7 +20,14 @@ export const CodProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <CodContext.Provider
-      value={{ currentQuery, setCurrentQuery, formula, setFormula, isBeingImported, setIsBeingImported }}
+      value={{
+        currentQuery,
+        setCurrentQuery,
+        formula,
+        setFormula,
+        isBeingImported,
+        setIsBeingImported,
+      }}
     >
       {children}
     </CodContext.Provider>
@@ -29,6 +36,7 @@ export const CodProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useCodSearch = () => {
   const context = useContext(CodContext);
-  if (!context) throw new Error("useCodSearch must be used within CodSearchProvider");
+  if (!context)
+    throw new Error("useCodSearch must be used within CodSearchProvider");
   return context;
 };
