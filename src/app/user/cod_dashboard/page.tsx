@@ -36,6 +36,8 @@ const CODDashboard = () => {
     setError("");
     setProgress(null);
     setAiResponse(null);
+    setFormula(null);
+    setCurrentQuery(null);
     setLoading(true);
 
     const isCodId = /^\d+$/.test(input.trim());

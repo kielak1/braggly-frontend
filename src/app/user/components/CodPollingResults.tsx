@@ -27,6 +27,11 @@ const CodPollingResults = () => {
   useEffect(() => {
     if (!currentQuery) return;
 
+    // 🔁 RESET przy nowym zapytaniu
+    setCodIds([]);
+    setResults([]);
+    setExpanded(null);
+
     let interval: NodeJS.Timeout;
     let stopped = false;
 
