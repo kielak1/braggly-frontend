@@ -23,11 +23,11 @@ const CodPollingResults = () => {
   const [codIds, setCodIds] = useState<string[]>([]);
   const [results, setResults] = useState<CodCifData[]>([]);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [isFetchingCif, setIsFetchingCif] = useState(false);
 
   useEffect(() => {
     if (!currentQuery) return;
 
-    // 🔁 RESET przy nowym zapytaniu
     setCodIds([]);
     setResults([]);
     setExpanded(null);
@@ -61,6 +61,10 @@ const CodPollingResults = () => {
           const newIds = ids.filter((id) => !codIds.includes(id));
           setCodIds((prev) => [...prev, ...newIds]);
 
+          if (newIds.length > 0) {
+            setIsFetchingCif(true);
+          }
+
           for (const id of newIds) {
             const cif = await fetch(`${API_BASE}/api/cod/cif/${id}`, {
               headers: {
@@ -70,6 +74,8 @@ const CodPollingResults = () => {
 
             setResults((prev) => [...prev, { ...cif, codId: id }]);
           }
+
+          setIsFetchingCif(false);
         }
       } catch (err) {
         console.error("Błąd podczas pollingowania:", err);
@@ -88,7 +94,6 @@ const CodPollingResults = () => {
     };
   }, [isBeingImported, currentQuery, formula]);
 
-
   if (results.length === 0 && formula) {
     return (
       <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded text-red-800">
@@ -100,6 +105,8 @@ const CodPollingResults = () => {
   if (!results.length) return null;
 
   return (
+
+    
     <div className="space-y-2">
       {[...results]
         .sort((a, b) => Number(a.codId) - Number(b.codId))
