@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import { useCodSearch } from "@/context/CodContext";
 
 const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
-const POLL_INTERVAL_MS = 2000;
+const POLL_INTERVAL_MS = 500;
 
 interface ActiveImport {
   formula: string;
-  startedAt: string;
+  requestedAt: string;
+  eta: string;
 }
 
 const CodImportStatusList = () => {
@@ -58,22 +59,57 @@ const CodImportStatusList = () => {
   const currentSet = new Set((formula ?? "").split(/\s+/).filter(Boolean));
 
   return (
-    <div className="bg-yellow-50 border border-yellow-300 p-3 rounded text-sm">
-      <strong>Trwające importy z COD:</strong>
-      <ul className="mt-1 list-disc list-inside">
-        {activeImports.map((imp, i) => {
-          const importSet = new Set(imp.formula.split(/\s+/).filter(Boolean));
-          const isCurrent = [...importSet].every((el) => currentSet.has(el));
+    <div className="bg-yellow-50 border border-yellow-300 p-4 rounded text-sm mt-4">
+      <strong className="block mb-2 text-yellow-900">
+        Trwające importy z COD:
+      </strong>
 
-          return (
-            <li
-              key={i}
-              className={isCurrent ? "text-red-700 font-semibold" : ""}
-            >
-              {imp.formula} {isCurrent && "(dotyczy bieżącego wyszukiwania)"}
-            </li>
-          );
-        })}
+      <ul className="space-y-1">
+        {[...activeImports]
+          .sort((a, b) => {
+            const setA = new Set(a.formula.split(/\s+/).filter(Boolean));
+            const setB = new Set(b.formula.split(/\s+/).filter(Boolean));
+            const currentSet = new Set(
+              (formula ?? "").split(/\s+/).filter(Boolean)
+            );
+
+            const isCurrentA = [...setA].every((el) => currentSet.has(el));
+            const isCurrentB = [...setB].every((el) => currentSet.has(el));
+
+            if (isCurrentA && !isCurrentB) return -1;
+            if (!isCurrentA && isCurrentB) return 1;
+
+            // Porównanie ETA jako czasu (jeśli da się sparsować)
+            const etaToSeconds = (eta: string) => {
+              const [h, m, s] = eta.split(":").map(Number);
+              return h * 3600 + m * 60 + s;
+            };
+
+            return etaToSeconds(a.eta) - etaToSeconds(b.eta);
+          })
+          .map((imp, i) => {
+            const importSet = new Set(imp.formula.split(/\s+/).filter(Boolean));
+            const isCurrent = [...importSet].every((el) => currentSet.has(el));
+
+            return (
+              <li
+                key={i}
+                className={`flex justify-between items-center ${
+                  isCurrent ? "text-red-700 font-semibold" : "text-gray-800"
+                }`}
+              >
+                <span>
+                  {imp.formula}
+                  {isCurrent && " (dotyczy bieżącego wyszukiwania)"}
+                </span>
+                <span className="text-gray-600 text-xs font-normal">
+                  {imp.eta === "00:00:00"
+                    ? "szacowanie..."
+                    : `pozostało ${imp.eta}`}
+                </span>
+              </li>
+            );
+          })}
       </ul>
     </div>
   );

@@ -92,47 +92,49 @@ const CodPollingResults = () => {
 
   return (
     <div className="space-y-2">
-      {results.map((res) => (
-        <div key={res.codId} className="border rounded overflow-hidden">
-          <button
-            onClick={() =>
-              setExpanded((prev) => (prev === res.codId ? null : res.codId))
-            }
-            className="w-full text-left px-4 py-2 bg-gray-100 font-semibold"
-          >
-            COD ID: {res.codId} {res.name ? `– ${res.name}` : ""}
-          </button>
+      {[...results]
+        .sort((a, b) => Number(a.codId) - Number(b.codId))
+        .map((res) => (
+          <div key={res.codId} className="border rounded overflow-hidden">
+            <button
+              onClick={() =>
+                setExpanded((prev) => (prev === res.codId ? null : res.codId))
+              }
+              className="w-full text-left px-4 py-2 bg-gray-100 font-semibold"
+            >
+              COD ID: {res.codId} {res.name ? `– ${res.name}` : ""}
+            </button>
 
-          {expanded === res.codId && (
-            <div className="grid grid-cols-2 gap-4 p-4 text-sm bg-white">
-              <div>
-                <strong>Wzór:</strong> {res.formula}
+            {expanded === res.codId && (
+              <div className="grid grid-cols-2 gap-4 p-4 text-sm bg-white">
+                <div>
+                  <strong>Wzór:</strong> {res.formula}
+                </div>
+                <div>
+                  <strong>Grupa przestrzenna:</strong> {res.spaceGroup}
+                </div>
+                <div>
+                  <strong>Autor:</strong> {res.author}
+                </div>
+                <div>
+                  <strong>Rok:</strong> {res.year}
+                </div>
+                <div>
+                  <strong>a:</strong> {res.a}
+                </div>
+                <div>
+                  <strong>b:</strong> {res.b}
+                </div>
+                <div>
+                  <strong>c:</strong> {res.c}
+                </div>
+                <div>
+                  <strong>Objętość:</strong> {res.volume}
+                </div>
               </div>
-              <div>
-                <strong>Grupa przestrzenna:</strong> {res.spaceGroup}
-              </div>
-              <div>
-                <strong>Autor:</strong> {res.author}
-              </div>
-              <div>
-                <strong>Rok:</strong> {res.year}
-              </div>
-              <div>
-                <strong>a:</strong> {res.a}
-              </div>
-              <div>
-                <strong>b:</strong> {res.b}
-              </div>
-              <div>
-                <strong>c:</strong> {res.c}
-              </div>
-              <div>
-                <strong>Objętość:</strong> {res.volume}
-              </div>
-            </div>
-          )}
-        </div>
-      ))}
+            )}
+          </div>
+        ))}
     </div>
   );
 };
