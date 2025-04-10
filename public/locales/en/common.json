@@ -140,7 +140,7 @@
   "remove_from_selected": "Remove from selected",
   "selected_files": "Selected file",
   "drag_here": "Drag files here to analyze",
-  "comparison_analysis": "Comparison Analysis",
-  "comparison_min_files": "Select at least two files for comparison analysis",
-  "cod_dashboard": "COD Dashboard"
+  "cod_dashboard": "COD panel",
+  "comparison_min_files": "Select at least two files for comparative analysis.",
+  "comparison_analysis": "Comparative analysis"
 }

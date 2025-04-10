@@ -140,6 +140,7 @@
   "remove_from_selected": "Usuń z wybranych",
   "selected_files": "Wybrane pliki",
   "drag_here": "Przeciągnij pliki tutaj, aby je analizować",
-  "comparison_analysis": "Analiza porównawcza",
-  "comparison_min_files": "Wybierz co najmniej dwa pliki do analizy porównawczej"
+  "cod_dashboard": "panel COD",
+  "comparison_min_files": "Wybierz co najmniej dwa pliki do analizy porównawczej.",
+  "comparison_analysis": "Analiza porównawcza"
 }

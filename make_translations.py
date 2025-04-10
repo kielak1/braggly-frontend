@@ -3,17 +3,16 @@ import re
 import json
 from pathlib import Path
 from openai import OpenAI
+from prompt_toolkit import prompt
 
 SRC_DIR = "src"
 LOCALES_DIR = "public/locales"
-TRANSLATION_PATTERN = r"translations\.([a-zA-Z0-9_]+)(?:\s*\|\|\s*[\"'](.+?)[\"'])?"
+TRANSLATION_PATTERN = r"translations(?:\?\.)?([a-zA-Z0-9_]+)(?:\s*\|\|\s*[\"'](.+?)[\"']\s*)?"
 
-# Ustawienie klienta OpenAI
 client = OpenAI(api_key=os.getenv("OPEN_AI_KEY"))
 
 
 def extract_translation_keys_from_src():
-    """Zbiera klucze tłumaczeń oraz wartości domyślne z plików źródłowych"""
     keys_with_defaults = {}
     print(f"🔍 Przeszukiwanie katalogu: {SRC_DIR}")
     for root, _, files in os.walk(SRC_DIR):
@@ -30,7 +29,6 @@ def extract_translation_keys_from_src():
 
 
 def load_locale_files():
-    """Ładuje pliki tłumaczeń JSON z katalogu locales"""
     locales = {}
     paths = {}
     print(f"📁 Ładowanie plików tłumaczeń z: {LOCALES_DIR}")
@@ -48,24 +46,29 @@ def load_locale_files():
 
 
 def find_missing_translations(used_keys, locale_dict):
-    """Zwraca brakujące pary (klucz, język)"""
     missing = []
-    for key in used_keys:
+    # Ustal pełny zestaw kluczy: z PL (jeśli istnieje) + z kodu
+    base_keys = set(locale_dict.get("pl", {}).keys()) | set(used_keys.keys())
+    
+    for key in base_keys:
         for lang, translations in locale_dict.items():
             if key not in translations:
                 missing.append((key, lang))
     return missing
 
 
-def generate_translation(prompt, target_lang_code):
-    """Używa OpenAI do przetłumaczenia tekstu"""
+def generate_translation(prompt_text, target_lang_code):
     try:
-        system_prompt = f"Tłumacz tekst na język {target_lang_code} w neutralnym tonie:"
+        system_prompt = (
+            f"Tłumacz tekst na język {target_lang_code} w neutralnym tonie. "
+            "Zachowaj wielkość liter zgodnie z tekstem źródłowym (np. wielka litera na początku zdania, "
+            "w środku zdania lub w nazwach własnych pozostaje taka sama)."
+        )
         response = client.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": prompt}
+                {"role": "user", "content": prompt_text}
             ],
             temperature=0.3,
         )
@@ -76,27 +79,46 @@ def generate_translation(prompt, target_lang_code):
 
 
 def fill_missing_translations_auto(missing, locales, paths, defaults):
-    """Automatycznie uzupełnia brakujące tłumaczenia na podstawie języka polskiego lub wartości domyślnej"""
     updated_languages = set()
 
+    # Przetwarzaj najpierw brakujące tłumaczenia dla PL
     for key, lang in missing:
         if lang == "pl":
-            continue  # Nie tłumaczymy na polski
+            default_text = defaults.get(key)
+            if not default_text:
+                print(f"⚠️ Brak wartości domyślnej dla klucza '{key}', pomijam.")
+                continue
+            suggestion = generate_translation(default_text, "pl") or default_text
+            print(f"\n🔤 Brakujące tłumaczenie [PL] dla klucza: '{key}'")
+            print(f"📦 Domyślny tekst: {default_text}")
+            print(f"🤖 Propozycja AI: {suggestion}")
+            user_input = prompt(
+                "✍️ Wpisz tłumaczenie (Enter = akceptuj propozycję, pusta wartość = pomiń): ",
+                default=suggestion
+            ).strip()
+            if user_input:
+                locales[lang][key] = user_input
+                updated_languages.add(lang)
+                print(f"✅ Zapisano tłumaczenie [pl]: {key} = \"{user_input}\"")
+            else:
+                print(f"⏭️ Pominięto '{key}'")
 
-        base_text = locales.get("pl", {}).get(key) or defaults.get(key)
-        if not base_text:
-            print(f"⚠️ Brak tekstu źródłowego dla klucza: {key}, pomijam...")
-            continue
+    # Po uzupełnieniu PL, tłumacz na inne języki
+    for key, lang in missing:
+        if lang != "pl":
+            base_text = locales.get("pl", {}).get(key)
+            if not base_text:
+                print(f"⚠️ Brak tłumaczenia PL dla '{key}', pomijam tłumaczenie na [{lang}]...")
+                continue
+            translated = generate_translation(base_text, lang)
+            if translated:
+                locales[lang][key] = translated
+                updated_languages.add(lang)
+                print(f"✅ Przetłumaczono '{key}' na [{lang}]: {translated}")
+            else:
+                print(f"⚠️ Nie udało się przetłumaczyć '{key}' na [{lang}]")
 
-        translated = generate_translation(base_text, lang)
-        if translated:
-            locales[lang][key] = translated
-            updated_languages.add(lang)
-            print(f"✅ Dodano tłumaczenie '{key}' [{lang}]: {translated}")
-        else:
-            print(f"⚠️ Nie udało się przetłumaczyć '{key}' na [{lang}]")
-
-    # Zapis do plików
+    # Zapisz zaktualizowane pliki
     for lang in updated_languages:
         with open(paths[lang], "w", encoding="utf-8") as f:
             json.dump(locales[lang], f, indent=2, ensure_ascii=False)
