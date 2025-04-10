@@ -142,5 +142,12 @@
   "drag_here": "Przeciągnij pliki tutaj, aby je analizować",
   "cod_dashboard": "panel COD",
   "comparison_min_files": "Wybierz co najmniej dwa pliki do analizy porównawczej.",
-  "comparison_analysis": "Analiza porównawcza"
+  "comparison_analysis": "Analiza porównawcza",
+  "cod_element_count": "Liczba elementów",
+  "cod_formula": "Rozpoznana formuła",
+  "cod_search_button": "Szukaj",
+  "cod_search_placeholder": "Wprowadź nazwę substancji lub ID COD...",
+  "cod_compound_name": "Rozpoznane imię",
+  "cod_query_format": "Format zapytania dla bazy danych COD",
+  "cod_import_progress": "Postęp procesu importu"
 }

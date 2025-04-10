@@ -7,7 +7,7 @@ from prompt_toolkit import prompt
 
 SRC_DIR = "src"
 LOCALES_DIR = "public/locales"
-TRANSLATION_PATTERN = r"translations(?:\?\.)?([a-zA-Z0-9_]+)(?:\s*\|\|\s*[\"'](.+?)[\"']\s*)?"
+TRANSLATION_PATTERN = r"translations(?:\?)?\.([a-zA-Z0-9_]+)(?:\s*\|\|\s*[\"'](.+?)[\"']\s*)?"
 
 client = OpenAI(api_key=os.getenv("OPEN_AI_KEY"))
 
@@ -19,12 +19,16 @@ def extract_translation_keys_from_src():
         for file in files:
             if file.endswith((".tsx", ".ts", ".js")):
                 file_path = os.path.join(root, file)
+                print(f"📄 Skanowanie pliku: {file_path}")
                 with open(file_path, "r", encoding="utf-8") as f:
                     content = f.read()
                     matches = re.findall(TRANSLATION_PATTERN, content)
+                    if matches:
+                        print(f"🔑 Znalezione klucze w pliku {file_path}: {[m[0] for m in matches]}")
                     for key, default in matches:
                         if key not in keys_with_defaults:
                             keys_with_defaults[key] = default or None
+    print(f"📋 Wszystkie znalezione klucze: {list(keys_with_defaults.keys())}")
     return keys_with_defaults
 
 
@@ -39,7 +43,7 @@ def load_locale_files():
                 try:
                     locales[lang] = json.load(f)
                     paths[lang] = lang_path
-                    print(f"✅ Załadowano {lang}: {len(locales[lang])} kluczy")
+                    print(f"✅ Załadowano {lang}: {len(locales[lang])} kluczy - {list(locales[lang].keys())}")
                 except json.JSONDecodeError as e:
                     print(f"❌ Błąd JSON w pliku {lang_path}: {e}")
     return locales, paths
@@ -47,13 +51,14 @@ def load_locale_files():
 
 def find_missing_translations(used_keys, locale_dict):
     missing = []
-    # Ustal pełny zestaw kluczy: z PL (jeśli istnieje) + z kodu
-    base_keys = set(locale_dict.get("pl", {}).keys()) | set(used_keys.keys())
+    base_keys = set(used_keys.keys())  # Używamy tylko kluczy z kodu jako bazy
+    print(f"🔍 Pełny zestaw kluczy do sprawdzenia: {list(base_keys)}")
     
     for key in base_keys:
         for lang, translations in locale_dict.items():
             if key not in translations:
                 missing.append((key, lang))
+                print(f"❌ Brakuje: {key} w języku {lang}")
     return missing
 
 
@@ -81,13 +86,13 @@ def generate_translation(prompt_text, target_lang_code):
 def fill_missing_translations_auto(missing, locales, paths, defaults):
     updated_languages = set()
 
-    # Przetwarzaj najpierw brakujące tłumaczenia dla PL
+    # Najpierw uzupełniamy PL
     for key, lang in missing:
         if lang == "pl":
             default_text = defaults.get(key)
             if not default_text:
-                print(f"⚠️ Brak wartości domyślnej dla klucza '{key}', pomijam.")
-                continue
+                default_text = key  # Używamy nazwy klucza jako domyślnej wartości
+                print(f"⚠️ Brak wartości domyślnej dla klucza '{key}', używam nazwy klucza: '{default_text}'")
             suggestion = generate_translation(default_text, "pl") or default_text
             print(f"\n🔤 Brakujące tłumaczenie [PL] dla klucza: '{key}'")
             print(f"📦 Domyślny tekst: {default_text}")
@@ -103,7 +108,7 @@ def fill_missing_translations_auto(missing, locales, paths, defaults):
             else:
                 print(f"⏭️ Pominięto '{key}'")
 
-    # Po uzupełnieniu PL, tłumacz na inne języki
+    # Następnie tłumaczymy na inne języki na podstawie PL
     for key, lang in missing:
         if lang != "pl":
             base_text = locales.get("pl", {}).get(key)
@@ -118,7 +123,7 @@ def fill_missing_translations_auto(missing, locales, paths, defaults):
             else:
                 print(f"⚠️ Nie udało się przetłumaczyć '{key}' na [{lang}]")
 
-    # Zapisz zaktualizowane pliki
+    # Zapisujemy zaktualizowane pliki
     for lang in updated_languages:
         with open(paths[lang], "w", encoding="utf-8") as f:
             json.dump(locales[lang], f, indent=2, ensure_ascii=False)

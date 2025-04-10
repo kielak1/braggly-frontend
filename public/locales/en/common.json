@@ -142,5 +142,12 @@
   "drag_here": "Drag files here to analyze",
   "cod_dashboard": "COD panel",
   "comparison_min_files": "Select at least two files for comparative analysis.",
-  "comparison_analysis": "Comparative analysis"
+  "comparison_analysis": "Comparative analysis",
+  "cod_element_count": "Number of elements",
+  "cod_formula": "Recognized formula",
+  "cod_search_button": "Search",
+  "cod_search_placeholder": "Enter the name of the substance or COD ID...",
+  "cod_compound_name": "Recognized name",
+  "cod_query_format": "Query format for the COD database",
+  "cod_import_progress": "Progress of the import process"
 }
