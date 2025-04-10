@@ -105,9 +105,32 @@ const CodPollingResults = () => {
   if (!results.length) return null;
 
   return (
+    <div className="space-y-2 mt-4">
+      {isFetchingCif && (
+        <div className="p-3 bg-yellow-50 border border-yellow-200 rounded text-yellow-800 text-sm flex items-center gap-2">
+          <svg
+            className="animate-spin h-4 w-4 text-yellow-600"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+              fill="none"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+            />
+          </svg>
+          Pobieranie szczegółów struktur...
+        </div>
+      )}
 
-    
-    <div className="space-y-2">
       {[...results]
         .sort((a, b) => Number(a.codId) - Number(b.codId))
         .map((res) => (
