@@ -88,6 +88,15 @@ const CodPollingResults = () => {
     };
   }, [isBeingImported, currentQuery, formula]);
 
+
+  if (results.length === 0 && formula) {
+    return (
+      <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded text-red-800">
+        ❗Nie znaleziono żadnych struktur w bazie COD dla podanej formuły.
+      </div>
+    );
+  }
+
   if (!results.length) return null;
 
   return (
