@@ -59,10 +59,7 @@ const CODDashboard = () => {
           body: JSON.stringify(input),
         }).then((r) => r.json());
 
-        setAiResponse(ai);
-        setFormula(ai.formulaCOD);
-        setCurrentQuery(ai.queryCOD);
-
+         setAiResponse(ai);
         if (ai.elementCount < 3) {
           setError(
             "Dla związków z mniej niż 3 pierwiastkami musisz podać COD ID."
@@ -70,6 +67,9 @@ const CODDashboard = () => {
           setLoading(false);
           return;
         }
+       
+        setFormula(ai.formulaCOD);
+        setCurrentQuery(ai.queryCOD);
       }
     } catch (err) {
       console.error(err);
