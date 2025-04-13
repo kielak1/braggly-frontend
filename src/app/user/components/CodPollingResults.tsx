@@ -18,83 +18,172 @@ interface CodCifData {
   volume: string;
 }
 
+interface CodQueryStatusResponse {
+  alreadyQueried: boolean;
+  queryRunning: boolean;
+  completed: boolean;
+  lastCompleted: string;
+  progress: number;
+}
+
+const CodAccordion = ({
+  data,
+  expanded,
+  onToggle,
+}: {
+  data: CodCifData;
+  expanded: string | null;
+  onToggle: (id: string) => void;
+}) => (
+  <div key={data.codId} className="border rounded overflow-hidden">
+    <button
+      onClick={() => onToggle(data.codId)}
+      className="w-full text-left px-4 py-2 bg-gray-100 font-semibold"
+    >
+      COD ID: {data.codId} {data.name ? `– ${data.name}` : " – ?"}
+    </button>
+
+    {expanded === data.codId && (
+      <div className="grid grid-cols-2 gap-4 p-4 text-sm bg-white">
+        <div>
+          <strong>Wzór:</strong> {data.formula}
+        </div>
+        <div>
+          <strong>Grupa przestrzenna:</strong> {data.spaceGroup}
+        </div>
+        <div>
+          <strong>Autor:</strong> {data.author}
+        </div>
+        <div>
+          <strong>Rok:</strong> {data.year}
+        </div>
+        <div>
+          <strong>a:</strong> {data.a}
+        </div>
+        <div>
+          <strong>b:</strong> {data.b}
+        </div>
+        <div>
+          <strong>c:</strong> {data.c}
+        </div>
+        <div>
+          <strong>Objętość:</strong> {data.volume}
+        </div>
+      </div>
+    )}
+  </div>
+);
+
 const CodPollingResults = () => {
-  const { formula, currentQuery, isBeingImported } = useCodSearch();
-  const [codIds, setCodIds] = useState<string[]>([]);
-  const [results, setResults] = useState<CodCifData[]>([]);
+  const { formula, currentQuery } = useCodSearch();
+
+  const [codIds, setCodIds] = useState<Set<string>>(new Set());
+  const [results, setResults] = useState<Map<string, CodCifData>>(new Map());
   const [expanded, setExpanded] = useState<string | null>(null);
   const [isFetchingCif, setIsFetchingCif] = useState(false);
+  const [queryCompleted, setQueryCompleted] = useState(false);
+  const [progress, setProgress] = useState<number>(0);
 
+  // Reset
+  useEffect(() => {
+    setCodIds(new Set());
+    setResults(new Map());
+    setExpanded(null);
+    setQueryCompleted(false);
+    setProgress(0);
+  }, [currentQuery]);
+
+  // Poll /api/cod/search
   useEffect(() => {
     if (!currentQuery) return;
-
-    setCodIds([]);
-    setResults([]);
-    setExpanded(null);
-
-    let interval: NodeJS.Timeout;
     let stopped = false;
 
-    const poll = async () => {
+    const pollStatus = async () => {
       try {
-        const resp = await fetch(`${API_BASE}/api/cod/search`, {     // przeszukiwanie bazy COD dla rodziny związków zawierających listę atomów np. --data "C H N O P Mo"
+        const resp = await fetch(`${API_BASE}/api/cod/search`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "text/plain",
           },
           body: currentQuery,
-        });   // endpoint konczy sie od razu ale w razie takiej koniecznosci uruchamia proces importu
-
-        const data = await resp.json();
-
-        if (data.alreadyQueried && data.completed) {
-          const ids: string[] = await fetch(
-            `${API_BASE}/api/cod/id?formula=${encodeURIComponent(formula ?? "")}`,   // przeszykanie bazy wlasnej w poszukiwaniu COD ID na podstawie wzoru np. https://bragglybackenddev.kielak.com/api/cod/id?formula=-%20C16%20H16%20O2%20
-            {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-              },
-            }
-          ).then((r) => r.json());
-
-          const newIds = ids.filter((id) => !codIds.includes(id));
-          setCodIds((prev) => [...prev, ...newIds]);
-
-          if (newIds.length > 0) {
-            setIsFetchingCif(true);
-          }
-
-          for (const id of newIds) {
-            const cif = await fetch(`${API_BASE}/api/cod/cif/${id}`, {  //  przeszukanie wlasbej bazy w poszukiwaniu CIF przypidanego do COD ID https://bragglybackenddev.kielak.com/api/cod/cif/4114699"
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-              },
-            }).then((r) => r.json());
-
-            setResults((prev) => [...prev, { ...cif, codId: id }]);
-          }
-
-          setIsFetchingCif(false);
+        });
+        const data: CodQueryStatusResponse = await resp.json();
+        setProgress(data.progress ?? 0);
+        if (data.completed && data.alreadyQueried) {
+          setQueryCompleted(true);
+          return;
         }
+        if (!stopped) setTimeout(pollStatus, 1000);
       } catch (err) {
-        console.error("Błąd podczas pollingowania:", err);
-      }
-
-      if (!stopped && isBeingImported) {
-        interval = setTimeout(poll, 1000);
+        console.error("Błąd w /api/cod/search:", err);
       }
     };
-
-    poll();
-
+    pollStatus();
     return () => {
       stopped = true;
-      clearTimeout(interval);
     };
-  }, [isBeingImported, currentQuery, formula]);
+  }, [currentQuery]);
 
-  if (results.length === 0 && formula && !isFetchingCif) {
+  // Poll /api/cod/id
+  useEffect(() => {
+    if (!formula) return;
+    let stopped = false;
+
+    const pollIds = async () => {
+      try {
+        const ids: string[] = await fetch(
+          `${API_BASE}/api/cod/id?formula=${encodeURIComponent(formula)}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        ).then((r) => r.json());
+
+        setCodIds((prev) => new Set([...prev, ...ids]));
+
+        if (!stopped && !queryCompleted) setTimeout(pollIds, 2000);
+      } catch (err) {
+        console.error("Błąd w /api/cod/id:", err);
+      }
+    };
+
+    pollIds();
+    return () => {
+      stopped = true;
+    };
+  }, [formula, queryCompleted]);
+
+  // Fetch CIFs
+  useEffect(() => {
+    const newIds = [...codIds].filter((id) => !results.has(id));
+    if (newIds.length === 0) return;
+
+    const fetchCifs = async () => {
+      setIsFetchingCif(true);
+
+      for (const id of newIds) {
+        try {
+          const cif = await fetch(`${API_BASE}/api/cod/cif/${id}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }).then((r) => r.json());
+
+          setResults((prev) => new Map(prev).set(id, { ...cif, codId: id }));
+        } catch (err) {
+          console.error(`Błąd w /api/cod/cif/${id}:`, err);
+        }
+      }
+
+      setIsFetchingCif(false);
+    };
+
+    fetchCifs();
+  }, [codIds, results]);
+
+  if (queryCompleted && results.size === 0 && formula && !isFetchingCif) {
     return (
       <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded text-red-800">
         ❗Nie znaleziono żadnych struktur w bazie COD dla podanej formuły.
@@ -102,10 +191,15 @@ const CodPollingResults = () => {
     );
   }
 
-  if (!results.length) return null;
-
   return (
     <div className="space-y-2 mt-4">
+      {!queryCompleted && (
+        <div className="p-3 bg-blue-50 border border-blue-200 rounded text-blue-800 text-sm">
+          ⏳ Trwa wyszukiwanie struktur...{" "}
+          {progress > 0 && `Postęp: ${progress}%`}
+        </div>
+      )}
+
       {isFetchingCif && (
         <div className="p-3 bg-yellow-50 border border-yellow-200 rounded text-yellow-800 text-sm flex items-center gap-2">
           <svg
@@ -131,48 +225,15 @@ const CodPollingResults = () => {
         </div>
       )}
 
-      {[...results]
+      {[...results.values()]
         .sort((a, b) => Number(a.codId) - Number(b.codId))
         .map((res) => (
-          <div key={res.codId} className="border rounded overflow-hidden">
-            <button
-              onClick={() =>
-                setExpanded((prev) => (prev === res.codId ? null : res.codId))
-              }
-              className="w-full text-left px-4 py-2 bg-gray-100 font-semibold"
-            >
-              COD ID: {res.codId} {res.name ? `– ${res.name}` : ""}
-            </button>
-
-            {expanded === res.codId && (
-              <div className="grid grid-cols-2 gap-4 p-4 text-sm bg-white">
-                <div>
-                  <strong>Wzór:</strong> {res.formula}
-                </div>
-                <div>
-                  <strong>Grupa przestrzenna:</strong> {res.spaceGroup}
-                </div>
-                <div>
-                  <strong>Autor:</strong> {res.author}
-                </div>
-                <div>
-                  <strong>Rok:</strong> {res.year}
-                </div>
-                <div>
-                  <strong>a:</strong> {res.a}
-                </div>
-                <div>
-                  <strong>b:</strong> {res.b}
-                </div>
-                <div>
-                  <strong>c:</strong> {res.c}
-                </div>
-                <div>
-                  <strong>Objętość:</strong> {res.volume}
-                </div>
-              </div>
-            )}
-          </div>
+          <CodAccordion
+            key={res.codId}
+            data={res}
+            expanded={expanded}
+            onToggle={(id) => setExpanded((prev) => (prev === id ? null : id))}
+          />
         ))}
     </div>
   );

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useCodSearch } from "@/context/CodContext";
 
 const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
-const POLL_INTERVAL_MS = 500;
+const POLL_INTERVAL_MS = 2500;
 
 interface ActiveImport {
   formula: string;
