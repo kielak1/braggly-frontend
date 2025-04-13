@@ -37,20 +37,20 @@ const CodPollingResults = () => {
 
     const poll = async () => {
       try {
-        const resp = await fetch(`${API_BASE}/api/cod/search`, {
+        const resp = await fetch(`${API_BASE}/api/cod/search`, {     // przeszukiwanie bazy COD dla rodziny związków zawierających listę atomów np. --data "C H N O P Mo"
           method: "POST",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "text/plain",
           },
           body: currentQuery,
-        });
+        });   // endpoint konczy sie od razu ale w razie takiej koniecznosci uruchamia proces importu
 
         const data = await resp.json();
 
         if (data.alreadyQueried && data.completed) {
           const ids: string[] = await fetch(
-            `${API_BASE}/api/cod/id?formula=${encodeURIComponent(formula ?? "")}`,
+            `${API_BASE}/api/cod/id?formula=${encodeURIComponent(formula ?? "")}`,   // przeszykanie bazy wlasnej w poszukiwaniu COD ID na podstawie wzoru np. https://bragglybackenddev.kielak.com/api/cod/id?formula=-%20C16%20H16%20O2%20
             {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -66,7 +66,7 @@ const CodPollingResults = () => {
           }
 
           for (const id of newIds) {
-            const cif = await fetch(`${API_BASE}/api/cod/cif/${id}`, {
+            const cif = await fetch(`${API_BASE}/api/cod/cif/${id}`, {  //  przeszukanie wlasbej bazy w poszukiwaniu CIF przypidanego do COD ID https://bragglybackenddev.kielak.com/api/cod/cif/4114699"
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
               },
