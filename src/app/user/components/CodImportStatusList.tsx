@@ -12,6 +12,15 @@ interface ActiveImport {
   eta: string;
 }
 
+// Pomocnicza funkcja: usuwa cyfry z każdego elementu i tworzy zbiór pierwiastków
+const extractElementSet = (input: string | null): Set<string> =>
+  new Set(
+    (input ?? "")
+      .split(/\s+/)
+      .map((el) => el.replace(/\d/g, "")) // "C2" → "C"
+      .filter(Boolean)
+  );
+
 const CodImportStatusList = () => {
   const { formula, setIsBeingImported } = useCodSearch();
   const [activeImports, setActiveImports] = useState<ActiveImport[]>([]);
@@ -31,12 +40,10 @@ const CodImportStatusList = () => {
         const data: ActiveImport[] = await res.json();
         setActiveImports(data);
 
-        const currentSet = new Set(
-          (formula ?? "").split(/\s+/).filter(Boolean)
-        );
+        const currentSet = extractElementSet(formula);
 
         const found = data.some((imp) => {
-          const importSet = new Set(imp.formula.split(/\s+/).filter(Boolean));
+          const importSet = extractElementSet(imp.formula);
           return [...importSet].every((el) => currentSet.has(el));
         });
 
@@ -56,7 +63,7 @@ const CodImportStatusList = () => {
 
   if (!activeImports.length) return null;
 
-  const currentSet = new Set((formula ?? "").split(/\s+/).filter(Boolean));
+  const currentSet = extractElementSet(formula);
 
   return (
     <div className="bg-yellow-50 border border-yellow-300 p-4 rounded text-sm mt-4">
@@ -67,11 +74,8 @@ const CodImportStatusList = () => {
       <ul className="space-y-1">
         {[...activeImports]
           .sort((a, b) => {
-            const setA = new Set(a.formula.split(/\s+/).filter(Boolean));
-            const setB = new Set(b.formula.split(/\s+/).filter(Boolean));
-            const currentSet = new Set(
-              (formula ?? "").split(/\s+/).filter(Boolean)
-            );
+            const setA = extractElementSet(a.formula);
+            const setB = extractElementSet(b.formula);
 
             const isCurrentA = [...setA].every((el) => currentSet.has(el));
             const isCurrentB = [...setB].every((el) => currentSet.has(el));
@@ -79,7 +83,6 @@ const CodImportStatusList = () => {
             if (isCurrentA && !isCurrentB) return -1;
             if (!isCurrentA && isCurrentB) return 1;
 
-            // Porównanie ETA jako czasu (jeśli da się sparsować)
             const etaToSeconds = (eta: string) => {
               const [h, m, s] = eta.split(":").map(Number);
               return h * 3600 + m * 60 + s;
@@ -88,7 +91,7 @@ const CodImportStatusList = () => {
             return etaToSeconds(a.eta) - etaToSeconds(b.eta);
           })
           .map((imp, i) => {
-            const importSet = new Set(imp.formula.split(/\s+/).filter(Boolean));
+            const importSet = extractElementSet(imp.formula);
             const isCurrent = [...importSet].every((el) => currentSet.has(el));
 
             return (
