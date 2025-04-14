@@ -318,6 +318,36 @@ const CodPollingResults = () => {
         </div>
       )}
 
+      {!isFetchingCif && rejectedIds.size > 0 && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded text-red-800 text-sm">
+          <div className="flex items-center gap-2 font-semibold mb-1">
+            <svg
+              className="h-4 w-4 text-red-600"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <circle cx="12" cy="12" r="10" stroke="currentColor" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            Nie udało się pobrać danych dla następujących COD ID:
+          </div>
+          <ul className="list-disc list-inside ml-1">
+            {Array.from(rejectedIds).map((id) => (
+              <li key={id}>
+                <code className="bg-red-100 px-1 rounded">{id}</code>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-2">
+            Upewnij się, że podane identyfikatory są poprawne i publicznie
+            dostępne w bazie COD.
+          </div>
+        </div>
+      )}
+
       {isFetchingCif && (
         <div className="p-3 bg-yellow-50 border border-yellow-200 rounded text-yellow-800 text-sm flex items-center gap-2">
           <svg
