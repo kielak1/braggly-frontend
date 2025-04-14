@@ -89,8 +89,7 @@ const CodPollingResults = () => {
   const [rejectedIds, setRejectedIds] = useState<Set<string>>(new Set());
   const lastProcessed = useRef<Set<string>>(new Set());
   const fetchingCifs = useRef<Set<string>>(new Set());
-  const prevIdsCount = useRef<number>(0); // Śledzenie liczby ID dla zatrzymania
-  const noChangeCount = useRef<number>(0); // Licznik cykli bez zmiany ID
+  const shouldStopPollingIds = useRef<boolean>(false); // Flaga do zatrzymania poolingu /api/cod/id
 
   // Reset
   useEffect(() => {
@@ -102,8 +101,7 @@ const CodPollingResults = () => {
     setRejectedIds(new Set());
     lastProcessed.current = new Set();
     fetchingCifs.current = new Set();
-    prevIdsCount.current = 0;
-    noChangeCount.current = 0;
+    shouldStopPollingIds.current = false;
   }, [currentQuery]);
 
   // Poll /api/cod/search
@@ -141,11 +139,16 @@ const CodPollingResults = () => {
 
   // Poll /api/cod/id
   useEffect(() => {
-    //   if (!formula || !queryCompleted) return;
     if (!formula) return;
     let stopped = false;
 
     const pollIds = async () => {
+      // Jeśli flaga wskazuje na zatrzymanie, nie wykonuj zapytania
+      if (shouldStopPollingIds.current) {
+        console.log("Zatrzymano odpytywanie /api/cod/id");
+        return;
+      }
+
       try {
         const ids: string[] = await fetch(
           `${API_BASE}/api/cod/id?formula=${encodeURIComponent(formula)}`,
@@ -157,27 +160,23 @@ const CodPollingResults = () => {
         ).then((r) => r.json());
 
         console.log("Odebrano ID z /api/cod/id:", ids);
-        setCodIds((prev) => {
-          const newIds = new Set([...prev, ...ids]);
-          // Sprawdzamy, czy liczba ID się zmieniła
-          if (newIds.size === prevIdsCount.current) {
-            noChangeCount.current += 1;
-          } else {
-            noChangeCount.current = 0;
-            prevIdsCount.current = newIds.size;
-          }
-          return newIds;
-        });
-        setTimeout(pollIds, POLL_IDS_INTERVAL);
-        // // Zatrzymaj odpytywanie po 5 cyklach bez zmiany ID
-        // if (!stopped && noChangeCount.current < 50000) {
-        //   setTimeout(pollIds, POLL_IDS_INTERVAL);
-        // } else {
-        //   console.log("Zatrzymano odpytywanie /api/cod/id - brak nowych ID");
-        // }
+        setCodIds((prev) => new Set([...prev, ...ids]));
+
+        // Jeśli queryCompleted jest true, to jest to ostatnie zapytanie
+        if (queryCompleted) {
+          shouldStopPollingIds.current = true;
+          console.log(
+            "Wykonano ostatnie zapytanie /api/cod/id przed zatrzymaniem"
+          );
+          return;
+        }
+
+        if (!stopped) setTimeout(pollIds, POLL_IDS_INTERVAL);
       } catch (err) {
         console.error("Błąd w /api/cod/id:", err);
-        if (!stopped) setTimeout(pollIds, POLL_IDS_INTERVAL);
+        if (!stopped && !shouldStopPollingIds.current) {
+          setTimeout(pollIds, POLL_IDS_INTERVAL);
+        }
       }
     };
 
