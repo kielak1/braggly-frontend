@@ -190,7 +190,9 @@ const CodPollingResults = () => {
   useEffect(() => {
     if (codIds.size === 0 || isFetchingCif) return;
 
-    const idsToFetch = Array.from(codIds).filter(
+    // Zapamiętaj snapshot aktualnych ID
+    const idsArray = Array.from(codIds);
+    const idsToFetch = idsArray.filter(
       (id) =>
         !results.has(id) &&
         !rejectedIds.has(id) &&
@@ -246,7 +248,7 @@ const CodPollingResults = () => {
             return updated;
           });
 
-          await new Promise((res) => setTimeout(res, 2000)); // Opóźnienie między żądaniami
+          await new Promise((res) => setTimeout(res, 2000));
         } catch (err) {
           console.error(`Błąd w /api/cod/cif/${id}:`, err);
         } finally {
@@ -256,7 +258,7 @@ const CodPollingResults = () => {
 
       setIsFetchingCif(false);
     })();
-  }, [codIds]);
+  }, [codIds.size]); // 🔥 UWAGA: tylko na `.size`, żeby reagował nawet jeśli Set się nie zmienia jako obiekt
 
   if (queryCompleted && results.size === 0 && formula && !isFetchingCif) {
     return (
