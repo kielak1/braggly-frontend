@@ -92,6 +92,7 @@ const CodPollingResults = () => {
   const fetchingCifs = useRef<Set<string>>(new Set());
   const shouldStopPollingIds = useRef<boolean>(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const { codId } = useCodSearch();
 
   // Reset
   useEffect(() => {
@@ -107,6 +108,13 @@ const CodPollingResults = () => {
     shouldStopPollingIds.current = false;
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
   }, [currentQuery]);
+
+  useEffect(() => {
+    if (codId && !codIds.has(codId)) {
+      console.log("Dodano bezpośredni COD ID:", codId);
+      setCodIds((prev) => new Set([...Array.from(prev), codId]));
+    }
+  }, [codId, codIds]);
 
   // Poll /api/cod/search
   useEffect(() => {
@@ -198,7 +206,7 @@ const CodPollingResults = () => {
   // Fetch CIFs
   useEffect(() => {
     // Wyzwalamy efekt, gdy codIds się zmienia lub gdy pooling /api/cod/id się zakończy
-    if (codIds.size === 0 || (isFetchingCif )) return;
+    if (codIds.size === 0 || isFetchingCif) return;
     console.log(
       "Rozpoczynam hook-a dla pobierania CIFs. Aktualne ID:",
       Array.from(codIds)
@@ -303,7 +311,7 @@ const CodPollingResults = () => {
 
   return (
     <div className="space-y-2 mt-4">
-      {!queryCompleted && (
+      {!queryCompleted && formula && (
         <div className="p-3 bg-blue-50 border border-blue-200 rounded text-blue-800 text-sm">
           ⏳ Trwa wyszukiwanie struktur...{" "}
           {progress > 0 && `Postęp: ${progress}%`}

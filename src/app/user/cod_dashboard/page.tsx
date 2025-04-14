@@ -30,8 +30,7 @@ const CODDashboard = () => {
   const [progress, setProgress] = useState<number | null>(null);
   const [error, setError] = useState("");
   const [aiResponse, setAiResponse] = useState<AiResponse | null>(null);
-  const { setFormula, setCurrentQuery, formula } = useCodSearch(); // Destructure formula here
-
+  const { setFormula, setCurrentQuery, formula, setCodId } = useCodSearch(); // Destructure formula here
   const handleStart = async () => {
     setError("");
     setProgress(null);
@@ -51,8 +50,10 @@ const CODDashboard = () => {
       }
 
       if (isCodId) {
-        setError("Direct COD ID is not currently supported in this mode.");
+        //     setError("Direct COD ID is not currently supported in this mode.");
         setLoading(false);
+        setCodId(input);
+        setFormula(null);
         return;
       } else {
         const ai = await fetch(`${API_BASE}/openai/cod`, {
@@ -74,6 +75,7 @@ const CODDashboard = () => {
         }
 
         setFormula(ai.formulaCOD);
+        setCodId(null);
         setCurrentQuery(ai.queryCOD);
       }
     } catch (err) {

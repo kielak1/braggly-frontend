@@ -5,9 +5,11 @@ import { createContext, useContext, useState } from "react";
 interface CodContextType {
   currentQuery: string | null;
   formula: string | null;
+  codId: string | null; // ⬅️ nowa zmienna
   isBeingImported: boolean;
   setCurrentQuery: (q: string | null) => void;
   setFormula: (f: string | null) => void;
+  setCodId: (id: string | null) => void; // ⬅️ nowy setter
   setIsBeingImported: (b: boolean) => void;
 }
 
@@ -17,6 +19,7 @@ export const CodProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentQuery, setCurrentQuery] = useState<string | null>(null);
   const [formula, setFormula] = useState<string | null>(null);
   const [isBeingImported, setIsBeingImported] = useState(false);
+  const [codId, setCodId] = useState<string | null>(null);
 
   return (
     <CodContext.Provider
@@ -25,6 +28,8 @@ export const CodProvider = ({ children }: { children: React.ReactNode }) => {
         setCurrentQuery,
         formula,
         setFormula,
+        codId,
+        setCodId,
         isBeingImported,
         setIsBeingImported,
       }}
