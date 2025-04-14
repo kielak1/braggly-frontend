@@ -5,6 +5,9 @@ import { useCodSearch } from "@/context/CodContext";
 
 const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
 
+// Interwał dla /api/cod/id (2 sekundy dla dev, można zmienić na 500 ms w produkcji)
+const POLL_IDS_INTERVAL = process.env.NODE_ENV === "development" ? 2000 : 500;
+
 interface CodCifData {
   codId: string;
   formula: string;
@@ -85,6 +88,9 @@ const CodPollingResults = () => {
   const [progress, setProgress] = useState<number>(0);
   const [rejectedIds, setRejectedIds] = useState<Set<string>>(new Set());
   const lastProcessed = useRef<Set<string>>(new Set());
+  const fetchingCifs = useRef<Set<string>>(new Set());
+  const prevIdsCount = useRef<number>(0); // Śledzenie liczby ID dla zatrzymania
+  const noChangeCount = useRef<number>(0); // Licznik cykli bez zmiany ID
 
   // Reset
   useEffect(() => {
@@ -95,6 +101,9 @@ const CodPollingResults = () => {
     setProgress(0);
     setRejectedIds(new Set());
     lastProcessed.current = new Set();
+    fetchingCifs.current = new Set();
+    prevIdsCount.current = 0;
+    noChangeCount.current = 0;
   }, [currentQuery]);
 
   // Poll /api/cod/search
@@ -119,7 +128,7 @@ const CodPollingResults = () => {
           setQueryCompleted(true);
           return;
         }
-        if (!stopped) setTimeout(pollStatus, 1000); // 1 sekunda
+        if (!stopped) setTimeout(pollStatus, 1000);
       } catch (err) {
         console.error("Błąd w /api/cod/search:", err);
       }
@@ -132,7 +141,8 @@ const CodPollingResults = () => {
 
   // Poll /api/cod/id
   useEffect(() => {
-    if (!formula || !queryCompleted) return;
+    //   if (!formula || !queryCompleted) return;
+    if (!formula) return;
     let stopped = false;
 
     const pollIds = async () => {
@@ -147,11 +157,27 @@ const CodPollingResults = () => {
         ).then((r) => r.json());
 
         console.log("Odebrano ID z /api/cod/id:", ids);
-        setCodIds((prev) => new Set([...prev, ...ids]));
-
-        if (!stopped && !queryCompleted) setTimeout(pollIds, 1000);
+        setCodIds((prev) => {
+          const newIds = new Set([...prev, ...ids]);
+          // Sprawdzamy, czy liczba ID się zmieniła
+          if (newIds.size === prevIdsCount.current) {
+            noChangeCount.current += 1;
+          } else {
+            noChangeCount.current = 0;
+            prevIdsCount.current = newIds.size;
+          }
+          return newIds;
+        });
+        setTimeout(pollIds, POLL_IDS_INTERVAL);
+        // // Zatrzymaj odpytywanie po 5 cyklach bez zmiany ID
+        // if (!stopped && noChangeCount.current < 50000) {
+        //   setTimeout(pollIds, POLL_IDS_INTERVAL);
+        // } else {
+        //   console.log("Zatrzymano odpytywanie /api/cod/id - brak nowych ID");
+        // }
       } catch (err) {
         console.error("Błąd w /api/cod/id:", err);
+        if (!stopped) setTimeout(pollIds, POLL_IDS_INTERVAL);
       }
     };
 
@@ -163,13 +189,14 @@ const CodPollingResults = () => {
 
   // Fetch CIFs
   useEffect(() => {
-    if (codIds.size === 0) return;
+    if (codIds.size === 0 || isFetchingCif) return;
 
     const idsToFetch = Array.from(codIds).filter(
       (id) =>
         !results.has(id) &&
         !rejectedIds.has(id) &&
-        !lastProcessed.current.has(id)
+        !lastProcessed.current.has(id) &&
+        !fetchingCifs.current.has(id)
     );
     if (idsToFetch.length === 0) return;
 
@@ -177,14 +204,24 @@ const CodPollingResults = () => {
 
     (async () => {
       for (const id of idsToFetch) {
-        // 👇 Podwójne zabezpieczenie – zawsze sprawdzaj aktualny `results`
-        if (results.has(id)) {
-          console.log(`Pomijam ${id}, już pobrany`);
+        if (
+          results.has(id) ||
+          rejectedIds.has(id) ||
+          fetchingCifs.current.has(id)
+        ) {
+          console.log(
+            `Pomijam ${id}, już przetworzony lub w trakcie pobierania`
+          );
           continue;
         }
+
+        fetchingCifs.current.add(id);
         lastProcessed.current.add(id);
 
         try {
+          console.log(
+            `Attempting to download CIF file with key: cif/${id}.cif`
+          );
           const resp = await fetch(`${API_BASE}/api/cod/cif/${id}`, {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -210,15 +247,17 @@ const CodPollingResults = () => {
             return updated;
           });
 
-          await new Promise((res) => setTimeout(res, 2000));
+          await new Promise((res) => setTimeout(res, 2000)); // Opóźnienie między żądaniami
         } catch (err) {
           console.error(`Błąd w /api/cod/cif/${id}:`, err);
+        } finally {
+          fetchingCifs.current.delete(id);
         }
       }
 
       setIsFetchingCif(false);
     })();
-  }, [codIds, rejectedIds]);
+  }, [codIds]);
 
   if (queryCompleted && results.size === 0 && formula && !isFetchingCif) {
     return (
