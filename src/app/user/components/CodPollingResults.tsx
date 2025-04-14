@@ -83,6 +83,7 @@ const CodPollingResults = () => {
   const [isFetchingCif, setIsFetchingCif] = useState(false);
   const [queryCompleted, setQueryCompleted] = useState(false);
   const [progress, setProgress] = useState<number>(0);
+  const [rejectedIds, setRejectedIds] = useState<Set<string>>(new Set());
 
   // Reset
   useEffect(() => {
@@ -91,6 +92,7 @@ const CodPollingResults = () => {
     setExpanded(null);
     setQueryCompleted(false);
     setProgress(0);
+    setRejectedIds(new Set());
   }, [currentQuery]);
 
   // Poll /api/cod/search
@@ -109,6 +111,7 @@ const CodPollingResults = () => {
           body: currentQuery,
         });
         const data: CodQueryStatusResponse = await resp.json();
+        console.log("Status zapytania:", data);
         setProgress(data.progress ?? 0);
         if (data.completed && data.alreadyQueried) {
           setQueryCompleted(true);
@@ -141,9 +144,10 @@ const CodPollingResults = () => {
           }
         ).then((r) => r.json());
 
+        console.log("Odebrano ID z /api/cod/id:", ids);
         setCodIds((prev) => new Set([...prev, ...ids]));
 
-        if (!stopped && !queryCompleted) setTimeout(pollIds, 2000);
+        if (!stopped && !queryCompleted) setTimeout(pollIds, 1000);
       } catch (err) {
         console.error("Błąd w /api/cod/id:", err);
       }
@@ -157,31 +161,52 @@ const CodPollingResults = () => {
 
   // Fetch CIFs
   useEffect(() => {
-    const newIds = [...codIds].filter((id) => !results.has(id));
-    if (newIds.length === 0) return;
+    if (codIds.size === 0) return;
 
-    const fetchCifs = async () => {
-      setIsFetchingCif(true);
+    const idsToFetch = Array.from(codIds).filter(
+      (id) => !results.has(id) && !rejectedIds.has(id)
+    );
+    if (idsToFetch.length === 0) return;
 
-      for (const id of newIds) {
+    setIsFetchingCif(true);
+
+    (async () => {
+      for (const id of idsToFetch) {
         try {
-          const cif = await fetch(`${API_BASE}/api/cod/cif/${id}`, {
+          const resp = await fetch(`${API_BASE}/api/cod/cif/${id}`, {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
-          }).then((r) => r.json());
+          });
 
-          setResults((prev) => new Map(prev).set(id, { ...cif, codId: id }));
+          if (!resp.ok) {
+            if (resp.status === 403) {
+              console.warn(`Błąd HTTP 403 przy /api/cod/cif/${id}`);
+              setRejectedIds((prev) => new Set([...prev, id]));
+              continue;
+            }
+            throw new Error(`Błąd HTTP ${resp.status}`);
+          }
+
+          const cif = await resp.json();
+          const full = { ...cif, codId: id };
+          console.log(`Pobrano /api/cod/cif/${id}:`, full);
+
+          setResults((prev) => {
+            const updated = new Map(prev);
+            updated.set(id, full);
+            return updated;
+          });
+
+          await new Promise((res) => setTimeout(res, 2000));
         } catch (err) {
           console.error(`Błąd w /api/cod/cif/${id}:`, err);
         }
       }
 
       setIsFetchingCif(false);
-    };
-
-    fetchCifs();
-  }, [codIds, results]);
+    })();
+  }, [codIds, rejectedIds]);
 
   if (queryCompleted && results.size === 0 && formula && !isFetchingCif) {
     return (
