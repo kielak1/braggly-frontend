@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useCodSearch } from "@/context/CodContext";
 
 const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -84,6 +84,7 @@ const CodPollingResults = () => {
   const [queryCompleted, setQueryCompleted] = useState(false);
   const [progress, setProgress] = useState<number>(0);
   const [rejectedIds, setRejectedIds] = useState<Set<string>>(new Set());
+  const lastProcessed = useRef<Set<string>>(new Set());
 
   // Reset
   useEffect(() => {
@@ -93,6 +94,7 @@ const CodPollingResults = () => {
     setQueryCompleted(false);
     setProgress(0);
     setRejectedIds(new Set());
+    lastProcessed.current = new Set();
   }, [currentQuery]);
 
   // Poll /api/cod/search
@@ -117,7 +119,7 @@ const CodPollingResults = () => {
           setQueryCompleted(true);
           return;
         }
-        if (!stopped) setTimeout(pollStatus, 1000);
+        if (!stopped) setTimeout(pollStatus, 1000); // 1 sekunda
       } catch (err) {
         console.error("Błąd w /api/cod/search:", err);
       }
@@ -130,7 +132,7 @@ const CodPollingResults = () => {
 
   // Poll /api/cod/id
   useEffect(() => {
-    if (!formula) return;
+    if (!formula || !queryCompleted) return;
     let stopped = false;
 
     const pollIds = async () => {
@@ -164,7 +166,10 @@ const CodPollingResults = () => {
     if (codIds.size === 0) return;
 
     const idsToFetch = Array.from(codIds).filter(
-      (id) => !results.has(id) && !rejectedIds.has(id)
+      (id) =>
+        !results.has(id) &&
+        !rejectedIds.has(id) &&
+        !lastProcessed.current.has(id)
     );
     if (idsToFetch.length === 0) return;
 
@@ -172,6 +177,13 @@ const CodPollingResults = () => {
 
     (async () => {
       for (const id of idsToFetch) {
+        // 👇 Podwójne zabezpieczenie – zawsze sprawdzaj aktualny `results`
+        if (results.has(id)) {
+          console.log(`Pomijam ${id}, już pobrany`);
+          continue;
+        }
+        lastProcessed.current.add(id);
+
         try {
           const resp = await fetch(`${API_BASE}/api/cod/cif/${id}`, {
             headers: {
