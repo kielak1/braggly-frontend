@@ -30,7 +30,7 @@ const CODDashboard = () => {
   const [progress, setProgress] = useState<number | null>(null);
   const [error, setError] = useState("");
   const [aiResponse, setAiResponse] = useState<AiResponse | null>(null);
-  const { setFormula, setCurrentQuery } = useCodSearch();
+  const { setFormula, setCurrentQuery, formula } = useCodSearch(); // Destructure formula here
 
   const handleStart = async () => {
     setError("");
@@ -84,12 +84,7 @@ const CODDashboard = () => {
     }
   };
 
-  if (!translations)
-    return (
-      <div>
-        { "Loading translations..."}
-      </div>
-    );
+  if (!translations) return <div>{"Loading translations..."}</div>;
 
   return (
     <div className="p-4 max-w-4xl mx-auto space-y-4">
@@ -149,10 +144,24 @@ const CODDashboard = () => {
         </div>
       )}
 
+      {!aiResponse &&
+        formula && ( // Check for formula existence
+          <div className="text-sm text-gray-700 border p-3 rounded bg-gray-50">
+            <div>
+              <strong>
+                {translations.cod_formula || "Recognized formula"}:
+              </strong>{" "}
+              {formula}
+            </div>
+          </div>
+        )}
+
       {progress !== null && (
         <div className="text-sm text-gray-600">
-          {translations.cod_import_progress?.replace("{progress}", progress.toString()) ||
-            `Import progress from COD database: ${progress}%`}
+          {translations.cod_import_progress?.replace(
+            "{progress}",
+            progress.toString()
+          ) || `Import progress from COD database: ${progress}%`}
         </div>
       )}
 
