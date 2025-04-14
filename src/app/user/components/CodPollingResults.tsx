@@ -87,9 +87,11 @@ const CodPollingResults = () => {
   const [queryCompleted, setQueryCompleted] = useState(false);
   const [progress, setProgress] = useState<number>(0);
   const [rejectedIds, setRejectedIds] = useState<Set<string>>(new Set());
+  const [isIdPollingComplete, setIsIdPollingComplete] = useState(false); // Nowy stan
   const lastProcessed = useRef<Set<string>>(new Set());
   const fetchingCifs = useRef<Set<string>>(new Set());
-  const shouldStopPollingIds = useRef<boolean>(false); // Flaga do zatrzymania poolingu /api/cod/id
+  const shouldStopPollingIds = useRef<boolean>(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Reset
   useEffect(() => {
@@ -99,9 +101,11 @@ const CodPollingResults = () => {
     setQueryCompleted(false);
     setProgress(0);
     setRejectedIds(new Set());
+    setIsIdPollingComplete(false); // Resetujemy nowy stan
     lastProcessed.current = new Set();
     fetchingCifs.current = new Set();
     shouldStopPollingIds.current = false;
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
   }, [currentQuery]);
 
   // Poll /api/cod/search
@@ -143,9 +147,10 @@ const CodPollingResults = () => {
     let stopped = false;
 
     const pollIds = async () => {
-      // Jeśli flaga wskazuje na zatrzymanie, nie wykonuj zapytania
       if (shouldStopPollingIds.current) {
         console.log("Zatrzymano odpytywanie /api/cod/id");
+        await new Promise((resolve) => setTimeout(resolve, 4000));
+        setIsIdPollingComplete(true); // Ustawiamy stan po zakończeniu poolingu
         return;
       }
 
@@ -162,7 +167,6 @@ const CodPollingResults = () => {
         console.log("Odebrano ID z /api/cod/id:", ids);
         setCodIds((prev) => new Set([...prev, ...ids]));
 
-        // Jeśli queryCompleted jest true, to jest to ostatnie zapytanie
         if (queryCompleted) {
           shouldStopPollingIds.current = true;
           console.log(
@@ -171,11 +175,13 @@ const CodPollingResults = () => {
           return;
         }
 
-        if (!stopped) setTimeout(pollIds, POLL_IDS_INTERVAL);
+        if (!stopped && !shouldStopPollingIds.current) {
+          timeoutRef.current = setTimeout(pollIds, POLL_IDS_INTERVAL);
+        }
       } catch (err) {
         console.error("Błąd w /api/cod/id:", err);
         if (!stopped && !shouldStopPollingIds.current) {
-          setTimeout(pollIds, POLL_IDS_INTERVAL);
+          timeoutRef.current = setTimeout(pollIds, POLL_IDS_INTERVAL);
         }
       }
     };
@@ -183,25 +189,38 @@ const CodPollingResults = () => {
     pollIds();
     return () => {
       stopped = true;
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
     };
   }, [formula, queryCompleted]);
 
   // Fetch CIFs
   useEffect(() => {
-    if (codIds.size === 0 || isFetchingCif) return;
-
-    // Zapamiętaj snapshot aktualnych ID
-    const idsArray = Array.from(codIds);
-    const idsToFetch = idsArray.filter(
+    // Wyzwalamy efekt, gdy codIds się zmienia lub gdy pooling /api/cod/id się zakończy
+    if (codIds.size === 0 || (isFetchingCif )) return;
+    console.log(
+      "Rozpoczynam hook-a dla pobierania CIFs. Aktualne ID:",
+      Array.from(codIds)
+    );
+    const idsToFetch = Array.from(codIds).filter(
       (id) =>
         !results.has(id) &&
         !rejectedIds.has(id) &&
         !lastProcessed.current.has(id) &&
         !fetchingCifs.current.has(id)
     );
-    if (idsToFetch.length === 0) return;
 
-    setIsFetchingCif(true);
+    if (idsToFetch.length === 0) {
+      if (!isFetchingCif) {
+        setIsFetchingCif(false);
+      }
+      return;
+    }
+
+    if (!isFetchingCif) {
+      setIsFetchingCif(true);
+    }
 
     (async () => {
       for (const id of idsToFetch) {
@@ -248,7 +267,7 @@ const CodPollingResults = () => {
             return updated;
           });
 
-          await new Promise((res) => setTimeout(res, 2000));
+          await new Promise((res) => setTimeout(res, 2000)); // Opóźnienie między żądaniami
         } catch (err) {
           console.error(`Błąd w /api/cod/cif/${id}:`, err);
         } finally {
@@ -256,9 +275,23 @@ const CodPollingResults = () => {
         }
       }
 
-      setIsFetchingCif(false);
+      const remainingIdsToFetch = Array.from(codIds).filter(
+        (id) =>
+          !results.has(id) &&
+          !rejectedIds.has(id) &&
+          !lastProcessed.current.has(id) &&
+          !fetchingCifs.current.has(id)
+      );
+
+      if (remainingIdsToFetch.length === 0) {
+        setIsFetchingCif(false);
+      } else {
+        console.log(
+          `Pozostały ID do przetworzenia: ${remainingIdsToFetch}, kontynuujemy fetchowanie`
+        );
+      }
     })();
-  }, [codIds.size]); // 🔥 UWAGA: tylko na `.size`, żeby reagował nawet jeśli Set się nie zmienia jako obiekt
+  }, [codIds, isIdPollingComplete]); // Dodajemy isIdPollingComplete jako zależność
 
   if (queryCompleted && results.size === 0 && formula && !isFetchingCif) {
     return (
