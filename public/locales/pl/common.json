@@ -8,7 +8,6 @@
   "googleLogin": "Zaloguj przez Google",
   "googleLogout": "Wyloguj Google",
   "panel": "Panel Użytkownika",
-  "dashboard": "Pulpit",
   "account": "Konto",
   "uploads": "Przesyłanie plików",
   "you_have": "masz",
@@ -140,7 +139,6 @@
   "remove_from_selected": "Usuń z wybranych",
   "selected_files": "Wybrane pliki",
   "drag_here": "Przeciągnij pliki tutaj, aby je analizować",
-  "cod_dashboard": "panel COD",
   "comparison_min_files": "Wybierz co najmniej dwa pliki do analizy porównawczej.",
   "comparison_analysis": "Analiza porównawcza",
   "cod_element_count": "Liczba elementów",
@@ -149,5 +147,12 @@
   "cod_search_placeholder": "Wprowadź nazwę substancji lub ID COD...",
   "cod_compound_name": "Rozpoznana nazwa",
   "cod_query_format": "Format zapytania dla bazy danych COD",
-  "cod_import_progress": "Postęp procesu importu"
+  "cod_import_progress": "Postęp procesu importu",
+  "cod_main_missing_token": "Brak tokena w localStorage",
+  "cod_main_too_few_elements": "Dla związków zawierających mniej niż 3 elementy, należy podać numer COD ID.",
+  "cod_main_import_progress": "postęp",
+  "cod_main_search_placeholder": "Wpisz nazwę związku lub numer COD ID...",
+  "cod_main_search_button": "Szukaj",
+  "cod_dashboard": "Baza danych krystalograficznych",
+  "dashboard": "Analiza danych z dyfrakcji rentgenowskiej (XRD)"
 }

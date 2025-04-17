@@ -8,7 +8,6 @@
   "googleLogin": "Login with Google",
   "googleLogout": "Logout from Google",
   "panel": "User Panel",
-  "dashboard": "Dashboard",
   "account": "Account",
   "uploads": "File Uploads",
   "you_have": "you have",
@@ -140,7 +139,6 @@
   "remove_from_selected": "Remove from selected",
   "selected_files": "Selected file",
   "drag_here": "Drag files here to analyze",
-  "cod_dashboard": "COD panel",
   "comparison_min_files": "Select at least two files for comparative analysis.",
   "comparison_analysis": "Comparative analysis",
   "cod_element_count": "Number of elements",
@@ -149,5 +147,12 @@
   "cod_search_placeholder": "Enter the name of the substance or COD ID...",
   "cod_compound_name": "Recognized name",
   "cod_query_format": "Query format for the COD database",
-  "cod_import_progress": "Progress of the import process"
+  "cod_import_progress": "Progress of the import process",
+  "cod_main_missing_token": "No token in localStorage",
+  "cod_main_too_few_elements": "For compounds containing less than 3 elements, the COD ID number should be provided.",
+  "cod_main_import_progress": "progress",
+  "cod_main_search_placeholder": "Enter the name of the compound or the COD ID number...",
+  "cod_main_search_button": "Search",
+  "cod_dashboard": "Crystallographic database",
+  "dashboard": "Analysis of data from X-ray diffraction (XRD)"
 }

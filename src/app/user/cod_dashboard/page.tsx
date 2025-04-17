@@ -30,7 +30,8 @@ const CODDashboard = () => {
   const [progress, setProgress] = useState<number | null>(null);
   const [error, setError] = useState("");
   const [aiResponse, setAiResponse] = useState<AiResponse | null>(null);
-  const { setFormula, setCurrentQuery, formula, setCodId } = useCodSearch(); // Destructure formula here
+  const { setFormula, setCurrentQuery, formula, setCodId } = useCodSearch();
+
   const handleStart = async () => {
     setError("");
     setProgress(null);
@@ -43,55 +44,54 @@ const CODDashboard = () => {
 
     try {
       const headers = getAuthHeaders();
-      if (!headers) {
-        setError("No token found in localStorage");
-        setLoading(false);
-        return;
-      }
 
       if (isCodId) {
-        //     setError("Direct COD ID is not currently supported in this mode.");
         setLoading(false);
         setCodId(input);
         setFormula(null);
         return;
-      } else {
-        const ai = await fetch(`${API_BASE}/openai/cod`, {
-          method: "POST",
-          headers: {
-            ...getAuthHeaders(),
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(input),
-        }).then((r) => r.json());
-
-        setAiResponse(ai);
-        if (ai.elementCount < 3) {
-          setError(
-            "For compounds with fewer than 3 elements, you must provide a COD ID."
-          );
-          setLoading(false);
-          return;
-        }
-
-        setFormula(ai.formulaCOD);
-        setCodId(null);
-        setCurrentQuery(ai.queryCOD);
       }
+
+      const ai = await fetch(`${API_BASE}/openai/cod`, {
+        method: "POST",
+        headers: {
+          ...headers,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(input),
+      }).then((r) => r.json());
+
+      setAiResponse(ai);
+      if (ai.elementCount < 3) {
+        setError(
+          translations?.["cod_main_too_few_elements"] ||
+            "Dla związków zawierających mniej niż 3 pierwiastki należy podać numer COD ID."
+        );
+        setLoading(false);
+        return;
+      }
+
+      setFormula(ai.formulaCOD);
+      setCodId(null);
+      setCurrentQuery(ai.queryCOD);
     } catch (err) {
       console.error(err);
-      setError("Error during processing.");
+      setError(
+        translations?.["cod_main_missing_token"] || "Brak tokena w localStorage"
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  if (!translations) return <div>{"Loading translations..."}</div>;
+  if (!translations) {
+    return <div>Loading translations...</div>;
+  }
 
   return (
     <div className="p-4 max-w-4xl mx-auto space-y-4">
       <h1 className="text-2xl font-bold">
-        {translations.cod_dashboard || "COD Dashboard"}
+        {translations["cod_dashboard"] || "COD Dashboard"}
       </h1>
 
       <CodImportStatusList />
@@ -101,8 +101,8 @@ const CODDashboard = () => {
           type="text"
           className="flex-1 border px-3 py-2 rounded w-full"
           placeholder={
-            translations.cod_search_placeholder ||
-            "Enter substance name or COD ID..."
+            translations?.["cod_main_search_placeholder"] ||
+            "Wpisz nazwę związku lub numer COD ID..."
           }
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -112,7 +112,7 @@ const CODDashboard = () => {
           disabled={!input || loading}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded disabled:opacity-50"
         >
-          {translations.cod_search_button || "Search"}
+          {translations?.["cod_main_search_button"] || "Szukaj"}
         </button>
       </div>
 
@@ -122,48 +122,50 @@ const CODDashboard = () => {
         <div className="text-sm text-gray-700 border p-3 rounded bg-gray-50">
           <div>
             <strong>
-              {translations.cod_element_count || "Number of elements"}:
+              {translations?.["cod_element_count"] || "Number of elements"}:
             </strong>{" "}
             {aiResponse.elementCount}
           </div>
           <div>
             <strong>
-              {translations.cod_query_format || "Query format for COD database"}
+              {translations?.["cod_query_format"] ||
+                "Query format for COD database"}
               :
             </strong>{" "}
             {aiResponse.queryCOD}
           </div>
           <div>
-            <strong>{translations.cod_formula || "Recognized formula"}:</strong>{" "}
+            <strong>
+              {translations?.["cod_formula"] || "Recognized formula"}:
+            </strong>{" "}
             {aiResponse.formulaCOD}
           </div>
           <div>
             <strong>
-              {translations.cod_compound_name || "Recognized name"}:
+              {translations?.["cod_compound_name"] || "Recognized name"}:
             </strong>{" "}
             {aiResponse.compoundName}
           </div>
         </div>
       )}
 
-      {!aiResponse &&
-        formula && ( // Check for formula existence
-          <div className="text-sm text-gray-700 border p-3 rounded bg-gray-50">
-            <div>
-              <strong>
-                {translations.cod_formula || "Recognized formula"}:
-              </strong>{" "}
-              {formula}
-            </div>
+      {!aiResponse && formula && (
+        <div className="text-sm text-gray-700 border p-3 rounded bg-gray-50">
+          <div>
+            <strong>
+              {translations?.["cod_formula"] || "Recognized formula"}:
+            </strong>{" "}
+            {formula}
           </div>
-        )}
+        </div>
+      )}
 
       {progress !== null && (
         <div className="text-sm text-gray-600">
-          {translations.cod_import_progress?.replace(
+          {translations?.["cod_main_import_progress"]?.replace(
             "{progress}",
             progress.toString()
-          ) || `Import progress from COD database: ${progress}%`}
+          ) || `Postęp importu z bazy COD: ${progress}%`}
         </div>
       )}
 

@@ -59,7 +59,7 @@ const Dashboard = () => {
 
   return (
     <div className="p-4 space-y-6">
-      <h1 className="text-2xl font-bold">User Dashboard</h1>
+      <h1 className="text-2xl font-bold"> {translations.dashboard}</h1>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         <div className="col-span-2 space-y-4">
