@@ -7,10 +7,9 @@ from prompt_toolkit import prompt
 
 SRC_DIR = "src"
 LOCALES_DIR = "public/locales"
-TRANSLATION_PATTERN = r"translations(?:\?)?\.([a-zA-Z0-9_]+)(?:\s*\|\|\s*[\"'](.+?)[\"']\s*)?"
+TRANSLATION_PATTERN = r"translations(?:\?)?\.([a-zA-Z0-9_]+)|translations(?:\?)?\.\[\"([a-zA-Z0-9_]+)\"\](?:\s*\|\|\s*[\"'](.+?)[\"']\s*)?"
 
 client = OpenAI(api_key=os.getenv("OPEN_AI_KEY"))
-
 
 def extract_translation_keys_from_src():
     keys_with_defaults = {}
@@ -24,13 +23,14 @@ def extract_translation_keys_from_src():
                     content = f.read()
                     matches = re.findall(TRANSLATION_PATTERN, content)
                     if matches:
-                        print(f"🔑 Znalezione klucze w pliku {file_path}: {[m[0] for m in matches]}")
-                    for key, default in matches:
-                        if key not in keys_with_defaults:
-                            keys_with_defaults[key] = default or None
+                        print(f"🔑 Znalezione klucze w pliku {file_path}: {[m[0] or m[1] for m in matches]}")
+                    for match in matches:
+                        key = match[0] or match[1]  # Wybieramy klucz z pierwszej lub drugiej grupy
+                        default = match[2] or None  # Wartość domyślna z trzeciej grupy
+                        if key and key not in keys_with_defaults:
+                            keys_with_defaults[key] = default
     print(f"📋 Wszystkie znalezione klucze: {list(keys_with_defaults.keys())}")
     return keys_with_defaults
-
 
 def load_locale_files():
     locales = {}
