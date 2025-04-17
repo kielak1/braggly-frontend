@@ -154,5 +154,14 @@
   "panel": "Panel de Usuario",
   "cod_main_search_button": "Buscar",
   "cod_dashboard": "Base de datos cristalográficos",
-  "dashboard": "Análisis de datos de difracción de rayos X (XRD)"
+  "dashboard": "Análisis de datos de difracción de rayos X (XRD)",
+  "cod_polling_loading_details": "La descarga de los detalles de la estructura está en curso…",
+  "cod_polling_failed_hint": "Asegúrate de que los identificadores proporcionados sean correctos y estén públicamente disponibles en la base de datos COD.",
+  "cod_polling_space_group": "Grupo espacial",
+  "cod_polling_volume": "Volumen",
+  "cod_polling_no_results": "No se encontraron estructuras en la base de datos COD para la fórmula proporcionada.",
+  "cod_polling_failed_title": "No se pudo obtener datos para los siguientes ID de COD:",
+  "cod_polling_author": "Autor",
+  "cod_polling_formula": "Patrón",
+  "cod_polling_year": "Año"
 }

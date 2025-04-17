@@ -2,10 +2,9 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useCodSearch } from "@/context/CodContext";
+import { useTranslations } from "@/context/TranslationsContext";
 
 const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
-
-// Interwał dla /api/cod/id (2 sekundy dla dev, można zmienić na 500 ms w produkcji)
 const POLL_IDS_INTERVAL = process.env.NODE_ENV === "development" ? 2000 : 500;
 
 interface CodCifData {
@@ -37,48 +36,64 @@ const CodAccordion = ({
   data: CodCifData;
   expanded: string | null;
   onToggle: (id: string) => void;
-}) => (
-  <div key={data.codId} className="border rounded overflow-hidden">
-    <button
-      onClick={() => onToggle(data.codId)}
-      className="w-full text-left px-4 py-2 bg-gray-100 font-semibold"
-    >
-      COD ID: {data.codId} {data.name ? `– ${data.name}` : " – ?"}
-    </button>
+}) => {
+  const { translations } = useTranslations();
 
-    {expanded === data.codId && (
-      <div className="grid grid-cols-2 gap-4 p-4 text-sm bg-white">
-        <div>
-          <strong>Wzór:</strong> {data.formula}
+  return (
+    <div key={data.codId} className="border rounded overflow-hidden">
+      <button
+        onClick={() => onToggle(data.codId)}
+        className="w-full text-left px-4 py-2 bg-gray-100 font-semibold"
+      >
+        COD ID: {data.codId} {data.name ? `– ${data.name}` : " – ?"}
+      </button>
+
+      {expanded === data.codId && (
+        <div className="grid grid-cols-2 gap-4 p-4 text-sm bg-white">
+          <div>
+            <strong>{translations?.["cod_polling_formula"] || "Wzór"}:</strong>{" "}
+            {data.formula}
+          </div>
+          <div>
+            <strong>
+              {translations?.["cod_polling_space_group"] ||
+                "Grupa przestrzenna"}
+              :
+            </strong>{" "}
+            {data.spaceGroup}
+          </div>
+          <div>
+            <strong>{translations?.["cod_polling_author"] || "Autor"}:</strong>{" "}
+            {data.author}
+          </div>
+          <div>
+            <strong>{translations?.["cod_polling_year"] || "Rok"}:</strong>{" "}
+            {data.year}
+          </div>
+          <div>
+            <strong>a:</strong> {data.a}
+          </div>
+          <div>
+            <strong>b:</strong> {data.b}
+          </div>
+          <div>
+            <strong>c:</strong> {data.c}
+          </div>
+          <div>
+            <strong>
+              {translations?.["cod_polling_volume"] || "Objętość"}:
+            </strong>{" "}
+            {data.volume}
+          </div>
         </div>
-        <div>
-          <strong>Grupa przestrzenna:</strong> {data.spaceGroup}
-        </div>
-        <div>
-          <strong>Autor:</strong> {data.author}
-        </div>
-        <div>
-          <strong>Rok:</strong> {data.year}
-        </div>
-        <div>
-          <strong>a:</strong> {data.a}
-        </div>
-        <div>
-          <strong>b:</strong> {data.b}
-        </div>
-        <div>
-          <strong>c:</strong> {data.c}
-        </div>
-        <div>
-          <strong>Objętość:</strong> {data.volume}
-        </div>
-      </div>
-    )}
-  </div>
-);
+      )}
+    </div>
+  );
+};
 
 const CodPollingResults = () => {
-  const { formula, currentQuery } = useCodSearch();
+  const { formula, currentQuery, codId } = useCodSearch();
+  const { translations } = useTranslations(); // Added useTranslations hook
 
   const [codIds, setCodIds] = useState<Set<string>>(new Set());
   const [results, setResults] = useState<Map<string, CodCifData>>(new Map());
@@ -87,14 +102,12 @@ const CodPollingResults = () => {
   const [queryCompleted, setQueryCompleted] = useState(false);
   const [progress, setProgress] = useState<number>(0);
   const [rejectedIds, setRejectedIds] = useState<Set<string>>(new Set());
-  const [isIdPollingComplete, setIsIdPollingComplete] = useState(false); // Nowy stan
+  const [isIdPollingComplete, setIsIdPollingComplete] = useState(false);
   const lastProcessed = useRef<Set<string>>(new Set());
   const fetchingCifs = useRef<Set<string>>(new Set());
   const shouldStopPollingIds = useRef<boolean>(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const { codId } = useCodSearch();
 
-  // Reset
   useEffect(() => {
     setCodIds(new Set());
     setResults(new Map());
@@ -102,7 +115,7 @@ const CodPollingResults = () => {
     setQueryCompleted(false);
     setProgress(0);
     setRejectedIds(new Set());
-    setIsIdPollingComplete(false); // Resetujemy nowy stan
+    setIsIdPollingComplete(false);
     lastProcessed.current = new Set();
     fetchingCifs.current = new Set();
     shouldStopPollingIds.current = false;
@@ -132,7 +145,6 @@ const CodPollingResults = () => {
           body: currentQuery,
         });
         const data: CodQueryStatusResponse = await resp.json();
-        console.log("Status zapytania:", data);
         setProgress(data.progress ?? 0);
         if (data.completed && data.alreadyQueried) {
           setQueryCompleted(true);
@@ -158,7 +170,7 @@ const CodPollingResults = () => {
       if (shouldStopPollingIds.current) {
         console.log("Zatrzymano odpytywanie /api/cod/id");
         await new Promise((resolve) => setTimeout(resolve, 4000));
-        setIsIdPollingComplete(true); // Ustawiamy stan po zakończeniu poolingu
+        setIsIdPollingComplete(true);
         return;
       }
 
@@ -205,7 +217,6 @@ const CodPollingResults = () => {
 
   // Fetch CIFs
   useEffect(() => {
-    // Wyzwalamy efekt, gdy codIds się zmienia lub gdy pooling /api/cod/id się zakończy
     if (codIds.size === 0 || isFetchingCif) return;
     console.log(
       "Rozpoczynam hook-a dla pobierania CIFs. Aktualne ID:",
@@ -275,7 +286,7 @@ const CodPollingResults = () => {
             return updated;
           });
 
-          await new Promise((res) => setTimeout(res, 2000)); // Opóźnienie między żądaniami
+          await new Promise((res) => setTimeout(res, 2000));
         } catch (err) {
           console.error(`Błąd w /api/cod/cif/${id}:`, err);
         } finally {
@@ -299,12 +310,14 @@ const CodPollingResults = () => {
         );
       }
     })();
-  }, [codIds, isIdPollingComplete]); // Dodajemy isIdPollingComplete jako zależność
+  }, [codIds, isIdPollingComplete]);
 
   if (queryCompleted && results.size === 0 && formula && !isFetchingCif) {
     return (
       <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded text-red-800">
-        ❗Nie znaleziono żadnych struktur w bazie COD dla podanej formuły.
+        ❗{" "}
+        {translations?.["cod_polling_no_results"] ||
+          "Nie znaleziono żadnych struktur w bazie COD dla podanej formuły."}
       </div>
     );
   }
@@ -332,7 +345,8 @@ const CodPollingResults = () => {
               <line x1="12" y1="8" x2="12" y2="12" />
               <line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
-            Nie udało się pobrać danych dla następujących COD ID:
+            {translations?.["cod_polling_failed_title"] ||
+              "Nie udało się pobrać danych dla następujących COD ID:"}
           </div>
           <ul className="list-disc list-inside ml-1">
             {Array.from(rejectedIds).map((id) => (
@@ -342,8 +356,8 @@ const CodPollingResults = () => {
             ))}
           </ul>
           <div className="mt-2">
-            Upewnij się, że podane identyfikatory są poprawne i publicznie
-            dostępne w bazie COD.
+            {translations?.["cod_polling_failed_hint"] ||
+              "Upewnij się, że podane identyfikatory są poprawne i publicznie dostępne w bazie COD."}
           </div>
         </div>
       )}
@@ -369,7 +383,8 @@ const CodPollingResults = () => {
               d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
             />
           </svg>
-          Pobieranie szczegółów struktur...
+          {translations?.["cod_polling_loading_details"] ||
+            "Pobieranie szczegółów struktur..."}
         </div>
       )}
 

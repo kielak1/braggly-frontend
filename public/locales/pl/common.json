@@ -154,5 +154,14 @@
   "cod_main_search_placeholder": "Wpisz nazwę związku lub numer COD ID...",
   "cod_main_search_button": "Szukaj",
   "cod_dashboard": "Baza danych krystalograficznych",
-  "dashboard": "Analiza danych z dyfrakcji rentgenowskiej (XRD)"
+  "dashboard": "Analiza danych z dyfrakcji rentgenowskiej (XRD)",
+  "cod_polling_loading_details": "Trwa pobieranie szczegółów struktury…",
+  "cod_polling_failed_hint": "Upewnij się, że podane identyfikatory są poprawne i publicznie dostępne w bazie COD.",
+  "cod_polling_space_group": "Grupa przestrzenna",
+  "cod_polling_volume": "Objętość",
+  "cod_polling_no_results": "Nie znaleziono żadnych struktur w bazie COD dla podanej formuły.",
+  "cod_polling_failed_title": "Nie udało się pobrać danych dla następujących ID COD:",
+  "cod_polling_author": "Autor",
+  "cod_polling_formula": "Wzór",
+  "cod_polling_year": "Rok"
 }

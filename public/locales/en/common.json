@@ -154,5 +154,14 @@
   "cod_main_search_placeholder": "Enter the name of the compound or the COD ID number...",
   "cod_main_search_button": "Search",
   "cod_dashboard": "Crystallographic database",
-  "dashboard": "Analysis of data from X-ray diffraction (XRD)"
+  "dashboard": "Analysis of data from X-ray diffraction (XRD)",
+  "cod_polling_loading_details": "Downloading structure details is in progress…",
+  "cod_polling_failed_hint": "Make sure that the provided identifiers are correct and publicly available in the COD database.",
+  "cod_polling_space_group": "Space group",
+  "cod_polling_volume": "Volume",
+  "cod_polling_no_results": "No structures were found in the COD database for the given formula.",
+  "cod_polling_failed_title": "Failed to retrieve data for the following COD IDs:",
+  "cod_polling_author": "Author",
+  "cod_polling_formula": "Pattern",
+  "cod_polling_year": "Year"
 }
