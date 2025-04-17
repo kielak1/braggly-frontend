@@ -163,5 +163,9 @@
   "cod_polling_failed_title": "Failed to retrieve data for the following COD IDs:",
   "cod_polling_author": "Author",
   "cod_polling_formula": "Pattern",
-  "cod_polling_year": "Year"
+  "cod_polling_year": "Year",
+  "cod_import_current_marker": "Refers to the current search.",
+  "cod_import_eta_pending": "estimation...",
+  "cod_import_eta_label": "remained",
+  "cod_import_active_list_title": "Ongoing imports from COD:"
 }

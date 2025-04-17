@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useCodSearch } from "@/context/CodContext";
+import { useTranslations } from "@/context/TranslationsContext";
 
 const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
 const POLL_INTERVAL_MS = 2500;
@@ -22,6 +23,7 @@ const extractElementSet = (input: string | null): Set<string> =>
   );
 
 const CodImportStatusList = () => {
+  const { translations } = useTranslations();
   const { formula, setIsBeingImported } = useCodSearch();
   const [activeImports, setActiveImports] = useState<ActiveImport[]>([]);
 
@@ -68,7 +70,7 @@ const CodImportStatusList = () => {
   return (
     <div className="bg-yellow-50 border border-yellow-300 p-4 rounded text-sm mt-4">
       <strong className="block mb-2 text-yellow-900">
-        Trwające importy z COD:
+        {translations?.["cod_import_active_list_title"] || "Trwające importy z COD:"}
       </strong>
 
       <ul className="space-y-1">
@@ -103,12 +105,13 @@ const CodImportStatusList = () => {
               >
                 <span>
                   {imp.formula}
-                  {isCurrent && " (dotyczy bieżącego wyszukiwania)"}
+                  {isCurrent &&
+                    ` (${translations?.["cod_import_current_marker"] || "dotyczy bieżącego wyszukiwania"})`}
                 </span>
                 <span className="text-gray-600 text-xs font-normal">
                   {imp.eta === "00:00:00"
-                    ? "szacowanie..."
-                    : `pozostało ${imp.eta}`}
+                    ? translations?.["cod_import_eta_pending"] || "szacowanie..."
+                    : `${translations?.["cod_import_eta_label"] || "pozostało"} ${imp.eta}`}
                 </span>
               </li>
             );

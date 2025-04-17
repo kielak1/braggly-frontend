@@ -163,5 +163,9 @@
   "cod_polling_failed_title": "No se pudo obtener datos para los siguientes ID de COD:",
   "cod_polling_author": "Autor",
   "cod_polling_formula": "Patrón",
-  "cod_polling_year": "Año"
+  "cod_polling_year": "Año",
+  "cod_import_current_marker": "Se refiere a la búsqueda actual.",
+  "cod_import_eta_pending": "estimación...",
+  "cod_import_eta_label": "quedó",
+  "cod_import_active_list_title": "Importaciones en curso desde COD:"
 }
