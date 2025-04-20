@@ -151,7 +151,7 @@
   "cod_main_missing_token": "Brak tokena w localStorage",
   "cod_main_too_few_elements": "Dla związków zawierających mniej niż 3 elementy, należy podać numer COD ID.",
   "cod_main_import_progress": "postęp",
-  "cod_main_search_placeholder": "Wpisz nazwę związku lub numer COD ID...",
+  "cod_main_search_placeholder": "Wpisz nazwę związku lub numer COD ID (np.1004000) ...",
   "cod_main_search_button": "Szukaj",
   "cod_dashboard": "Baza danych krystalograficznych",
   "dashboard": "Analiza danych z dyfrakcji rentgenowskiej (XRD)",

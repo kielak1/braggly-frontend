@@ -144,14 +144,12 @@
   "cod_element_count": "Number of elements",
   "cod_formula": "Recognized formula",
   "cod_search_button": "Search",
-  "cod_search_placeholder": "Enter the name of the substance or COD ID...",
   "cod_compound_name": "Recognized name",
   "cod_query_format": "Query format for the COD database",
   "cod_import_progress": "Progress of the import process",
   "cod_main_missing_token": "No token in localStorage",
   "cod_main_too_few_elements": "For compounds containing less than 3 elements, the COD ID number should be provided.",
   "cod_main_import_progress": "progress",
-  "cod_main_search_placeholder": "Enter the name of the compound or the COD ID number...",
   "cod_main_search_button": "Search",
   "cod_dashboard": "Crystallographic database",
   "dashboard": "Analysis of data from X-ray diffraction (XRD)",
@@ -167,5 +165,6 @@
   "cod_import_current_marker": "Refers to the current search.",
   "cod_import_eta_pending": "estimation...",
   "cod_import_eta_label": "remained",
-  "cod_import_active_list_title": "Ongoing imports from COD:"
+  "cod_import_active_list_title": "Ongoing imports from COD:",
+  "cod_main_search_placeholder": "Enter the name of the compound or COD ID number (e.g. 1004000) ..."
 }

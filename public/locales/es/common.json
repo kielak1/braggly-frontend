@@ -143,14 +143,12 @@
   "cod_element_count": "Número de elementos",
   "cod_formula": "Fórmula reconocida",
   "cod_search_button": "Buscar",
-  "cod_search_placeholder": "Introduce el nombre de la sustancia o el ID COD...",
   "cod_compound_name": "Nombre reconocido",
   "cod_query_format": "Formato de consulta para la base de datos COD",
   "cod_import_progress": "Progreso del proceso de importación",
   "cod_main_missing_token": "Falta token en localStorage",
   "cod_main_too_few_elements": "Para compuestos que contienen menos de 3 elementos, se debe proporcionar el número de COD ID.",
   "cod_main_import_progress": "progreso",
-  "cod_main_search_placeholder": "Ingrese el nombre del compuesto o el número de COD ID...",
   "panel": "Panel de Usuario",
   "cod_main_search_button": "Buscar",
   "cod_dashboard": "Base de datos cristalográficos",
@@ -167,5 +165,6 @@
   "cod_import_current_marker": "Se refiere a la búsqueda actual.",
   "cod_import_eta_pending": "estimación...",
   "cod_import_eta_label": "quedó",
-  "cod_import_active_list_title": "Importaciones en curso desde COD:"
+  "cod_import_active_list_title": "Importaciones en curso desde COD:",
+  "cod_main_search_placeholder": "Ingrese el nombre del compuesto o el número de COD ID (por ejemplo, 1004000) ..."
 }
