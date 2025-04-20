@@ -5,7 +5,7 @@ import { useCodSearch } from "@/context/CodContext";
 import { useTranslations } from "@/context/TranslationsContext";
 
 const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
-const POLL_IDS_INTERVAL = process.env.NODE_ENV === "development" ? 2000 : 500;
+const POLL_IDS_INTERVAL = 500;
 
 interface CodCifData {
   codId: string;
@@ -150,7 +150,7 @@ const CodPollingResults = () => {
           setQueryCompleted(true);
           return;
         }
-        if (!stopped) setTimeout(pollStatus, 1000);
+        if (!stopped) setTimeout(pollStatus, 500);
       } catch (err) {
         console.error("Błąd w /api/cod/search:", err);
       }
@@ -286,7 +286,7 @@ const CodPollingResults = () => {
             return updated;
           });
 
-          await new Promise((res) => setTimeout(res, 2000));
+          await new Promise((res) => setTimeout(res, 500));
         } catch (err) {
           console.error(`Błąd w /api/cod/cif/${id}:`, err);
         } finally {
