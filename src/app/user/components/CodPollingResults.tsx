@@ -279,7 +279,14 @@ const CodPollingResults = () => {
           const cif = await resp.json();
           const full = { ...cif, codId: id };
           console.log(`Pobrano /api/cod/cif/${id}:`, full);
-
+          
+          if (Array.isArray(cif.atoms)) {
+            console.log(`[DEBUG] Atomy dla ${id}:`);
+            cif.atoms.forEach((atom: any, index: number) => {
+              console.log(`#${index}:`, atom);
+            });
+          }
+          
           setResults((prev) => {
             const updated = new Map(prev);
             updated.set(id, full);
