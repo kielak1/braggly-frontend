@@ -241,7 +241,7 @@ const CodAccordion = ({
             viewer.addCylinder({
               start: { x: atom1.x, y: atom1.y, z: atom1.z },
               end: { x: atom2.x, y: atom2.y, z: atom2.z },
-              radius: 0.3, // Grubość wiązania
+              radius: 0.07, // Grubość wiązania
               color: "green",
             });
             bondsAdded++;
