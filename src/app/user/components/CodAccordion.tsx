@@ -6,9 +6,25 @@ import type { CodCifData } from "./CodPollingResults";
 
 // Deklaracja typu dla GLViewer
 interface GLViewer {
-  addSphere: (spec: { center: { x: number; y: number; z: number }; radius: number; color: string }) => void;
-  addCylinder: (spec: { start: { x: number; y: number; z: number }; end: { x: number; y: number; z: number }; radius: number; color: string }) => void;
-  addLabel: (text: string, options: { position: { x: number; y: number; z: number }; fontColor: string; fontSize: number }) => void;
+  addSphere: (spec: {
+    center: { x: number; y: number; z: number };
+    radius: number;
+    color: string;
+  }) => void;
+  addCylinder: (spec: {
+    start: { x: number; y: number; z: number };
+    end: { x: number; y: number; z: number };
+    radius: number;
+    color: string;
+  }) => void;
+  addLabel: (
+    text: string,
+    options: {
+      position: { x: number; y: number; z: number };
+      fontColor: string;
+      fontSize: number;
+    }
+  ) => void;
   zoomTo: () => void;
   render: () => void;
   clear: () => void;
@@ -50,9 +66,9 @@ const CodAccordion = ({
   // Mapowanie kolorów i promieni atomów (zgodnie z CPK i promieniami van der Waalsa)
   const atomStyles: { [key: string]: { color: string; radius: number } } = {
     H: { color: "white", radius: 1.2 }, // Wodór
-    C: { color: "gray", radius: 1.7 },  // Węgiel
+    C: { color: "gray", radius: 1.7 }, // Węgiel
     N: { color: "blue", radius: 1.55 }, // Azot
-    O: { color: "red", radius: 1.52 },  // Tlen
+    O: { color: "red", radius: 1.52 }, // Tlen
     S: { color: "yellow", radius: 1.8 }, // Siarka
     P: { color: "orange", radius: 1.8 }, // Fosfor
     default: { color: "pink", radius: 1.5 }, // Domyślne dla nieznanych atomów
@@ -122,7 +138,8 @@ const CodAccordion = ({
     if (!$3Dmol) {
       console.error("3Dmol.js nie jest załadowany mimo prób ładowania.");
       setViewerError(
-        translations?.["3dmol_load_failed"] || "Nie udało się załadować 3Dmol.js."
+        translations?.["3dmol_load_failed"] ||
+          "Nie udało się załadować 3Dmol.js."
       );
       return;
     }
@@ -168,7 +185,11 @@ const CodAccordion = ({
       }
 
       console.log("Zwrócony obiekt viewer:", viewer);
-      if (!viewer || typeof viewer.addSphere !== "function" || typeof viewer.addCylinder !== "function") {
+      if (
+        !viewer ||
+        typeof viewer.addSphere !== "function" ||
+        typeof viewer.addCylinder !== "function"
+      ) {
         console.error(
           "[3Dmol.js] createViewer zwrócił niepoprawny obiekt:",
           viewer
@@ -193,7 +214,13 @@ const CodAccordion = ({
       console.log("Przetwarzane atomy:", atoms);
 
       // Lista atomów z ich pozycjami (do późniejszego obliczania wiązań)
-      const atomPositions: { x: number; y: number; z: number; element: string; radius: number }[] = [];
+      const atomPositions: {
+        x: number;
+        y: number;
+        z: number;
+        element: string;
+        radius: number;
+      }[] = [];
 
       // Skalowanie współrzędnych
       const scaleFactor = 5.0; // Zmniejszamy skalę, aby sprawdzić, czy to pomaga
@@ -206,7 +233,9 @@ const CodAccordion = ({
           continue;
         }
 
-        console.log(`Dodawanie atomu ${atom.element} na pozycji: x=${x}, y=${y}, z=${z}`);
+        console.log(
+          `Dodawanie atomu ${atom.element} na pozycji: x=${x}, y=${y}, z=${z}`
+        );
 
         const style = atomStyles[atom.element] || atomStyles.default;
         viewer.addSphere({
@@ -215,7 +244,13 @@ const CodAccordion = ({
           color: style.color,
         });
 
-        atomPositions.push({ x, y, z, element: atom.element, radius: style.radius });
+        atomPositions.push({
+          x,
+          y,
+          z,
+          element: atom.element,
+          radius: style.radius,
+        });
       }
 
       // Obliczanie i dodawanie wiązań
@@ -235,7 +270,9 @@ const CodAccordion = ({
           // Maksymalna odległość wiązania = suma promieni + tolerancja
           const maxBondDistance = (atom1.radius + atom2.radius) * bondTolerance;
 
-          console.log(`Odległość między atomami ${i} (${atom1.element}) i ${j} (${atom2.element}): ${distance}, maxBondDistance: ${maxBondDistance}`);
+          console.log(
+            `Odległość między atomami ${i} (${atom1.element}) i ${j} (${atom2.element}): ${distance}, maxBondDistance: ${maxBondDistance}`
+          );
 
           if (distance < maxBondDistance && distance > 0) {
             viewer.addCylinder({
@@ -252,14 +289,41 @@ const CodAccordion = ({
 
       // Dodanie osi krystalograficznych
       const axisLength = 20;
-      viewer.addCylinder({ start: { x: 0, y: 0, z: 0 }, end: { x: axisLength, y: 0, z: 0 }, radius: 0.1, color: "red" }); // Oś a
-      viewer.addCylinder({ start: { x: 0, y: 0, z: 0 }, end: { x: 0, y: axisLength, z: 0 }, radius: 0.1, color: "green" }); // Oś b
-      viewer.addCylinder({ start: { x: 0, y: 0, z: 0 }, end: { x: 0, y: 0, z: axisLength }, radius: 0.1, color: "blue" }); // Oś c
+      viewer.addCylinder({
+        start: { x: 0, y: 0, z: 0 },
+        end: { x: axisLength, y: 0, z: 0 },
+        radius: 0.1,
+        color: "red",
+      }); // Oś a
+      viewer.addCylinder({
+        start: { x: 0, y: 0, z: 0 },
+        end: { x: 0, y: axisLength, z: 0 },
+        radius: 0.1,
+        color: "green",
+      }); // Oś b
+      viewer.addCylinder({
+        start: { x: 0, y: 0, z: 0 },
+        end: { x: 0, y: 0, z: axisLength },
+        radius: 0.1,
+        color: "blue",
+      }); // Oś c
 
       // Dodanie etykiet do osi
-      viewer.addLabel("a", { position: { x: axisLength + 2, y: 0, z: 0 }, fontColor: "red", fontSize: 12 });
-      viewer.addLabel("b", { position: { x: 0, y: axisLength + 2, z: 0 }, fontColor: "green", fontSize: 12 });
-      viewer.addLabel("c", { position: { x: 0, y: 0, z: axisLength + 2 }, fontColor: "blue", fontSize: 12 });
+      viewer.addLabel("a", {
+        position: { x: axisLength + 2, y: 0, z: 0 },
+        fontColor: "red",
+        fontSize: 12,
+      });
+      viewer.addLabel("b", {
+        position: { x: 0, y: axisLength + 2, z: 0 },
+        fontColor: "green",
+        fontSize: 12,
+      });
+      viewer.addLabel("c", {
+        position: { x: 0, y: 0, z: axisLength + 2 },
+        fontColor: "blue",
+        fontSize: 12,
+      });
 
       // Ustawienie widoku kamery
       viewer.zoomTo();
@@ -358,8 +422,7 @@ const CodAccordion = ({
               <div
                 ref={viewerRef}
                 id={`molviewer-${data.codId}`}
-                className="w-full h-64 border mt-4"
-                style={{ position: "relative" }}
+                className="relative w-full aspect-square border mt-4"
               />
             )}
           </div>
