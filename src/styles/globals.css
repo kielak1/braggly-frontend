@@ -809,6 +809,10 @@ video {
   height: 300px;
 }
 
+.h-\[32rem\] {
+  height: 32rem;
+}
+
 .h-\[450px\] {
   height: 450px;
 }
