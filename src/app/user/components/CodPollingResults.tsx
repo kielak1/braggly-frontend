@@ -1,11 +1,11 @@
+// CodPollingResults.tsx
+
 "use client";
 
 import { useEffect, useState, useRef } from "react";
 import { useCodSearch } from "@/context/CodContext";
 import { useTranslations } from "@/context/TranslationsContext";
-
-const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
-const POLL_IDS_INTERVAL = 500;
+import CodAccordion from "./CodAccordion";
 
 interface CodCifData {
   codId: string;
@@ -18,8 +18,15 @@ interface CodCifData {
   b: string;
   c: string;
   volume: string;
+  atoms?: {
+    element: string;
+    x: string;
+    y: string;
+    z: string;
+    label?: string;
+  }[];
 }
-
+export type { CodCifData };
 interface CodQueryStatusResponse {
   alreadyQueried: boolean;
   queryRunning: boolean;
@@ -28,72 +35,12 @@ interface CodQueryStatusResponse {
   progress: number;
 }
 
-const CodAccordion = ({
-  data,
-  expanded,
-  onToggle,
-}: {
-  data: CodCifData;
-  expanded: string | null;
-  onToggle: (id: string) => void;
-}) => {
-  const { translations } = useTranslations();
-
-  return (
-    <div key={data.codId} className="border rounded overflow-hidden">
-      <button
-        onClick={() => onToggle(data.codId)}
-        className="w-full text-left px-4 py-2 bg-gray-100 font-semibold"
-      >
-        COD ID: {data.codId} {data.name ? `– ${data.name}` : " – ?"}
-      </button>
-
-      {expanded === data.codId && (
-        <div className="grid grid-cols-2 gap-4 p-4 text-sm bg-white">
-          <div>
-            <strong>{translations?.["cod_polling_formula"] || "Wzór"}:</strong>{" "}
-            {data.formula}
-          </div>
-          <div>
-            <strong>
-              {translations?.["cod_polling_space_group"] ||
-                "Grupa przestrzenna"}
-              :
-            </strong>{" "}
-            {data.spaceGroup}
-          </div>
-          <div>
-            <strong>{translations?.["cod_polling_author"] || "Autor"}:</strong>{" "}
-            {data.author}
-          </div>
-          <div>
-            <strong>{translations?.["cod_polling_year"] || "Rok"}:</strong>{" "}
-            {data.year}
-          </div>
-          <div>
-            <strong>a:</strong> {data.a}
-          </div>
-          <div>
-            <strong>b:</strong> {data.b}
-          </div>
-          <div>
-            <strong>c:</strong> {data.c}
-          </div>
-          <div>
-            <strong>
-              {translations?.["cod_polling_volume"] || "Objętość"}:
-            </strong>{" "}
-            {data.volume}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
+const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
+const POLL_IDS_INTERVAL = 500;
 
 const CodPollingResults = () => {
   const { formula, currentQuery, codId } = useCodSearch();
-  const { translations } = useTranslations(); // Added useTranslations hook
+  const { translations } = useTranslations();
 
   const [codIds, setCodIds] = useState<Set<string>>(new Set());
   const [results, setResults] = useState<Map<string, CodCifData>>(new Map());
@@ -129,11 +76,9 @@ const CodPollingResults = () => {
     }
   }, [codId, codIds]);
 
-  // Poll /api/cod/search
   useEffect(() => {
     if (!currentQuery) return;
     let stopped = false;
-
     const pollStatus = async () => {
       try {
         const resp = await fetch(`${API_BASE}/api/cod/search`, {
@@ -161,7 +106,6 @@ const CodPollingResults = () => {
     };
   }, [currentQuery]);
 
-  // Poll /api/cod/id
   useEffect(() => {
     if (!formula) return;
     let stopped = false;
@@ -215,13 +159,13 @@ const CodPollingResults = () => {
     };
   }, [formula, queryCompleted]);
 
-  // Fetch CIFs
   useEffect(() => {
     if (codIds.size === 0 || isFetchingCif) return;
     console.log(
       "Rozpoczynam hook-a dla pobierania CIFs. Aktualne ID:",
       Array.from(codIds)
     );
+
     const idsToFetch = Array.from(codIds).filter(
       (id) =>
         !results.has(id) &&
@@ -231,15 +175,11 @@ const CodPollingResults = () => {
     );
 
     if (idsToFetch.length === 0) {
-      if (!isFetchingCif) {
-        setIsFetchingCif(false);
-      }
+      if (!isFetchingCif) setIsFetchingCif(false);
       return;
     }
 
-    if (!isFetchingCif) {
-      setIsFetchingCif(true);
-    }
+    if (!isFetchingCif) setIsFetchingCif(true);
 
     (async () => {
       for (const id of idsToFetch) {
@@ -258,9 +198,6 @@ const CodPollingResults = () => {
         lastProcessed.current.add(id);
 
         try {
-          console.log(
-            `Attempting to download CIF file with key: cif/${id}.cif`
-          );
           const resp = await fetch(`${API_BASE}/api/cod/cif/${id}`, {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -278,15 +215,11 @@ const CodPollingResults = () => {
 
           const cif = await resp.json();
           const full = { ...cif, codId: id };
-          console.log(`Pobrano /api/cod/cif/${id}:`, full);
-          
+
           if (Array.isArray(cif.atoms)) {
-            console.log(`[DEBUG] Atomy dla ${id}:`);
-            cif.atoms.forEach((atom: any, index: number) => {
-              console.log(`#${index}:`, atom);
-            });
+            console.log(`[DEBUG] Atomy dla ${id}:`, cif.atoms);
           }
-          
+
           setResults((prev) => {
             const updated = new Map(prev);
             updated.set(id, full);
@@ -312,9 +245,7 @@ const CodPollingResults = () => {
       if (remainingIdsToFetch.length === 0) {
         setIsFetchingCif(false);
       } else {
-        console.log(
-          `Pozostały ID do przetworzenia: ${remainingIdsToFetch}, kontynuujemy fetchowanie`
-        );
+        console.log(`Pozostały ID do przetworzenia: ${remainingIdsToFetch}`);
       }
     })();
   }, [codIds, isIdPollingComplete]);

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "@/context/TranslationsContext";
 import CodImportStatusList from "@/user/components/CodImportStatusList";
 import CodPollingResults from "@/user/components/CodPollingResults";
+import ThreeDmolLoader from "@/user/components/ThreeDmolLoader";
 import { useCodSearch } from "@/context/CodContext";
 
 const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -168,7 +169,7 @@ const CODDashboard = () => {
           ) || `Postęp importu z bazy COD: ${progress}%`}
         </div>
       )}
-
+      <ThreeDmolLoader />
       <CodPollingResults />
     </div>
   );
