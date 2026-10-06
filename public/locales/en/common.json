@@ -166,5 +166,14 @@
   "cod_import_eta_pending": "estimation...",
   "cod_import_eta_label": "remained",
   "cod_import_active_list_title": "Ongoing imports from COD:",
-  "cod_main_search_placeholder": "Enter the name of the compound or COD ID number (e.g. 1004000) ..."
+  "cod_main_search_placeholder": "Enter the name of the compound or COD ID number (e.g. 1004000) ...",
+  "cod_request_failed": "The import failed.",
+  "cod_request_busy": "The server is busy and has reached its concurrent operation limit. Please try again later.",
+  "cod_request_auth": "Cannot access the data. Please sign in again or check your permissions.",
+  "cod_request_request": "Could not retrieve the data. Please try again later.",
+  "cod_request_cif": "Some structures could not be retrieved.",
+  "cod_retry_button": "Try again",
+  "cod_retry_wait": "Please wait before retrying, as requested by the server.",
+  "cod_polling_searching": "Searching for structures...",
+  "cod_polling_progress": "Progress: {progress}%"
 }

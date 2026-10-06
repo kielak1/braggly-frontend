@@ -167,5 +167,14 @@
   "cod_import_current_marker": "Dotyczy aktualnego wyszukiwania.",
   "cod_import_eta_pending": "estymacja...",
   "cod_import_eta_label": "zostało",
-  "cod_import_active_list_title": "Trwające importy z COD:"
+  "cod_import_active_list_title": "Trwające importy z COD:",
+  "cod_request_failed": "Import nie powiódł się.",
+  "cod_request_busy": "Serwer jest zajęty i osiągnął limit równoległych operacji. Spróbuj ponownie później.",
+  "cod_request_auth": "Nie można uzyskać dostępu do danych. Zaloguj się ponownie lub sprawdź uprawnienia.",
+  "cod_request_request": "Nie udało się pobrać danych. Spróbuj ponownie później.",
+  "cod_request_cif": "Nie udało się pobrać części struktur.",
+  "cod_retry_button": "Spróbuj ponownie",
+  "cod_retry_wait": "Serwer zaleca odczekanie przed ponowieniem.",
+  "cod_polling_searching": "Trwa wyszukiwanie struktur...",
+  "cod_polling_progress": "Postęp: {progress}%"
 }

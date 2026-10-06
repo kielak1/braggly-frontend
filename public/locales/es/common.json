@@ -166,5 +166,14 @@
   "cod_import_eta_pending": "estimación...",
   "cod_import_eta_label": "quedó",
   "cod_import_active_list_title": "Importaciones en curso desde COD:",
-  "cod_main_search_placeholder": "Ingrese el nombre del compuesto o el número de COD ID (por ejemplo, 1004000) ..."
+  "cod_main_search_placeholder": "Ingrese el nombre del compuesto o el número de COD ID (por ejemplo, 1004000) ...",
+  "cod_request_failed": "La importación ha fallado.",
+  "cod_request_busy": "El servidor está ocupado y ha alcanzado su límite de operaciones simultáneas. Inténtalo más tarde.",
+  "cod_request_auth": "No se puede acceder a los datos. Inicia sesión de nuevo o comprueba tus permisos.",
+  "cod_request_request": "No se pudieron obtener los datos. Inténtalo más tarde.",
+  "cod_request_cif": "No se pudieron obtener algunas estructuras.",
+  "cod_retry_button": "Intentar de nuevo",
+  "cod_retry_wait": "Espera antes de volver a intentarlo, según lo indicado por el servidor.",
+  "cod_polling_searching": "Buscando estructuras...",
+  "cod_polling_progress": "Progreso: {progress}%"
 }
