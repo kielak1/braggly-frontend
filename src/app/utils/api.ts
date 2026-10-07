@@ -242,7 +242,6 @@ export const quickAnalysisXrdFile = async (file: File): Promise<any> => {
     console.error("Błąd autoryzacji:", error);
     throw error;
   }
-  console.info("authHeader: ", authHeaders);
   const response = await fetch("/api/xrd/analyze", {
     method: "POST",
     headers: authHeaders, // Tylko Authorization, Content-Type ustawi się automatycznie
