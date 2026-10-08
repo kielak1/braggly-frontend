@@ -7,7 +7,7 @@ import {
   fetchRestrictedPaths,
 } from "@/utils/api";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
   //  console.log("middleware:", token);
   if (!token) {
