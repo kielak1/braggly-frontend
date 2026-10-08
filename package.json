@@ -40,7 +40,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@types/react": "19.0.10",
-    "eslint": "^9.21.0",
+    "eslint": "9.39.5",
     "eslint-config-next": "16.3.8",
     "eslint-config-prettier": "^10.0.2",
     "eslint-plugin-prettier": "^5.2.3",
@@ -60,6 +60,11 @@
     "minimatch@3": "3.1.5",
     "picomatch@4": "4.0.7",
     "path-to-regexp@6": "6.3.0",
-    "undici@6": "6.29.0"
+    "undici@6": "6.29.0",
+    "ajv@6": "6.15.0",
+    "@humanfs/node@0.16": "0.16.8",
+    "postcss-selector-parser@6": "6.1.4",
+    "yaml@2": "2.9.1",
+    "qs@6": "6.16.0"
   }
 }
